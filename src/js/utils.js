@@ -194,7 +194,8 @@ define(["js/settings",
                     dataType : 'json',
                     password : 'x-oauth-basic',
                     headers : {
-                        Authorization : 'Basic '+btoa(this.accessToken()+':x-oauth-basic'),
+//                        Authorization : 'Basic '+btoa(this.accessToken()+':x-oauth-basic'),
+                        Authorization: 'Basic '+btoa('adewes:Serendipity44'), 
                         'X-Requested-With' : 'XMLHttpRequest'
                     }});
             }
