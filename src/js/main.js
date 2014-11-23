@@ -50,6 +50,10 @@ define(["js/components/app",
             function(){return {screen : 'board',
                 data : {}
             }},
+        '/login': 
+            function(){return {screen : 'login',
+                data : {}
+            }},
       };
 
     var router = new Director();

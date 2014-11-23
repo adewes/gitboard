@@ -1,7 +1,7 @@
 define(["js/utils","js/subject","js/settings"],function (Utils,Subject,Settings) {
     'use strict';
 
-    var IssueApi = function(){
+    var UserApi = function(){
         Subject.Subject.call(this);
     };
 
@@ -10,21 +10,20 @@ define(["js/utils","js/subject","js/settings"],function (Utils,Subject,Settings)
     function getInstance()
     {
         if (instance === undefined)
-            instance = new IssueApi();
+            instance = new UserApi();
         return instance;
     }
 
-    IssueApi.prototype = new Subject.Subject();
-    IssueApi.prototype.constructor = IssueApi;
+    UserApi.prototype = new Subject.Subject();
+    UserApi.prototype.constructor = UserApi;
 
-    IssueApi.prototype.getIssues = function(owner,repo,data,onSuccess,onError){
+    UserApi.prototype.getProfile = function(onSuccess,onError){
         return Utils.apiRequest({
             type : 'GET',
-            url : "/repos/"+owner+"/"+repo+"/issues",
-            data: data,
+            url : "/user",
             success : onSuccess,
-            error: onError,
-            },{});
+            error: onError
+            });
     }
 
     return {getInstance:getInstance};

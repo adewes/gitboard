@@ -187,17 +187,21 @@ define(["js/settings",
 
             if (authenticated)
             {
+                var headers = {
+                        'X-Requested-With' : 'XMLHttpRequest'
+                    };
+                if (opts.login && opts.password)
+                    headers['Authorization'] = 'Basic '+btoa(opts.login+':'+opts.password);
+                else if (this.accessToken() !== undefined)
+                    headers['Authorization'] = 'Basic '+btoa(this.accessToken()+':x-oauth-basic')
+                if (opts.otp !== undefined)
+                    headers['X-Github-OTP'] = opts.otp;
                 //If this is an authenticated request, we add the authorization header
                 fullData = $.extend($.extend({},data),{
                     url : settings.source+data['url'],
-                    username : this.accessToken(),
                     dataType : 'json',
-                    password : 'x-oauth-basic',
-                    headers : {
-//                        Authorization : 'Basic '+btoa(this.accessToken()+':x-oauth-basic'),
-                        Authorization: 'Basic '+btoa('adewes:Serendipity44'), 
-                        'X-Requested-With' : 'XMLHttpRequest'
-                    }});
+                    headers : headers
+                    });
             }
             else{
                 fullData = $.extend($.extend({},data),{ 
@@ -284,6 +288,7 @@ define(["js/settings",
                     var cachedData = this.getFromCache(url);
                     if (cachedData !== undefined && cachedData[0] !== undefined){
                         fullData['ifModified'] = true;
+                        console.log("Adding if modified header...");
                         if (originalOnSuccess !== undefined){
                             originalOnSuccess($.extend($.extend({},cachedData[0]),{'__requestId__' : requestId,'__cached__' : true}));
                             if (cachedData[1]+settings.cacheRefreshLimit*1000 > (new Date()).getTime()){
@@ -315,7 +320,7 @@ define(["js/settings",
             }
 
             requestData[requestId] = {data : fullData, opts : opts};
-
+            console.log(fullData);
             $.ajax(fullData);
 
             return requestId;

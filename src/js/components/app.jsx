@@ -10,15 +10,19 @@
 define(["react",
         "js/utils",
         "js/components/header",
+        "js/components/menu",
+        "js/components/sprint/board",
+        "js/components/user/login",
         "js/flash_messages",
-        "js/api/github/issue",
         "jquery"
         ],
         function (React,
                   Utils,
                   Header,
+                  Menu,
+                  SprintBoard,
+                  Login,
                   FlashMessagesService,
-                  IssueApi,
                   $
                   )
         {
@@ -38,20 +42,12 @@ define(["react",
 
         componentWillMount : function(){
             this.flashMessagesService = FlashMessagesService.getInstance();
-            this.issueApi = IssueApi.getInstance();
         },
 
         componentDidMount : function(){
-
-            var onSuccess = function(data){
-                console.log(data);
-            }.bind(this);
-
-            this.issueApi.getIssues(onSuccess);
     
-            this.flashMessagesService.postMessage({type : "info",description :"hello, world!"});
             if (Utils.isLoggedIn()){
-                $(".navbar-brand").attr("href", "/app#/projects");
+                $(".navbar-brand").attr("href", "#/projects");
             }
 
             var bodyIsTool = $("body").hasClass("app");
@@ -71,15 +67,22 @@ define(["react",
             baseUrl   : the base URL for the given component
             */
 
-            var header = <Header user={this.state.user}
-                                 params={this.props.params}
+            var header = <Header params={this.props.params}
                                  data={this.props.data}
-                                 app={this}/>;
+                                 app={this} />;
             React.renderComponent(header,
               document.getElementById('header')
             );
 
-            var projects = function(screen) {
+            var menu = <Menu params={this.props.params}
+                             data={this.props.data}
+                             app={this} />;
+            React.renderComponent(menu,
+              document.getElementById('menu')
+            );
+
+
+            var dashboard = function(screen) {
                 if (Utils.isLoggedIn())
                     return React.DOM.div;
                 return React.DOM.div;
@@ -89,8 +92,16 @@ define(["react",
 
             var screens = {
                 '_default' : {
-                    callback : projects
-                }
+                    callback : dashboard
+                },
+                'login' : {
+                    component : Login,
+                    baseUrl : "#/login",
+                    },
+                'board' : {
+                    component : SprintBoard,
+                    baseUrl : "#/board",
+                    },
             };
 
 
