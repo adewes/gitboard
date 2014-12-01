@@ -32,17 +32,17 @@ define(["react",
                         params : ['quantifiedcode','webapp',{per_page : 100}],
                         mapping : {
                             'issues' : undefined,
-                        }
+                        },
+                        success : function(data,xhr){
+                            console.log(data);
+                        },
                     }
                 ];
             },
 
-            silentLoading : true,
-            displayName: 'Menu',
+            displayName: 'SprintBoard',
 
             render: function () {
-
-                console.log(this.state);
 
                 return <div className="container">
                     <div className="row">

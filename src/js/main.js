@@ -46,9 +46,17 @@ define(["js/components/app",
     var routes = {
         '' : 
             function(){return {screen : 'index',data : {}}},
-        '/board': 
-            function(){return {screen : 'board',
+        '/sprintboard/:repositoryId/:milestoneId': 
+            function(repositoryId,milestoneId){return {screen : 'sprintboard',
+                data : {repositoryId : repositoryId,milestoneId : milestoneId}
+            }},
+        '/repositories': 
+            function(){return {screen : 'repositories',
                 data : {}
+            }},
+        '/milestones/:repositoryId': 
+            function(repositoryId){return {screen : 'milestones',
+                data : {repositoryId : repositoryId}
             }},
         '/login': 
             function(){return {screen : 'login',
@@ -59,6 +67,8 @@ define(["js/components/app",
     var router = new Director();
 
     router.configure({notfound : function(url){Utils.redirectTo("#/");},strict : false });
+    router.param('repositoryId', /([\w\d\-\:\.]+)/);
+    router.param('milestoneId', /([\w\d\-\:\.]+)/);
 
     //We add URL-style parameters to all routes by decorating the original handler function.
     var routesWithParams = {};

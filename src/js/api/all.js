@@ -1,9 +1,13 @@
 define(["js/api/github/authorization",
         "js/api/github/user",
         "js/api/github/issue",
+        "js/api/github/repository",
+        "js/api/github/milestone",
         ],function (AuthorizationApi,
                     UserApi,
-                    IssueApi
+                    IssueApi,
+                    RepositoryApi,
+                    MilestoneApi
                     ) {
     'use strict';
 
@@ -11,5 +15,7 @@ define(["js/api/github/authorization",
         authorization : AuthorizationApi.getInstance(),
         user : UserApi.getInstance(),
         issue : IssueApi.getInstance(),
+        repository : RepositoryApi.getInstance(),
+        milestone : MilestoneApi.getInstance()
     };
 });

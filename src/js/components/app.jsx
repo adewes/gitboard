@@ -11,7 +11,10 @@ define(["react",
         "js/utils",
         "js/components/header",
         "js/components/menu",
-        "js/components/sprint/board",
+        "js/components/mixins/loader",
+        "js/components/sprintboard",
+        "js/components/milestones",
+        "js/components/repositories",
         "js/components/user/login",
         "js/flash_messages",
         "jquery"
@@ -20,7 +23,10 @@ define(["react",
                   Utils,
                   Header,
                   Menu,
+                  LoaderMixin,
                   SprintBoard,
+                  Milestones,
+                  Repositories,
                   Login,
                   FlashMessagesService,
                   $
@@ -30,14 +36,31 @@ define(["react",
 
         var MainApp = React.createClass({
 
+        mixins : [LoaderMixin],
+
         displayName: 'MainApp',
 
-        getInitialState: function () {
-            return {params: {}};
-        },
-
-        getDefaultProps : function (){
-            return {data : undefined};
+        resources : function(props,state){
+            var r = [
+                    {
+                        name : 'user',
+                        endpoint : this.apis.user.getProfile,
+                        success : function(data,xhr){
+                            this.setState({user : data});
+                        }.bind(this)
+                    },
+                ];
+            if (props.data.repositoryId !== undefined && state.user !== undefined){
+                r.push({
+                        name : 'repository',
+                        params : [state.user.login,props.data.repositoryId,{}],
+                        endpoint : this.apis.repository.getDetails,
+                        success : function(data,xhr){
+                            this.setState({repository : data});
+                        }.bind(this)
+                    })
+            }
+            return r;
         },
 
         componentWillMount : function(){
@@ -47,7 +70,7 @@ define(["react",
         componentDidMount : function(){
     
             if (Utils.isLoggedIn()){
-                $(".navbar-brand").attr("href", "#/projects");
+                $(".navbar-brand").attr("href", "#/repositories");
             }
 
             var bodyIsTool = $("body").hasClass("app");
@@ -69,6 +92,7 @@ define(["react",
 
             var header = <Header params={this.props.params}
                                  data={this.props.data}
+                                 repository={this.state.repository}
                                  app={this} />;
             React.renderComponent(header,
               document.getElementById('header')
@@ -76,6 +100,8 @@ define(["react",
 
             var menu = <Menu params={this.props.params}
                              data={this.props.data}
+                             user={this.state.user}
+                             repository={this.state.repository}
                              app={this} />;
             React.renderComponent(menu,
               document.getElementById('menu')
@@ -98,9 +124,17 @@ define(["react",
                     component : Login,
                     baseUrl : "#/login",
                     },
-                'board' : {
+                'sprintboard' : {
                     component : SprintBoard,
-                    baseUrl : "#/board",
+                    baseUrl : "#/sprintboard/"+props.data.repositoryId+'/'+props.data.milestoneId,
+                    },
+                'repositories' : {
+                    component : Repositories,
+                    baseUrl : "#/repositories",
+                    },
+                'milestones' : {
+                    component : Milestones,
+                    baseUrl : "#/milestones/"+props.data.repositoryId,
                     },
             };
 
@@ -118,6 +152,8 @@ define(["react",
                 app={this}
                 baseUrl={screen.baseUrl}
                 data={propsData}
+                user={this.state.user}
+                repository={this.state.repository}
                 params={props.params}/>;
         }
     });
