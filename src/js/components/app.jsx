@@ -15,6 +15,7 @@ define(["react",
         "js/components/sprintboard",
         "js/components/milestones",
         "js/components/repositories",
+        "js/components/organizations",
         "js/components/user/login",
         "js/flash_messages",
         "jquery"
@@ -27,6 +28,7 @@ define(["react",
                   SprintBoard,
                   Milestones,
                   Repositories,
+                  Organizations,
                   Login,
                   FlashMessagesService,
                   $
@@ -36,32 +38,7 @@ define(["react",
 
         var MainApp = React.createClass({
 
-        mixins : [LoaderMixin],
-
         displayName: 'MainApp',
-
-        resources : function(props,state){
-            var r = [
-                    {
-                        name : 'user',
-                        endpoint : this.apis.user.getProfile,
-                        success : function(data,xhr){
-                            this.setState({user : data});
-                        }.bind(this)
-                    },
-                ];
-            if (props.data.repositoryId !== undefined && state.user !== undefined){
-                r.push({
-                        name : 'repository',
-                        params : [state.user.login,props.data.repositoryId,{}],
-                        endpoint : this.apis.repository.getDetails,
-                        success : function(data,xhr){
-                            this.setState({repository : data});
-                        }.bind(this)
-                    })
-            }
-            return r;
-        },
 
         componentWillMount : function(){
             this.flashMessagesService = FlashMessagesService.getInstance();
@@ -92,7 +69,6 @@ define(["react",
 
             var header = <Header params={this.props.params}
                                  data={this.props.data}
-                                 repository={this.state.repository}
                                  app={this} />;
             React.renderComponent(header,
               document.getElementById('header')
@@ -100,13 +76,18 @@ define(["react",
 
             var menu = <Menu params={this.props.params}
                              data={this.props.data}
-                             user={this.state.user}
-                             repository={this.state.repository}
                              app={this} />;
             React.renderComponent(menu,
               document.getElementById('menu')
             );
 
+
+            var logout = function(screen){
+                Utils.logout();
+                console.log("Logged out!");
+                Utils.redirectTo("#/");
+                return React.DOM.div;
+            };
 
             var dashboard = function(screen) {
                 if (Utils.isLoggedIn())
@@ -115,6 +96,12 @@ define(["react",
             };
             var props = this.props,
                 propsData = props.data;
+            console.log(Utils.isLoggedIn());
+
+            if (!Utils.isLoggedIn() && ! props.anonOk){
+                console.log("Not logged in!");
+                Utils.redirectTo("#/login");
+            }
 
             var screens = {
                 '_default' : {
@@ -124,13 +111,21 @@ define(["react",
                     component : Login,
                     baseUrl : "#/login",
                     },
+                'logout' : {
+                    callback : logout,
+                    baseUrl : '#/logout',
+                },
                 'sprintboard' : {
                     component : SprintBoard,
                     baseUrl : "#/sprintboard/"+props.data.repositoryId+'/'+props.data.milestoneId,
                     },
                 'repositories' : {
                     component : Repositories,
-                    baseUrl : "#/repositories",
+                    baseUrl : "#/repositories"+(this.props.data.organizationId !== undefined ? '/'+this.props.data.organizationId : ''),
+                    },
+                'organizations' : {
+                    component : Organizations,
+                    baseUrl : "#/organizations",
                     },
                 'milestones' : {
                     component : Milestones,
@@ -152,8 +147,6 @@ define(["react",
                 app={this}
                 baseUrl={screen.baseUrl}
                 data={propsData}
-                user={this.state.user}
-                repository={this.state.repository}
                 params={props.params}/>;
         }
     });

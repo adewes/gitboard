@@ -47,19 +47,31 @@ define(["js/components/app",
         '' : 
             function(){return {screen : 'index',data : {}}},
         '/sprintboard/:repositoryId/:milestoneId': 
-            function(repositoryId,milestoneId){return {screen : 'sprintboard',
+            function(repositoryId,milestoneId){return {screen : 'sprintboard',anonOk : true,
                 data : {repositoryId : repositoryId,milestoneId : milestoneId}
             }},
         '/repositories': 
             function(){return {screen : 'repositories',
                 data : {}
             }},
+        '/repositories/:organizationId': 
+            function(organizationId){return {screen : 'repositories',
+                data : {organizationId : organizationId}
+            }},
+        '/organizations': 
+            function(){return {screen : 'organizations',
+                data : {}
+            }},
         '/milestones/:repositoryId': 
-            function(repositoryId){return {screen : 'milestones',
+            function(repositoryId){return {screen : 'milestones',anonOk : true,
                 data : {repositoryId : repositoryId}
             }},
         '/login': 
             function(){return {screen : 'login',
+                data : {}
+            }},
+        '/logout' : 
+            function(){return {screen : 'logout',
                 data : {}
             }},
       };
@@ -67,8 +79,9 @@ define(["js/components/app",
     var router = new Director();
 
     router.configure({notfound : function(url){Utils.redirectTo("#/");},strict : false });
-    router.param('repositoryId', /([\w\d\-\:\.]+)/);
+    router.param('repositoryId', /([\w\d\-\:\.\/]+)/);
     router.param('milestoneId', /([\w\d\-\:\.]+)/);
+    router.param('organizationId', /([\w\d\-\:\.]+)/);
 
     //We add URL-style parameters to all routes by decorating the original handler function.
     var routesWithParams = {};

@@ -1,7 +1,7 @@
 define(["js/utils","js/subject","js/settings"],function (Utils,Subject,Settings) {
     'use strict';
 
-    var IssueApi = function(){
+    var OrganizationApi = function(type){
         Subject.Subject.call(this);
     };
 
@@ -10,35 +10,36 @@ define(["js/utils","js/subject","js/settings"],function (Utils,Subject,Settings)
     function getInstance()
     {
         if (instance === undefined)
-            instance = new IssueApi();
+            instance = new OrganizationApi();
         return instance;
     }
 
-    IssueApi.prototype = new Subject.Subject();
-    IssueApi.prototype.constructor = IssueApi;
+    OrganizationApi.prototype = new Subject.Subject();
+    OrganizationApi.prototype.constructor = OrganizationApi;
 
-    IssueApi.prototype.getIssues = function(fullName,data,onSuccess,onError){
+    OrganizationApi.prototype.getOrganizations = function(owner,data,onSuccess,onError){
         return Utils.apiRequest({
             type : 'GET',
-            url : "/repos/"+fullName+"/issues"+'?'+Utils.toUrlParams(data),
+            url : "/users/"+owner+"/orgs"+'?'+Utils.toUrlParams(data),
             success : onSuccess,
             error: onError,
             },{});
     }
 
-    IssueApi.prototype.getDetails = function(fullName,issueNumber,data,onSuccess,onError){
+    OrganizationApi.prototype.getRepositories = function(owner,data,onSuccess,onError){
+        console.log("Getting repositories for organization "+owner)
         return Utils.apiRequest({
             type : 'GET',
-            url : "/repos/"+fullName+"/issues/"+issueNumber+'?'+Utils.toUrlParams(data),
+            url : "/orgs/"+owner+"/repos"+'?'+Utils.toUrlParams(data),
             success : onSuccess,
             error: onError,
             },{});
     }
 
-    IssueApi.prototype.getComments = function(fullName,issueNumber,data,onSuccess,onError){
+    OrganizationApi.prototype.getDetails = function(name,data,onSuccess,onError){
         return Utils.apiRequest({
             type : 'GET',
-            url : "/repos/"+fullName+"/issues/"+issueNumber+'/comments'+'?'+Utils.toUrlParams(data),
+            url : "/orgs/"+name+'?'+Utils.toUrlParams(data),
             success : onSuccess,
             error: onError,
             },{});

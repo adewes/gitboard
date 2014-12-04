@@ -17,11 +17,10 @@ define(["js/utils","js/subject","js/settings"],function (Utils,Subject,Settings)
     MilestoneApi.prototype = new Subject.Subject();
     MilestoneApi.prototype.constructor = MilestoneApi;
 
-    MilestoneApi.prototype.getMilestones = function(owner,repo,data,onSuccess,onError){
+    MilestoneApi.prototype.getMilestones = function(fullName,data,onSuccess,onError){
         return Utils.apiRequest({
             type : 'GET',
-            url : "/repos/"+owner+"/"+repo+"/milestones",
-            data: data,
+            url : "/repos/"+fullName+"/milestones"+'?'+Utils.toUrlParams(data),
             success : onSuccess,
             error: onError,
             },{});

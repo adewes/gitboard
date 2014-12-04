@@ -91,7 +91,7 @@ define(["js/settings",
 
                 var onError = function(xhr,status,message){
                 }.bind(this);
-                this.authorizationApi.createAuthorization(formData.login,formData.password,formData.otp,{note : 'gitboard',scopes : ['repo']},onSuccess,onError)
+                this.authorizationApi.createAuthorization(formData.login,formData.password,formData.otp,{note : 'gitboard',scopes : ['repo','read:org']},onSuccess,onError)
             }.bind(this);
 
             var onError = function(xhr,status,message){

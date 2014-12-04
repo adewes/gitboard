@@ -49,6 +49,7 @@ var cssFiles = [
         '/bower_components/font-awesome/css/font-awesome.min.css',
         '/bower_components/octicons/octicons/octicons.css',
         '/assets/css/bootstrap.min.css',
+        '/assets/css/styles.css',
         ];
 
 var cssTags;

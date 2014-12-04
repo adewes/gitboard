@@ -1,0 +1,22 @@
+.container-wide{
+    width:auto;
+    max-width:1600px;
+    min-width:1200px;
+    padding:15px;
+    margin:0 auto;
+}
+
+.navbar{
+    position:fixed;
+    width:100%;
+    margin-top:-60px;
+}
+
+.container{
+    width:auto;
+    max-width:1600px;
+}
+
+body{
+    margin-top:60px !important;
+}

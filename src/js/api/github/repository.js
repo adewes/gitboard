@@ -17,21 +17,10 @@ define(["js/utils","js/subject","js/settings"],function (Utils,Subject,Settings)
     RepositoryApi.prototype = new Subject.Subject();
     RepositoryApi.prototype.constructor = RepositoryApi;
 
-    RepositoryApi.prototype.getRepositories = function(owner,data,onSuccess,onError){
+    RepositoryApi.prototype.getDetails = function(fullName,data,onSuccess,onError){
         return Utils.apiRequest({
             type : 'GET',
-            url : "/users/"+owner+"/repos",
-            data: data,
-            success : onSuccess,
-            error: onError,
-            },{});
-    }
-
-    RepositoryApi.prototype.getDetails = function(owner,repo,data,onSuccess,onError){
-        return Utils.apiRequest({
-            type : 'GET',
-            url : "/repos/"+owner+"/"+repo,
-            data: data,
+            url : "/repos/"+fullName+'?'+Utils.toUrlParams(data),
             success : onSuccess,
             error: onError,
             },{});

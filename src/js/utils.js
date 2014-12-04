@@ -245,9 +245,10 @@ define(["js/settings",
 
             if (fullData.type == 'GET')
             {
+                var makeCall = true;
                 if (ongoingRequests[fullData.url] !== undefined){
                     ongoingRequests[fullData.url].callbacks.push({success : fullData.success,error : fullData.error});
-                    return requestId; 
+                    makeCall = false;
                 }
                 else{
                     ongoingRequests[fullData.url] = { callbacks : [{success :fullData.success,error : fullData.error}]};
@@ -288,13 +289,12 @@ define(["js/settings",
                     var cachedData = this.getFromCache(url);
                     if (cachedData !== undefined && cachedData[0] !== undefined){
                         fullData['ifModified'] = true;
-                        console.log("Adding if modified header...");
                         if (originalOnSuccess !== undefined){
                             originalOnSuccess($.extend($.extend({},cachedData[0]),{'__requestId__' : requestId,'__cached__' : true}));
                             if (cachedData[1]+settings.cacheRefreshLimit*1000 > (new Date()).getTime()){
                                 if (url in ongoingRequests)
                                     delete ongoingRequests[url];
-                                return requestId;
+                                makeCall = false;
                             }
                         }
                     }
@@ -316,11 +316,11 @@ define(["js/settings",
 
                     fullData.success = onSuccess;
                 }
-
+                if (!makeCall)
+                    return requestId;
             }
 
             requestData[requestId] = {data : fullData, opts : opts};
-            console.log(fullData);
             $.ajax(fullData);
 
             return requestId;

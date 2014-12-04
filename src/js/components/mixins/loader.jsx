@@ -93,6 +93,7 @@ define(["react",
                     this.updateLoadingState(role,"failed");
                 if (handler !== undefined)
                     return handler.apply(this,arguments);
+                this.forceUpdate();
             }.bind(this);
         },
 
@@ -116,10 +117,10 @@ define(["react",
             }.bind(this);
         },
 
-        autoLoadResources : function(props){
+        autoLoadResources : function(props,state){
             if (this.onLoadResources !== undefined)
                 this.onLoadResources(props);
-            var resources = this.resources(props,this.state);
+            var resources = this.resources(props,state);
             if (this.resources === undefined)
                 return;
             for(var i in resources){
@@ -168,10 +169,26 @@ define(["react",
             this.setState({loaderInitialized : true});
         },
 
+        checkLoadingState : function(props,state){
+            var resources = this.resources(props,state);
+            for(var i in resources){
+                var resource = resources[i];
+                for (var state in this.loadingState){
+                    if (resource.name in this.loadingState[state]){
+                        if (state == 'inProgress'){
+                            this.loadingInProgress = true;
+                            return;
+                        }
+                    }
+                }
+            }
+            this.loadingInProgress = false;
+        },
+
         loadResources : function(props){
             this.resetLoadingState();
             if (this.resources)
-                this.autoLoadResources(props);
+                this.autoLoadResources(props,this.state);
             if (this.onLoadResources)
                 this.onLoadResources(props);
         },
@@ -201,14 +218,14 @@ define(["react",
 
         loaderIsActive : function(){
             return !this.state.loaderInitialized ||
-                    Object.keys(this.loadingState.inProgress).length ||
-                    Object.keys(this.loadingState.failed).length;
+                    this.loadingInProgress;
         },
 
         componentWillMount : function(){
             this._render = this.render;
             this.render = this.renderLoader;
             this.apis = Apis;
+            this.loadingInProgress = true;
             this.requestIds = {};
             this.resetLoadingState();
         },
@@ -220,8 +237,12 @@ define(["react",
             return this._render();
         },
 
-        componentDidUpdate :function(prevProps,prevState){
-            this.autoLoadResources(this.props);
+        componentDidUpdate : function(prevProps,prevState){
+            var oldLoadingInProgress = this.loadingInProgress;
+            this.autoLoadResources(this.props,this.state);
+            this.checkLoadingState(this.props,this.state);
+            if (oldLoadingInProgress !== this.loadingInProgress)
+                this.forceUpdate();
         },
 
         showLoader : function(){

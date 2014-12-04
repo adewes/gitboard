@@ -22,13 +22,15 @@ define(["react","js/utils",
             mixins : [LoaderMixin],
 
             resources : function(props,state){
-                return [
+                if (Utils.isLoggedIn())
+                    return [
                     {
                         name : 'user',
                         endpoint : this.apis.user.getProfile,
                         nonBlocking : true,
                     }
-                ];
+                    ];
+                return [];
             },
 
             silentLoading : true,
@@ -60,12 +62,13 @@ define(["react","js/utils",
                 if (Utils.isLoggedIn())
                 {
                     return <div><ul className="nav navbar-nav">
+                        <li><a href="#/organizations">Organizations</a></li>
                         <li><a href="#/repositories">Repositories</a></li>
                     </ul>
                     <ul className="nav navbar-nav navbar-right">
                         {projectMenu}
                         <li><a href="#/settings"><i className="fa fa-gears"></i></a></li>
-                        <li><a href="#/login">Logout</a></li>
+                        <li><a href="#/logout">Logout</a></li>
                     </ul>
                     </div>;
                 }

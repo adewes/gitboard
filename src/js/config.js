@@ -8,6 +8,7 @@ var require ={
     "react": "bower_components/react/react",
     "sprintf" :"bower_components/sprintf/src/sprintf",
     "markdown":"bower_components/markdown/lib/markdown",
+    "marked" : "bower_components/marked/lib/marked",
   },
   shim : {
     "director" : {
@@ -18,7 +19,10 @@ var require ={
     },
     "prism" : {
         exports : 'Prism'
-    }
+    },
+    "marked" : {
+        exports : 'marked',
+    },
   },
 baseUrl : "../static",
 urlArgs: "bust=" + (new Date()).getTime()

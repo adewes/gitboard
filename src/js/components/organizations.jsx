@@ -15,7 +15,7 @@ define(["react",
         function (React,Utils,LoaderMixin,$) {
         'use'+' strict';
 
-        var Repositories = React.createClass({
+        var Organizations = React.createClass({
 
             mixins : [LoaderMixin],
 
@@ -27,38 +27,40 @@ define(["react",
                             this.setState({user : data});
                         }.bind(this),
                     }];
-                if (state.user !== undefined || props.data.organizationId !== undefined)
-                    r.push({
-                            name : 'repositories',
-                            endpoint : props.data.organizationId !== undefined ? this.apis.organization.getRepositories : this.apis.user.getRepositories,
-                            params : [props.data.organizationId || state.user.login,{per_page : 100}],
+                if (state.user !== undefined){
+                    console.log("Adding organization");
+                    r.push(
+                        {
+                            name : 'organizations',
+                            endpoint : this.apis.organization.getOrganizations,
+                            params : [state.user.login,{per_page : 100}],
                             success : function(data,xhr){
-
-                                var repos_array = [];
+                                var arr = [];
                                 for(var i in data) {
                                     if(data.hasOwnProperty(i) && !isNaN(+i)) {
-                                        repos_array[+i] = data[i];
+                                        arr[+i] = data[i];
                                     }
                                 }
-                                this.setState({repositories : repos_array});
+                                this.setState({organizations : arr});
                             }.bind(this)
                         });
+                }
                 return r;
             },
 
-            displayName: 'Repositories',
+            displayName: 'Organizations',
 
             render: function () {
-                var repositoryItems = this.state.repositories.map(function(repository){
-                    return <li><a href={"#/milestones/"+repository.full_name}>{repository.full_name}</a></li>;
+                var organizationItems = this.state.organizations.map(function(organization){
+                    return <li><a href={"#/repositories/"+organization.login}>{organization.login}</a></li>;
                 }.bind(this))
 
                 return <div className="container">
                     <div className="row">
                         <div className="col-md-9">
-                        <h3>Your repositories</h3>
+                        <h3>Your organizations</h3>
                         <ul>
-                            {repositoryItems}
+                            {organizationItems}
                         </ul>
                         </div>
                         <div className="col-md-3">
@@ -69,5 +71,5 @@ define(["react",
             }
         });
 
-        return Repositories;
+        return Organizations;
 });

@@ -12,6 +12,7 @@
     "react-bootstrap" : "latest",
     "sprintf" : "latest",
     "markdown" : "latest",
+    "marked" : "latest",
     "font-mfizz" : "latest",
     "octicons" : "latest"
   }
