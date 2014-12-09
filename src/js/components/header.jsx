@@ -57,12 +57,14 @@ define(["react","js/utils",
             componentWillMount : function(){
                 this.requestNotifier = RequestNotifier.getInstance();
                 Utils.addRequestNotifier(this.requestNotifier);
-                this.requestNotifier.subscribe(this.updateStatus);
-                this.setState({activeRequestCount : this.requestNotifier.activeRequestCount()});
             },
 
             getInitialState : function(){
                 return {activeRequestCount : 0};
+            },
+
+            componentDidMount : function(){
+                this.requestNotifier.subscribe(this.updateStatus);
             },
 
             componentWillUnmount : function(){

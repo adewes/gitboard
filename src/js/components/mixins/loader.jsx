@@ -166,7 +166,6 @@ define(["react",
 
         componentDidMount : function(){
             this.loadResources(this.props);
-            this.setState({loaderInitialized : true});
         },
 
         checkLoadingState : function(props,state){
@@ -216,11 +215,6 @@ define(["react",
                     loadingErrorMessage : ""};
         },
 
-        loaderIsActive : function(){
-            return !this.state.loaderInitialized ||
-                    this.loadingInProgress;
-        },
-
         componentWillMount : function(){
             this._render = this.render;
             this.render = this.renderLoader;
@@ -231,7 +225,7 @@ define(["react",
         },
 
         renderLoader : function(){
-            if (this.loaderIsActive()){
+            if (this.loadingInProgress || Object.keys(this.loadingState.failed).length > 0){
                 return this.showLoader();
             }
             return this._render();
@@ -248,8 +242,9 @@ define(["react",
         showLoader : function(){
             if (this.silentLoading !== undefined)
                 return <div />;
-            if (Object.keys(this.loadingState.failed).length)
+            if (Object.keys(this.loadingState.failed).length){
                 return this.showErrorMessage();
+            }
             else
                 return this.showLoadingMessage();
         },

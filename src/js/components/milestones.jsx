@@ -15,6 +15,20 @@ define(["react",
         function (React,Utils,LoaderMixin,$) {
         'use'+' strict';
 
+
+        var MilestoneItem = React.createClass({
+
+            render : function(){
+                return <div className="col-md-3"><div className="panel panel-primary milestone-item">
+                  <a href={"#/sprintboard/"+this.props.repository.full_name+"/"+this.props.milestone.number}>
+                    <div className="panel-body">
+                        <h5>{this.props.milestone.title}</h5>
+                    </div>
+                    </a>
+                </div></div>;
+            }
+        });
+
         var Milestones = React.createClass({
 
             mixins : [LoaderMixin],
@@ -53,21 +67,18 @@ define(["react",
             displayName: 'Milestones',
 
             render: function () {
-                console.log(this.state.milestones);
                 var milestoneItems = this.state.milestones.map(function(milestone){
-                    return <li><a href={"#/sprintboard/"+this.props.data.repositoryId+"/"+milestone.number}>{milestone.title}</a></li>;
+                    return <MilestoneItem milestone={milestone} repository={this.state.repository} />;
                 }.bind(this))
 
                 return <div className="container">
                     <div className="row">
-                        <div className="col-md-9">
-                        <h3>Your milestones</h3>
-                        <ul>
-                            {milestoneItems}
-                        </ul>
+                        <div className="col-md-12">
+                            <h3>Your Milestones</h3>
                         </div>
-                        <div className="col-md-3">
-                        </div>
+                    </div>
+                    <div className="row">
+                        {milestoneItems}
                     </div>
                 </div>;
             }

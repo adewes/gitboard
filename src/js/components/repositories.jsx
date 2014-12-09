@@ -15,6 +15,19 @@ define(["react",
         function (React,Utils,LoaderMixin,$) {
         'use'+' strict';
 
+        var RepositoryItem = React.createClass({
+
+            render : function(){
+                return <div className="col-md-3"><div className="panel panel-primary organization-item">
+                  <a href={"#/milestones/"+this.props.repository.full_name}>
+                    <div className="panel-body">
+                        <h5>{this.props.repository.name}</h5>
+                    </div>
+                    </a>
+                </div></div>;
+            }
+        });
+
         var Repositories = React.createClass({
 
             mixins : [LoaderMixin],
@@ -30,8 +43,11 @@ define(["react",
                 if (state.user !== undefined || props.data.organizationId !== undefined)
                     r.push({
                             name : 'repositories',
-                            endpoint : props.data.organizationId !== undefined ? this.apis.organization.getRepositories : this.apis.user.getRepositories,
-                            params : [props.data.organizationId || state.user.login,{per_page : 100}],
+                            endpoint : props.data.organizationId !== undefined ? 
+                                        this.apis.organization.getRepositories : 
+                                        this.apis.user.getRepositories,
+                            params : [props.data.organizationId || state.user.login,
+                                      {per_page : 100}],
                             success : function(data,xhr){
 
                                 var repos_array = [];
@@ -50,20 +66,17 @@ define(["react",
 
             render: function () {
                 var repositoryItems = this.state.repositories.map(function(repository){
-                    return <li><a href={"#/milestones/"+repository.full_name}>{repository.full_name}</a></li>;
+                    return <RepositoryItem repository={repository} />;
                 }.bind(this))
 
                 return <div className="container">
                     <div className="row">
-                        <div className="col-md-9">
-                        <h3>Your repositories</h3>
-                        <ul>
-                            {repositoryItems}
-                        </ul>
+                        <div className="col-md-12">
+                            <h3>Your repositories</h3>
                         </div>
-                        <div className="col-md-3">
-                        <h3>Doing</h3>
-                        </div>
+                    </div>
+                    <div className="row">
+                        {repositoryItems}
                     </div>
                 </div>;
             }

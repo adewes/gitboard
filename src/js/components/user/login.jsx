@@ -56,23 +56,39 @@ define(["js/settings",
             var params = Utils.makeUrlParameters(this.props.params);
             var spacerWidth = this.state.spacerWidth ? 'large' : 'thin';
 
-            return <form className="col-xs-8 col-xs-offset-2" 
-                         onSubmit={this.handleSubmit} 
-                         roleName="form">
-                        {this.formatErrorMessage()}
-                        {this.formatFieldError('login')}
-                        <input type="login" onChange={this.setLogin} id="login" className="form-control" placeholder="Github Login" autofocus />
-                        {this.formatFieldError('password')}
-                        <input type="password" onChange={this.setPassword} id="password" className="form-control" placeholder="Password" />
-                        {this.formatFieldError('otp')}
-                        <input type="login" onChange={this.setOtp} id="otp" className="form-control" placeholder="One-Time-Password" />
-                        <button id="login-button" className="btn btn-c2a btn-block arrow" type="submit"><span className="text">Log in</span> <span className="trigger"></span></button>
-                      </form>;
+            return <div className="container">
+                        <div className="row">
+                            &nbsp;
+                        </div>
+                        <div className="row">
+                            <div className="col-xs-4 col-xs-offset-4">
+                                <div className="well bs-component">
+                                    <form className="form-horizontal" 
+                                     onSubmit={this.handleSubmit} 
+                                     roleName="form">
+                                        {this.formatErrorMessage()}
+                                        {this.formatFieldError('login')}
+                                        <fieldset>
+                                            <input type="login" onChange={this.setLogin} id="login" className="form-control" placeholder="Github Login" autofocus />
+                                            {this.formatFieldError('password')}
+                                            <input type="password" onChange={this.setPassword} id="password" className="form-control" placeholder="Password" />
+                                            {this.formatFieldError('otp')}
+                                            <input type="login" onChange={this.setOtp} id="otp" className="form-control" placeholder="One-Time-Password (if required)" />
+                                            <button id="login-button" className="btn btn-primary" type="submit"><span className="text">Log in</span> <span className="trigger"></span></button>
+                                        </fieldset>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
         },
 
         handleSubmit: function (e) {
 
             var formData = {login : this.state.login,password : this.state.password,otp : this.state.otp};
+
+            if (!this.validate())
+                return;
 
             var onSuccess = function(data){
                 for(var i in data){
@@ -97,7 +113,9 @@ define(["js/settings",
             var onError = function(xhr,status,message){
                 var otpHeader = xhr.getResponseHeader('X-Github-OTP');
                 if (otpHeader !== null && otpHeader.match(/required/i))
-                    console.log("one-time-password required!");
+                    this.addFieldError("otp","Please enter a valid one-time-password.");
+                else
+                    this.setErrorMessage("Wrong username or password. Please try again.");
             }.bind(this);
 
             this.authorizationApi.getAuthorizations(formData.login,formData.password,formData.otp,onSuccess,onError);

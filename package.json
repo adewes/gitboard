@@ -22,6 +22,5 @@
         "gulp-rename" : "1.2.0",
         "gulp-ruby-sass" : "0.7.1",
         "gulp-plumber" : "0.6.4",
-        "requirejs" : "2.1.14"
     }
 }

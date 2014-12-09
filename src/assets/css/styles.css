@@ -20,3 +20,99 @@
 body{
     margin-top:60px !important;
 }
+
+.sprintboard .issue-item .panel-heading{
+    position:relative;
+}
+
+.sprintboard .issue-item .panel-body{
+    padding:4px;
+}
+
+.sprintboard .issue-item img.assignee {
+    position:absolute;
+    right:0;
+    top:0;
+}
+
+.issue-list.dragged-over{
+    background:#aaa;
+}
+
+.sprintboard .issue-item a{
+    text-decoration: none;
+    color: inherit;
+    background:inherit;
+}
+
+.sprintboard .issue-item h5{
+    font-weight:bold !important;
+}
+
+.sprintboard .issue-details img{
+    max-width:100%;
+}
+
+.sprintboard .issue-item .label-1,
+.sprintboard .issue-item .label-2,
+.sprintboard .issue-item .label-3,
+.sprintboard .issue-item .label-4,
+.sprintboard .issue-item .label-5,
+.sprintboard .issue-item .label-6,
+.sprintboard .issue-item .label-7,
+.sprintboard .issue-item .label-8,
+.sprintboard .issue-item .label-9,
+.sprintboard .issue-item .label-10,
+.sprintboard .issue-item .label-11,
+.sprintboard .issue-item .label-12
+{
+    position:absolute;
+    top:0;
+    left:0;
+    width:5px;
+    height:16px;
+}
+
+.sprintboard .issue-item .label-1{
+    left:0px;
+}
+
+.sprintboard .issue-item .label-2{
+    left:5px;
+}
+
+.sprintboard .issue-item .label-3{
+    left:10px;
+}
+
+.sprintboard .issue-item .label-4{
+    left:15px;
+}
+
+.sprintboard .issue-item .label-5{
+    left:20px;
+}
+
+.sprintboard .issue-item .label-6{
+    left:25px;
+}
+
+.sprintboard .issue-item .label-7{
+    left:30px;
+}
+
+.sprintboard .issue-item .label-8{
+    left:35px;
+}
+
+.sprintboard .issue-item .label-9{
+    left:40px;
+}
+
+.sprintboard .issue-item .label-10{
+    left:45px;
+}
+
+.sprintboard .issue-item .label-11{
+    left:50px;
+}

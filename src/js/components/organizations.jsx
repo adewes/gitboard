@@ -15,6 +15,20 @@ define(["react",
         function (React,Utils,LoaderMixin,$) {
         'use'+' strict';
 
+
+        var OrganizationItem = React.createClass({
+
+            render : function(){
+                return <div className="col-md-3"><div className="panel panel-primary organization-item">
+                  <a href={"#/repositories/"+this.props.organization.login}>
+                    <div className="panel-body">
+                        <h5>{this.props.organization.login}</h5>
+                    </div>
+                    </a>
+                </div></div>;
+            }
+        });
+
         var Organizations = React.createClass({
 
             mixins : [LoaderMixin],
@@ -52,20 +66,17 @@ define(["react",
 
             render: function () {
                 var organizationItems = this.state.organizations.map(function(organization){
-                    return <li><a href={"#/repositories/"+organization.login}>{organization.login}</a></li>;
+                    return <OrganizationItem organization={organization} />;
                 }.bind(this))
 
                 return <div className="container">
                     <div className="row">
-                        <div className="col-md-9">
+                        <div className="col-md-12">
                         <h3>Your organizations</h3>
-                        <ul>
-                            {organizationItems}
-                        </ul>
                         </div>
-                        <div className="col-md-3">
-                        <h3>Doing</h3>
-                        </div>
+                    </div>
+                    <div className="row">
+                        {organizationItems}
                     </div>
                 </div>;
             }

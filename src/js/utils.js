@@ -4,59 +4,11 @@ define(["js/settings",
     'use strict';
 
     var requestCount = 0;
-    var requestEndpoints = {};
     var ongoingRequests = {};
     var requestData = {};
     var requestNotifiers = [];
 
     var utils = {
-
-        uuid: function () {
-            /*jshint bitwise:false */
-            var i, random;
-            var uuid = '';
-
-            for (i = 0; i < 32; i++) {
-                random = Math.random() * 16 | 0;
-                if (i === 8 || i === 12 || i === 16 || i === 20) {
-                    uuid += '-';
-                }
-                uuid += (i === 12 ? 4 : (i === 16 ? (random & 3 | 8) : random))
-                .toString(16);
-            }
-
-            return uuid;
-        },
-
-        contains : function(array,value){
-            for (var i in array) {
-                if (array[i] === value)
-                    return true;
-            }
-                return false;
-        },
-
-        toUrlParams: function(params)
-        {
-            var urlParams;
-            if (params !== undefined)
-                urlParams = $.param(params,{traditional:true});
-            else
-                urlParams = '';
-            return urlParams;
-        },
-
-        pluralize: function (count, word) {
-            return count === 1 ? word : word + 's';
-        },
-
-        accessToken: function(value){
-            return this.store("accessToken",value);
-        },
-
-        hideReminder: function(value){
-            return this.store("reminder",value);
-        },
 
         getUrlParameters: function(query)
         {
@@ -93,6 +45,16 @@ define(["js/settings",
                 return strings.join("&");
         },
 
+        toUrlParams: function(params)
+        {
+            var urlParams;
+            if (params !== undefined)
+                urlParams = $.param(params,{traditional:true});
+            else
+                urlParams = '';
+            return urlParams;
+        },
+        
         makeUrl:function(baseUrl,newParams,oldParams,unsetParams){
             var params = $.extend({},newParams);
             for (var param in oldParams) {
@@ -107,6 +69,10 @@ define(["js/settings",
                 }
             }
             return baseUrl+"?"+this.makeUrlParameters(params);
+        },
+
+        accessToken: function(value){
+            return this.store("accessToken",value);
         },
 
         redirectTo:function(url){
@@ -352,21 +318,7 @@ define(["js/settings",
 
         delete : function(namespace){
             localStorage.removeItem(namespace);
-        },
-
-        truncate : function(str,n,useWordBoundary){
-         var toLong = str.length>n,
-         s_ = toLong ? str.substr(0,n-1) : str;
-         s_ = useWordBoundary && toLong ? s_.substr(0,s_.lastIndexOf(' ')) : s_;
-         return  toLong ? s_ + '...' : s_;
-     },
-
-     truncateInMiddle : function(str,n){
-         var toLong = str.length>n+2,
-         s_ = toLong ? (str.substr(0,(n-1)/2) + "..." +str.substr(-(n-1)/2)): str;
-         return  s_;
-     },
-
+        }
 
  };
 

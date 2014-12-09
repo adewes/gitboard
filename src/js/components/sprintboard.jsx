@@ -57,7 +57,9 @@ define(["react",
             },
 
             render :function(){
-                return <div dangerouslySetInnerHTML={{__html : marked(this.state.issue.body)}} />;
+                return <div className="issue-details">
+                    <div dangerouslySetInnerHTML={{__html : marked(this.state.issue.body)}} />
+                </div>;
             }
         });
 
@@ -85,11 +87,11 @@ define(["react",
             render : function(){
                 var assigneeInfo;
                 if (this.props.issue.assignee !== undefined && this.props.issue.assignee !== null)
-                    assigneeInfo = <img width="16" height="16" src={this.props.issue.assignee.avatar_url+'&s=16'} />;
+                    assigneeInfo = <img className="assignee" width="16" height="16" src={this.props.issue.assignee.avatar_url+'&s=16'} />;
                 var labelInfo = [];
                 for (var i in this.props.issue.labels){
                     var label = this.props.issue.labels[i];
-                    labelInfo.push(<span className="label" style={{background:'#'+label.color}}>{label.name}</span>);
+                    labelInfo.push(<span className={"label-"+(parseInt(i)+1)} style={{background:'#'+label.color}}></span>);
                     labelInfo.push(' ');
                 }
                 var modal;
@@ -103,15 +105,36 @@ define(["react",
                         <IssueDetails issue={this.props.issue} data={this.props.data}/>
                       </Modal>   
                 }
-                return <div className="panel panel-default" draggable={true}>
+                return <div className="panel panel-primary issue-item" draggable={true}>
                   {modal}                 
                   <a href="#" onClick={this.showIssueDetails}>
+                    <div className="panel-heading">
+                        {labelInfo} <span className="assignee">{assigneeInfo}</span>
+                    </div>
                     <div className="panel-body">
-                        <h6>{this.props.issue.title} <span className="assignee">{assigneeInfo}</span></h6>
-                        {labelInfo}
+                        <h5>{this.props.issue.title}</h5>
                     </div>
                     </a>
                 </div>;
+            }
+        });
+
+        var IssueList = React.createClass({
+
+            onDragEnter : function(e){
+                this.setState({draggedOver : true});
+            },
+
+            onDragLeave : function(e){
+                this.setState({draggedOver :false});
+            },
+
+            getInitialState : function(){
+                return {draggedOver : false};
+            },
+
+            render : function(){
+                return <div onDragEnter={this.onDragEnter} onDragLeave={this.onDragLeave} className={"col-xs-3 issue-list"+(this.state.draggedOver ? ' dragged-over' : '')}>{this.props.children}</div>;
             }
         });
 
@@ -183,24 +206,24 @@ define(["react",
                     var issues = categories[category];
                     issueItems[category] = issues.map(function(issue){return <IssueItem data={this.props.data} key={issue.number} issue={issue} />;}.bind(this));
                 }
-                return <div className="container-wide">
+                return <div className="container-wide sprintboard">
                     <div className="row">
-                        <div className="col-xs-3">
-                        <h3>To Do</h3>
+                        <IssueList>
+                        <h4>To Do</h4>
                         {issueItems.toDo}
-                        </div>
-                        <div className="col-xs-3">
-                        <h3>Doing</h3>
+                        </IssueList>
+                        <IssueList>
+                        <h4>Doing</h4>
                         {issueItems.doing}
-                        </div>
-                        <div className="col-xs-3">
-                        <h3>Awaiting Review</h3>
+                        </IssueList>
+                        <IssueList>
+                        <h4>Done / Awaiting Review</h4>
                         {issueItems.awaitingReview}
-                        </div>
-                        <div className="col-xs-3">
-                        <h3>Done</h3>
+                        </IssueList>
+                        <IssueList>
+                        <h4>Closed</h4>
                         {issueItems.done}
-                        </div>
+                        </IssueList>
                     </div>
                 </div>;
             }

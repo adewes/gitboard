@@ -32,7 +32,7 @@ console.log("Environment: "+environment);
 
 var sourcePath = 'src';
 var buildPath = 'build';
-var baseUrl="../static";
+var baseUrl="static";
 
 var paths = {
   scripts: [sourcePath+'/js/**/*.js'],
@@ -49,6 +49,7 @@ var cssFiles = [
         '/bower_components/font-awesome/css/font-awesome.min.css',
         '/bower_components/octicons/octicons/octicons.css',
         '/assets/css/bootstrap.min.css',
+        '/bower_components/bootstrap-material-design/dist/css/material-wfont.css',
         '/assets/css/styles.css',
         ];
 
@@ -124,7 +125,7 @@ gulp.task('templates', function (){
     return gulp.src(paths.templates)
         .pipe(plumber())
         .pipe(preprocess({ context : {ENVIRONMENT : environment,cssTags : cssTags } }))
-        .pipe(gulp.dest(buildPath+'/templates'))
+        .pipe(gulp.dest(buildPath+'/'))
 });
 
 gulp.task('assets', function (){

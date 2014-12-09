@@ -68,6 +68,7 @@ define(["react",
         },
 
         validate : function(data){
+            this.clearAllErrors();
             var validated = true;
             var fieldErrors = {}
             for(var name in this.fields){

@@ -10,10 +10,11 @@ define(["js/components/app",
     {
 
     var app = undefined;
+    var appComponent = undefined;
 
     function initApp(){
-        React.renderComponent(app,
-          document.getElementById('qcapp')
+        appComponent = React.render(app,
+          document.getElementById('app')
         );
     }
 
@@ -23,7 +24,6 @@ define(["js/components/app",
              'page': location.pathname + location.search  + location.hash
             });
         }
-
         if (props.params !== undefined)
         {
             props.stringParams = props.params.slice(1);
@@ -34,13 +34,11 @@ define(["js/components/app",
 
         if (app === undefined)
         {
-            app = MainApp(props);
+            app = React.createElement(MainApp,props);
             initApp();
         }
         else
-        {
-            app.replaceProps(props);
-        }
+            appComponent.replaceProps(props);
     }
 
     var routes = {
@@ -87,15 +85,18 @@ define(["js/components/app",
     var routesWithParams = {};
     for (var url in routes){
         var urlWithParams = url+'/?(\\?.*)?';
-        var generateCallBack = function(url,urlWithParams){
+        var generateCallBack = function(url, urlWithParams){
             return function(){
                 var callBack = routes[url];
-                var params = callBack.apply(this,Array.prototype.slice.call(arguments,0,arguments.length-1));
+                var params = callBack.apply(
+                    this,
+                    Array.prototype.slice.call(arguments, 0, arguments.length-1)
+                );
                 params['params'] = arguments[arguments.length-1];
+                params['url'] = url;
                 return render(params);
             };
         };
-
         routesWithParams[urlWithParams] = generateCallBack(url,urlWithParams);
     }
 
