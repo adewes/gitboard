@@ -2,7 +2,6 @@
 npm*log
 venv/*
 **/build/*
-**/bower_components/*
 **/.sass-cache/*
 **/sass-cache/*
 frontend/build
