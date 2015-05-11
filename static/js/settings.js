@@ -3,7 +3,7 @@ define([],function (Utils) {
 
     var settings = {
         source : 'https://api.github.com',
-        frontendUrl : '/',
+        frontendUrl : '/gitboard',
         html5history : false,
         github : {
             //Application keys can be managed here:
