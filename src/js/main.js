@@ -151,9 +151,6 @@ define(
     router.init();
 
     if (!Settings.html5history){
-        if (window.location.pathname != Settings.frontendUrl){
-            window.location.pathname = Settings.frontendUrl;
-        }
         if (window.location.hash === ''){
             window.location.hash="#/";
         }

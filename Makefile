@@ -42,7 +42,7 @@ npm:
 
 optimize-css:
 	mkdir -p $(BUILD_TMP_DIR)/static/css
-	cleancss -r $(BUILD_TMP_DIR) -o $(BUILD_TMP_DIR)/static/css/all.min.css $(addprefix $(BUILD_TMP_DIR)/static,$(CSS_FILES))
+	cleancss -o $(BUILD_TMP_DIR)/static/css/all.min.css $(addprefix $(BUILD_TMP_DIR)/static,$(CSS_FILES))
 
 optimize-rjs:
 	r.js -o $(BUILD_TMP_DIR)/static/js/build.js

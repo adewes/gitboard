@@ -3,7 +3,7 @@ define([],function (Utils) {
 
     var settings = {
         source : 'https://api.github.com',
-        frontendUrl : '/',
+        frontendUrl : '',
         html5history : false,
         useCache : true,
         cacheValidity : 3600*24, //cache expires after 24 hours
