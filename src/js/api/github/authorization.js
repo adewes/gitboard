@@ -27,6 +27,15 @@ define(["js/utils","js/subject","js/settings"],function (Utils,Subject,Settings)
             },{authenticated : true,login : login,password : password, otp : otp});
     }
 
+    AuthorizationApi.prototype.deleteAuthorization = function(login,password,otp,id,onSuccess,onError){
+        return Utils.apiRequest({
+            type : 'DELETE',
+            url : "/authorizations/"+id,
+            success : onSuccess,
+            error: onError
+            },{authenticated : true,login : login,password : password, otp : otp});
+    }
+
     AuthorizationApi.prototype.getAuthorizations = function(login,password,otp,onSuccess,onError){
         return Utils.apiRequest({
             type : 'GET',

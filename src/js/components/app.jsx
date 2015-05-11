@@ -11,26 +11,12 @@ define(["react",
         "js/utils",
         "js/components/header",
         "js/components/menu",
-        "js/components/mixins/loader",
-        "js/components/sprintboard",
-        "js/components/milestones",
-        "js/components/repositories",
-        "js/components/organizations",
-        "js/components/user/login",
-        "js/flash_messages",
         "jquery"
         ],
         function (React,
                   Utils,
                   Header,
                   Menu,
-                  LoaderMixin,
-                  SprintBoard,
-                  Milestones,
-                  Repositories,
-                  Organizations,
-                  Login,
-                  FlashMessagesService,
                   $
                   )
         {
@@ -39,10 +25,6 @@ define(["react",
         var MainApp = React.createClass({
 
         displayName: 'MainApp',
-
-        componentWillMount : function(){
-            this.flashMessagesService = FlashMessagesService.getInstance();
-        },
 
         componentDidMount : function(){
     
@@ -81,66 +63,17 @@ define(["react",
               document.getElementById('menu')
             );
 
-
-            var logout = function(screen){
-                Utils.logout();
-                console.log("Logged out!");
-                Utils.redirectTo("#/");
-                return React.DOM.div;
-            };
-
-            var dashboard = function(screen) {
-                if (Utils.isLoggedIn())
-                    return React.DOM.div;
-                return React.DOM.div;
-            };
             var props = this.props,
                 propsData = props.data;
-            console.log(Utils.isLoggedIn());
 
             if (!Utils.isLoggedIn() && ! props.anonOk){
                 console.log("Not logged in!");
                 Utils.redirectTo("#/login");
             }
 
-            var screens = {
-                '_default' : {
-                    callback : dashboard
-                },
-                'login' : {
-                    component : Login,
-                    baseUrl : "#/login",
-                    },
-                'logout' : {
-                    callback : logout,
-                    baseUrl : '#/logout',
-                },
-                'sprintboard' : {
-                    component : SprintBoard,
-                    baseUrl : "#/sprintboard/"+props.data.repositoryId+'/'+props.data.milestoneId,
-                    },
-                'repositories' : {
-                    component : Repositories,
-                    baseUrl : "#/repositories"+(this.props.data.organizationId !== undefined ? '/'+this.props.data.organizationId : ''),
-                    },
-                'organizations' : {
-                    component : Organizations,
-                    baseUrl : "#/organizations",
-                    },
-                'milestones' : {
-                    component : Milestones,
-                    baseUrl : "#/milestones/"+props.data.repositoryId,
-                    },
-            };
-
-
-            var screen = $.extend({},screens['_default']);
-            if (props.screen in screens)
-                screen = $.extend({},screens[props.screen]);
-
-            var Component = screen.component;
-            if (screen.callback !== undefined){
-                Component = screen.callback(screen);
+            var Component = this.props.component;
+            if (this.props.callback){
+                Component = this.props.callback(this.props);
             }
 
             return <Component

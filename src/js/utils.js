@@ -140,6 +140,12 @@ define(["js/settings",
                 requestNotifiers.splice(requestNotifiers.indexOf(notifier),1);
         },
 
+        removeFromCache : function(url){
+            var key = "cache_"+url;
+            this.remove(key);
+        },
+
+
         apiRequest: function(data,opts){
 
             if (opts === undefined)
@@ -170,12 +176,12 @@ define(["js/settings",
                     });
             }
             else{
-                fullData = $.extend($.extend({},data),{ 
+                fullData = $.extend($.extend({},data),{
                    url : settings.source+data['url'],
                    beforeSend : function(xhr){
                        xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
                    }.bind(this)
-                });
+                }); 
             }
 
             //We overwrite the success/error handlers so that we can inform the request notifier about the status of the request.
@@ -251,36 +257,37 @@ define(["js/settings",
                     //if the cache is activated and this is a GET request, do the caching magic
 
                     var originalOnSuccess = fullData.success;
+                    var originalOnError = fullData.error;
                     var url = fullData.url;
                     var cachedData = this.getFromCache(url);
                     if (cachedData !== undefined && cachedData[0] !== undefined){
                         fullData['ifModified'] = true;
-                        if (originalOnSuccess !== undefined){
-                            originalOnSuccess($.extend($.extend({},cachedData[0]),{'__requestId__' : requestId,'__cached__' : true}));
-                            if (cachedData[1]+settings.cacheRefreshLimit*1000 > (new Date()).getTime()){
-                                if (url in ongoingRequests)
-                                    delete ongoingRequests[url];
-                                makeCall = false;
-                            }
+                        if (originalOnSuccess){
+                            var cd = $.extend($.extend({},cachedData[0]),{'__requestId__' : requestId,'__cached__' : true});
+                            originalOnSuccess(cd);
                         }
                     }
 
-                    var onSuccess = function(url,cachedData,onSuccess,newData,status){
+                    var onSuccess = function(url,cachedData,onSuccess,newData,status,xhr){
                         //if the data is unmodified, we retrieve it from the cache instead...
-                        if (status == 'notmodified'){
+                        if (status == 'notmodified')
                             newData = cachedData[0];
-                        }
-
-                        if (JSON.stringify(newData) == JSON.stringify(cachedData)){
-                            return;
-                        }
-                        if (onSuccess !== undefined){
+                        else
+                            newData = $.extend({'__etag__' : xhr.getResponseHeader('etag')},newData);
+                        if (onSuccess)
                             onSuccess(newData);
-                        }
                         this.storeToCache(url,newData);
                     }.bind(this,url,cachedData,originalOnSuccess)
 
+                    var onError = function(url,cachedData,onError,xhr,status,e){
+                        if (cachedData !== undefined)
+                            this.removeFromCache(url);
+                        if (onError)
+                            onError(xhr,status,e);
+                    }.bind(this,url,cachedData,originalOnError)
+
                     fullData.success = onSuccess;
+                    fullData.error = onError;
                 }
                 if (!makeCall)
                     return requestId;
@@ -300,11 +307,16 @@ define(["js/settings",
         login : function(accessToken) {
             //we clear the local storage to make sure no information about other users is present
             localStorage.clear();
+            console.log(accessToken);
             this.store("accessToken",accessToken);
         },
 
         isLoggedIn : function(){
             return this.accessToken() !== undefined ? true : false;
+        },
+
+        remove : function(namespace){
+            sessionStorage.removeItem(namespace);
         },
 
         store: function (namespace, data) {

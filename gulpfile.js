@@ -48,8 +48,8 @@ var cssFiles = [
         '/bower_components/font-mfizz/css/font-mfizz.css',
         '/bower_components/font-awesome/css/font-awesome.min.css',
         '/bower_components/octicons/octicons/octicons.css',
-        '/assets/css/bootstrap.min.css',
-        '/bower_components/bootstrap-material-design/dist/css/material-wfont.css',
+        '/bower_components/bootstrap/dist/css/bootstrap.min.css',
+        '/bower_components/bootstrap-material-design/dist/css/material.min.css',
         '/assets/css/styles.css',
         ];
 

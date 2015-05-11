@@ -20,11 +20,11 @@ define(["react",
 
             render : function(){
                 return <div className="col-md-3"><div className="panel panel-primary organization-item">
-                  <a href={"#/repositories/"+this.props.organization.login}>
+                  <A href={"#/repositories/"+this.props.organization.login}>
                     <div className="panel-body">
                         <h5>{this.props.organization.login}</h5>
                     </div>
-                    </a>
+                    </A>
                 </div></div>;
             }
         });

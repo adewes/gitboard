@@ -22,12 +22,18 @@ define(["react","js/utils",
             mixins : [LoaderMixin],
 
             resources : function(props,state){
+                var logout  = function(){
+                    Utils.logout();
+                    Utils.redirectTo(Utils.makeUrl('#/login'));
+                };
+                
                 if (Utils.isLoggedIn())
                     return [
                     {
                         name : 'user',
                         endpoint : this.apis.user.getProfile,
                         nonBlocking : true,
+                        error : logout
                     }
                     ];
                 return [];
@@ -62,13 +68,13 @@ define(["react","js/utils",
                 if (Utils.isLoggedIn())
                 {
                     return <div><ul className="nav navbar-nav">
-                        <li><a href="#/organizations">Organizations</a></li>
-                        <li><a href="#/repositories">Repositories</a></li>
+                        <li><A href="#/organizations">Organizations</A></li>
+                        <li><A href="#/repositories">Repositories</A></li>
                     </ul>
                     <ul className="nav navbar-nav navbar-right">
                         {projectMenu}
-                        <li><a href="#/settings"><i className="fa fa-gears"></i></a></li>
-                        <li><a href="#/logout">Logout</a></li>
+                        <li><A href="#/settings"><i className="fa fa-gears"></i></A></li>
+                        <li><A href="#/logout">Logout</A></li>
                     </ul>
                     </div>;
                 }
@@ -78,7 +84,7 @@ define(["react","js/utils",
                         <ul className="nav navbar-nav">
                         </ul>
                         <ul className="nav navbar-nav navbar-right">
-                            <li><a href="#/login">Login</a></li>
+                            <li><A href="#/login">Login</A></li>
                             {flashMessagesMenu}
                         </ul>
                     </div>;

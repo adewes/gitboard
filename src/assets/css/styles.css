@@ -1,3 +1,13 @@
+.modal-backdrop{
+    z-index: -1;
+}
+
+.modal .modal-body {
+    max-height: 420px !important;
+    overflow: auto;
+    z-index:1060;
+}
+
 .container-wide{
     width:auto;
     max-width:1600px;
@@ -35,8 +45,12 @@ body{
     top:0;
 }
 
-.issue-list.dragged-over{
+.issue-list.active{
     background:#aaa;
+}
+
+.issue-list.active .issue-item{
+    pointer-events:none;
 }
 
 .sprintboard .issue-item a{

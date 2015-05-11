@@ -38,12 +38,12 @@ define(["react","js/utils",
 
             render : function(){
                 if (this.props.connectionError == true)
-                    return <p className="request-indicator"><a href="" onClick={this.hideMessage}><span className="fa fa-exclamation-triangle" /> Connection problem! Trying again in {this.props.willRetryIn} s.</a></p>;
+                    return <p className="request-indicator"><A href="" onClick={this.hideMessage}><span className="fa fa-exclamation-triangle" /> Connection problem! Trying again in {this.props.willRetryIn} s.</A></p>;
                 if (this.props.activeRequestCount > 0 && ! this.state.hidden){
                     var dots = "";
                     for (var i=0;i<this.props.activeRequestCount;i++)
                         dots+=".";
-                    return <p className="request-indicator"><a href="" onClick={this.hideMessage}><span className="fa fa-spin fa-refresh" /> loading data{dots}</a></p>;
+                    return <p className="request-indicator"><A href="" onClick={this.hideMessage}><span className="fa fa-spin fa-refresh" /> loading data{dots}</A></p>;
                 }
                 else
                     return <span />;

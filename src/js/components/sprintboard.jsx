@@ -18,14 +18,7 @@ define(["react",
         'use'+' strict';
 
         marked.setOptions({
-          renderer: new marked.Renderer(),
-          gfm: true,
-          tables: true,
-          breaks: false,
-          pedantic: false,
-          sanitize: true,
-          smartLists: true,
-          smartypants: false
+          sanitize: true
         });
 
         var IssueDetails = React.createClass({
@@ -47,8 +40,8 @@ define(["react",
                     success : function(data){
                         var arr = [];
                         for(var i in data) {
-                            if(data.hasOwnProperty(i) && !isNaN(+i)) {
-                                arr[+i] = data[i];
+                            if(data.hasOwnProperty(i) && !isNaN(i)) {
+                                arr[i] = data[i];
                             }
                         }
                         this.setState({comments : arr});
@@ -57,90 +50,131 @@ define(["react",
             },
 
             render :function(){
-                return <div className="issue-details">
-                    <div dangerouslySetInnerHTML={{__html : marked(this.state.issue.body)}} />
-                </div>;
+                var markdown = <p>(no description given)</p>;
+                try{
+                    var markdownText = '(no description given)';
+                    if (this.state.issue.body)
+                        markdownText = marked(this.state.issue.body);
+                    markdown = <div key={this.state.issue.id} dangerouslySetInnerHTML={{__html : markdownText}}></div>;
+                    return markdown;
+                }
+                catch(err)
+                {
+                    markdown = <div>
+                        <p>An error occured when trying to render the Markdown, sorry... Displaying RAW text instead.</p>
+                        <p>
+                            {this.state.issue.body}
+                        </p>
+                    </div>;
+                }
+                finally{
+                    return <div className="issue-details">
+                        {markdown}
+                    </div>;
+                }
             }
         });
 
-        var IssueItem = React.createClass({
+    var IssueItem = React.createClass({
 
-            showIssueDetails : function(e){
-                this.setState({showDetails : true});
-                e.preventDefault();
-            },
+        showIssueDetails : function(e){
+            this.setState({showDetails : true});
+            e.preventDefault();
+        },
 
-            closeModal : function(e){
-                this.refs.issueDetails.close();
-                $(".modal-backdrop").remove();
-            },
+        closeModal : function(e){
+            console.log("closing modal");
+            this.refs.issueDetails.close();
+            this.setState({showDetails : false});
+        },
 
-            getInitialState : function(){
-                return {showDetails : false};
-            },
+        getInitialState : function(){
+            return {showDetails : false};
+        },
 
-            componentDidUpdate : function(prevProps,prevState){
-                if (this.state.showDetails)
-                    this.refs.issueDetails.open();
-            },
+        componentDidUpdate : function(prevProps,prevState){
+            if (this.state.showDetails)
+                this.refs.issueDetails.open();
+        },
 
-            render : function(){
-                var assigneeInfo;
-                if (this.props.issue.assignee !== undefined && this.props.issue.assignee !== null)
-                    assigneeInfo = <img className="assignee" width="16" height="16" src={this.props.issue.assignee.avatar_url+'&s=16'} />;
-                var labelInfo = [];
-                for (var i in this.props.issue.labels){
-                    var label = this.props.issue.labels[i];
-                    labelInfo.push(<span className={"label-"+(parseInt(i)+1)} style={{background:'#'+label.color}}></span>);
-                    labelInfo.push(' ');
-                }
-                var modal;
-                if (this.state.showDetails){
-                    modal = <Modal
-                        ref="issueDetails"
-                        cancel="Close"
-                        onCancel={this.closeModal}
-                        onConfirm={this.closeModal}
-                        title={this.props.issue.title}>
+        onDragStart: function(){
+            console.log("Starting to drag!");
+        },
+
+        onDragEnd : function(){
+            console.log("onDragEnd");
+        },
+
+        render : function(){
+            var assigneeInfo;
+            if (this.props.issue.assignee !== undefined && this.props.issue.assignee !== null)
+                assigneeInfo = <img className="assignee" width="16" height="16" src={this.props.issue.assignee.avatar_url+'&s=16'} />;
+            var labelInfo = [];
+            for (var i in this.props.issue.labels){
+                var label = this.props.issue.labels[i];
+                labelInfo.push(<span className={"label-"+(parseInt(i)+1)} style={{background:'#'+label.color}}></span>);
+                labelInfo.push(' ');
+            }
+            var modal;
+            if (this.state.showDetails){
+                modal = <Modal
+                    ref="issueDetails"
+                    cancel="Close"
+                    onCancel={this.closeModal}
+                    onConfirm={this.closeModal}
+                    title={this.props.issue.title}>
                         <IssueDetails issue={this.props.issue} data={this.props.data}/>
-                      </Modal>   
-                }
-                return <div className="panel panel-primary issue-item" draggable={true}>
-                  {modal}                 
-                  <a href="#" onClick={this.showIssueDetails}>
-                    <div className="panel-heading">
-                        {labelInfo} <span className="assignee">{assigneeInfo}</span>
-                    </div>
-                    <div className="panel-body">
-                        <h5>{this.props.issue.title}</h5>
-                    </div>
-                    </a>
-                </div>;
+                  </Modal>   
             }
-        });
+            return <div className="panel panel-primary issue-item" onDragStart={this.onDragStart}
+                        onDragEnd={this.onDragEnd}
+                        draggable={true}>
+              {modal}                 
+              <A href="#" onClick={this.showIssueDetails}>
+                <div className="panel-heading">
+                    {labelInfo} <span className="assignee">{assigneeInfo}</span>
+                </div>
+                <div className="panel-body">
+                    <h5>{this.props.issue.title}</h5>
+                </div>
+                </A>
+            </div>;
+        }
+    });
 
         var IssueList = React.createClass({
 
             onDragEnter : function(e){
-                this.setState({draggedOver : true});
+                console.log("Entering");
+                this.props.setActiveDropzone(this.props.name);
             },
 
             onDragLeave : function(e){
-                this.setState({draggedOver :false});
             },
 
-            getInitialState : function(){
-                return {draggedOver : false};
+            onDragEnd : function(e){
+                console.log("Drag ended");
+                this.props.setActiveDropzone(undefined);
             },
 
             render : function(){
-                return <div onDragEnter={this.onDragEnter} onDragLeave={this.onDragLeave} className={"col-xs-3 issue-list"+(this.state.draggedOver ? ' dragged-over' : '')}>{this.props.children}</div>;
+                return <div onDragEnter={this.onDragEnter}
+                            onDragLeave={this.onDragLeave}
+                            className={"col-xs-3 issue-list"+(this.props.active ? ' active' : '')}>{this.props.children}</div>;
             }
         });
 
         var Board = React.createClass({
 
             mixins : [LoaderMixin],
+
+            setActiveDropzone : function(name){
+                this.setState({dropZone : name})
+            },
+
+            getInitialState : function(){
+                return {dropZone : undefined};
+            },
 
             resources : function(props,state){
                 return [
@@ -208,19 +242,19 @@ define(["react",
                 }
                 return <div className="container-wide sprintboard">
                     <div className="row">
-                        <IssueList>
+                        <IssueList setActiveDropzone={this.setActiveDropzone} name="todo" active={this.state.dropZone == "todo" ? true : false}>
                         <h4>To Do</h4>
                         {issueItems.toDo}
                         </IssueList>
-                        <IssueList>
+                        <IssueList setActiveDropzone={this.setActiveDropzone} name="doing" active={this.state.dropZone == "doing" ? true : false}>
                         <h4>Doing</h4>
                         {issueItems.doing}
                         </IssueList>
-                        <IssueList>
+                        <IssueList setActiveDropzone={this.setActiveDropzone} name="done" active={this.state.dropZone == "done" ? true : false}>
                         <h4>Done / Awaiting Review</h4>
                         {issueItems.awaitingReview}
                         </IssueList>
-                        <IssueList>
+                        <IssueList setActiveDropzone={this.setActiveDropzone} name="closed" active={this.state.dropZone == "closed" ? true : false}>
                         <h4>Closed</h4>
                         {issueItems.done}
                         </IssueList>

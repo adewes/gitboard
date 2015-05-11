@@ -78,7 +78,7 @@ define(["react","js/utils","js/flash_messages","jquery"],function (React,Utils,F
                       prepareUnmount = true;
                     }
                 }
-                return <li><a href=""><h4>{title}</h4>{msg.data.description}</a></li>;
+                return <li><A href=""><h4>{title}</h4>{msg.data.description}</A></li>;
               }.bind(this)
             );
           messageItems = messageItems.filter(function(item){if (item !== undefined)return true;return false;}).reverse();
@@ -90,7 +90,7 @@ define(["react","js/utils","js/flash_messages","jquery"],function (React,Utils,F
                 color = "#fff";
             }
             return <li className="col-lg-8 dropdown flash-messages-menu">
-                <a href="#" className="dropdown-toggle" data-toggle="dropdown" onClick={this.markAsViewed}><i className={"fa "+messageStatus} style={{color:color}} /></a>
+                <A href="#" className="dropdown-toggle" data-toggle="dropdown" onClick={this.markAsViewed}><i className={"fa "+messageStatus} style={{color:color}} /></A>
                 <ul className="dropdown-menu pull-right" role="menu" >
                   {messageItems}
                 </ul>
@@ -109,12 +109,12 @@ define(["react","js/utils","js/flash_messages","jquery"],function (React,Utils,F
         render : function() {
 
 
-            //<a className="alert-link" href="" onClick={this.fadeOut}>{this.props.message.data.description}<i className="fa fa-times" /></a>
+            //<A className="alert-link" href="" onClick={this.fadeOut}>{this.props.message.data.description}<i className="fa fa-times" /></A>
             return <div className={"flash alert alert-"+(this.props.message.data.type !== undefined ? this.props.message.data.type : "info")}>
                       <div className="container">
                         <div className="row">
                           <p key={this.props.message.id} className="col-lg-8 pull-left">
-                            <a className="alert-link" href="" onClick={this.fadeOut}>{this.props.message.data.description} <i className="fa fa-times" /></a>
+                            <A className="alert-link" href="" onClick={this.fadeOut}>{this.props.message.data.description} <i className="fa fa-times" /></A>
                           </p>
                         </div>
                       </div>

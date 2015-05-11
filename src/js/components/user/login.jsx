@@ -85,29 +85,55 @@ define(["js/settings",
 
         handleSubmit: function (e) {
 
+            e.preventDefault();
+
             var formData = {login : this.state.login,password : this.state.password,otp : this.state.otp};
 
             if (!this.validate())
                 return;
 
             var onSuccess = function(data){
+                var existingAuthorization;
                 for(var i in data){
-                    var token = data[i];
-                    if (token.note == 'gitboard'){
+                    var authorization = data[i];
+                    if (authorization.note == 'gitboard'){
+                        existingAuthorization = authorization;
+                        break;
+                        console.log(token);
                         Utils.login(token.token);
                         Utils.redirectTo("#/");
                         return;
                     }
                 }
 
-                var onSuccess = function(data){
-                    Utils.login(data.token);
-                    Utils.redirectTo("#/");
+                var createAuthorization = function(){
+
+                    var onSuccess = function(data){
+                        Utils.login(data.token);
+                        Utils.redirectTo("#/");
+                    }.bind(this);
+
+                    var onError = function(xhr,status,message){
+                        this.setErrorMessage("The login failed for an unknown reason. Sorry :/");
+                    }.bind(this);
+
+                    this.authorizationApi.createAuthorization(formData.login,formData.password,formData.otp,{note : 'gitboard',scopes : ['repo','read:org']},onSuccess,onError)
+
+
                 }.bind(this);
 
-                var onError = function(xhr,status,message){
-                }.bind(this);
-                this.authorizationApi.createAuthorization(formData.login,formData.password,formData.otp,{note : 'gitboard',scopes : ['repo','read:org']},onSuccess,onError)
+                if (existingAuthorization){
+                    var onDeleteSuccess = function(){
+                        createAuthorization();
+                    }.bind(this);
+                    var onDeleteError = function(){
+                        this.setErrorMessage("Cannot delete existing authorization from Github. Sorry :/");
+                    }
+                    this.authorizationApi.deleteAuthorization(formData.login,formData.password,formData.otp,existingAuthorization.id,onDeleteSuccess,onDeleteError)
+
+                }
+                else
+                    createAuthorization();
             }.bind(this);
 
             var onError = function(xhr,status,message){
@@ -120,8 +146,7 @@ define(["js/settings",
 
             this.authorizationApi.getAuthorizations(formData.login,formData.password,formData.otp,onSuccess,onError);
 
-            e.preventDefault();
-        },  
+        },
 
     });
 

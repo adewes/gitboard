@@ -3,7 +3,8 @@ define([],function (Utils) {
 
     var settings = {
         source : 'https://api.github.com',
-        frontendUrl : '/app',
+        frontendUrl : '/',
+        html5history : false,
         github : {
             //Application keys can be managed here:
             //https://github.com/organizations/quantifiedcode/settings/applications/

@@ -7,7 +7,7 @@
 /*jshint newcap:false */
 /*global React, Router*/
 
-define(["react","bootstrap","jquery"],function (React,Bootstrap,$) {
+define(["react","jquery","bootstrap"],function (React,$,Bootstrap) {
     'use'+' strict';
 
     var BootstrapButton = React.createClass({
@@ -16,9 +16,9 @@ define(["react","bootstrap","jquery"],function (React,Bootstrap,$) {
         // transferPropsTo() is smart enough to merge classes provided
         // to this component.
         return this.transferPropsTo(
-          <a href="javascript:;" role="button" className="btn">
+          <A role="button" className="btn">
             {this.props.children}
-          </a>
+          </A>
         );
       }
     });
@@ -27,77 +27,94 @@ define(["react","bootstrap","jquery"],function (React,Bootstrap,$) {
       // The following two methods are the only places we need to
       // integrate with Bootstrap or jQuery!
       displayName: 'BootstrapModal',
-      componentDidMount: function() {
-        // When the component is added, turn it into a modal
-        $(this.getDOMNode())
-          .modal({keyboard: false, show: this.props.show || false})
-      },
-      componentWillUnmount: function() {
-        $(this.getDOMNode()).off('hidden', this.handleHidden);
-      },
 
       close: function() {
-        $(this.getDOMNode()).modal('hide');
         this.setState({hidden : true});
       },
 
       open: function() {
-        $(this.getDOMNode()).modal('show');
         this.setState({hidden : false});
       },
 
       getInitialState : function(){
-        return {hidden : true}
+        return {hidden : this.props.hidden !== undefined ? this.props.hidden : true}
+      },
+
+      getDefaultProps : function(){
+        return {closable : true,disabled : false};
+      },
+
+      componentWillReceiveProps : function(props){
+        if (props.hidden && props.hidden != this.state.hidden)
+            this.setState({hidden : props.hidden});
+      },
+
+      componentDidUpdate : function(){
+        if (!this.isMounted())
+            return;
       },
 
       render: function() {
-        var confirmButton = null;
-        var cancelButton = null;
+
+        if (this.state.hidden)
+            return <div ref="modal"/>;
+
+        var confirmButton;
+        var cancelButton;
 
         if (this.props.confirm) {
           confirmButton = (
             <BootstrapButton
               onClick={this.handleConfirm}
+              disabled={this.props.disabled}
               className="btn-primary">
               {this.props.confirm}
             </BootstrapButton>
           );
         }
+
+        var closeButton;
+
+        if (this.props.closable){
+          closeButton = <button
+            type="button"
+            className="close"
+            disabled={this.props.disabled}
+            onClick={this.handleCancel}
+            dangerouslySetInnerHTML={{__html: '&times'}}/>
+        }
+
         if (this.props.cancel) {
           cancelButton = (
-            <BootstrapButton onClick={this.handleCancel}>
+            <BootstrapButton disabled={this.props.disabled} onClick={this.handleCancel}>
               {this.props.cancel}
             </BootstrapButton>
           );
         }
 
+
         var footer = '';
 
-        if (this.props.onCancel !== undefined || this.props.onConfirm !== undefined)
+        if (this.props.onCancel || this.props.onConfirm)
         {
           footer = <div className="modal-footer">
             {cancelButton}
             {confirmButton}
           </div>
         }
-        var content = undefined;
-        if (this.state.hidden == false){
-            if (this.props.getContent !== undefined)
-                content = this.props.getContent();
-            else
-                content = this.props.children;
-        }
+        var content;
+
+        if (this.props.getContent)
+            content = this.props.getContent();
+        else
+            content = this.props.children;
 
         return (
-          <div className="modal">
+          <div className="modal show" ref="modal">
             <div className="modal-dialog">
               <div className="modal-content">
                 <div className="modal-header">
-                  <button
-                    type="button"
-                    className="close"
-                    onClick={this.handleCancel}
-                    dangerouslySetInnerHTML={{__html: '&times'}}/>
+                  {closeButton}
                   <h3>{this.props.title}</h3>
                 </div>
                 <div className="modal-body">
@@ -106,19 +123,22 @@ define(["react","bootstrap","jquery"],function (React,Bootstrap,$) {
                 {footer}
               </div>
             </div>
+            <div className="modal-backdrop in" onClick={this.props.closable ? this.handleCancel : function(e){e.preventDefault();}}></div>
           </div>
         );
       },
-      handleCancel: function() {
-        if (this.props.onCancel) {
-          this.props.onCancel();
-        }
+
+      handleCancel: function(e) {
+        if (this.props.onCancel)
+          this.props.onCancel(e);
+        e.preventDefault();
         this.close();
       },
-      handleConfirm: function() {
-        if (this.props.onConfirm) {
-          this.props.onConfirm();
-        }
+
+      handleConfirm: function(e) {
+        if (this.props.onConfirm)
+          this.props.onConfirm(e);
+        e.preventDefault();
       }
     });
 

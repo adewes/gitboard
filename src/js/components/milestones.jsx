@@ -20,11 +20,11 @@ define(["react",
 
             render : function(){
                 return <div className="col-md-3"><div className="panel panel-primary milestone-item">
-                  <a href={"#/sprintboard/"+this.props.repository.full_name+"/"+this.props.milestone.number}>
+                  <A href={"#/sprintboard/"+this.props.repository.full_name+"/"+this.props.milestone.number}>
                     <div className="panel-body">
                         <h5>{this.props.milestone.title}</h5>
                     </div>
-                    </a>
+                    </A>
                 </div></div>;
             }
         });
