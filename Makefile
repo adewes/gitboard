@@ -1,18 +1,23 @@
 #!/bin/bash
 
+## Copyright (c) 2015 - Andreas Dewes
+##
+## This file is part of Gitboard.
+##
+## Gitboard is free software: you can redistribute it and/or modify
+## it under the terms of the GNU Affero General Public License as
+## published by the Free Software Foundation, either version 3 of the
+## License, or (at your option) any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU Affero General Public License for more details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-ifeq ($(ENVIRONMENT),production)
-	BUILD_TMP_DIR=newBuild
-	BUILD_ENVIRONMENT=production
-else
-	BUILD_TMP_DIR=build
-	BUILD_ENVIRONMENT=development
-endif
-
-$(info Build dir: $(BUILD_TMP_DIR))
-
-BUILD_FINAL_DIR=build
-BUILD_BACKUP_DIR=lastBuild
+BUILD_DIR=build
 SOURCE_DIR=src
 
 CSS_FILES = /bower_components/font-mfizz/css/font-mfizz.css \
@@ -24,14 +29,18 @@ CSS_FILES = /bower_components/font-mfizz/css/font-mfizz.css \
 
 export PATH := 	./node_modules/.bin:$(PATH);
 
+ifeq ($(ENVIRONMENT),production)
+	BUILD_ENVIRONMENT=production
+else
+	BUILD_ENVIRONMENT=development
+endif
+
 all: $(BUILD_ENVIRONMENT)
 
 clean:
-	rm -rf $(BUILD_FINAL_DIR)
-	rm -rf $(BUILD_TMP_DIR)
-	rm -rf $(BUILD_BACKUP_DIR)
+	rm -rf $(BUILD_DIR)
 
-production: backup npm bower assets scripts jsx templates optimize move
+production: backup npm bower assets scripts jsx templates optimize
 
 development: npm bower assets scripts jsx templates optimize-css watch
 
@@ -41,36 +50,31 @@ npm:
 	npm install
 
 optimize-css:
-	mkdir -p $(BUILD_TMP_DIR)/static/css
-	cleancss -o $(BUILD_TMP_DIR)/static/css/all.min.css $(addprefix $(BUILD_TMP_DIR)/static,$(CSS_FILES))
+	mkdir -p $(BUILD_DIR)/static/css
+	cleancss -o $(BUILD_DIR)/static/css/all.min.css $(addprefix $(BUILD_DIR)/static,$(CSS_FILES))
 
 optimize-rjs:
-	r.js -o $(BUILD_TMP_DIR)/static/js/build.js
+	r.js -o $(BUILD_DIR)/static/js/build.js
 
 scripts:
-	mkdir -p $(BUILD_TMP_DIR)/static/js
-	rsync -rupE $(SOURCE_DIR)/js --include="*.js" $(BUILD_TMP_DIR)/static
+	mkdir -p $(BUILD_DIR)/static/js
+	rsync -rupE $(SOURCE_DIR)/js --include="*.js" $(BUILD_DIR)/static
 
 templates:
-	mkdir -p $(BUILD_TMP_DIR)
-	rsync -rupE $(SOURCE_DIR)/templates/ --include="*.html" $(BUILD_TMP_DIR)
+	mkdir -p $(BUILD_DIR)
+	rsync -rupE $(SOURCE_DIR)/templates/ --include="*.html" $(BUILD_DIR)
 
 jsx:
-	jsx $(SOURCE_DIR)/js $(BUILD_TMP_DIR)/static/js -x jsx
+	jsx $(SOURCE_DIR)/js $(BUILD_DIR)/static/js -x jsx
 
 assets:
-	rsync -rupE $(SOURCE_DIR)/assets $(BUILD_TMP_DIR)/static
+	rsync -rupE $(SOURCE_DIR)/assets $(BUILD_DIR)/static
 
 .PHONY: scripts
 
 bower:
-	mkdir -p $(BUILD_TMP_DIR)/static
-	bower install --config.directory=$(BUILD_TMP_DIR)/static/bower_components
-
-backup:
-	@if [ ! -e $(BUILD_TMP_DIR) ]; then \
-		mkdir $(BUILD_TMP_DIR); \
-	fi;
+	mkdir -p $(BUILD_DIR)/static
+	bower install --config.directory=$(BUILD_DIR)/static/bower_components
 
 watch:
 	@which inotifywait || (echo "Please install inotifywait";exit 2)
@@ -78,22 +82,3 @@ watch:
 		inotifywait -r src -e create,delete,move,modify || break; \
 		($(MAKE) assets scripts jsx templates) || break;\
 	done
-
-move:
-	@if [ -e $(BUILD_BACKUP_DIR) ]; then \
-		rm -rf $(BUILD_BACKUP_DIR); \
-	fi;
-
-	if [ -e $(BUILD_FINAL_DIR) -a ! $(BUILD_TMP_DIR) = $(BUILD_FINAL_DIR) ]; then \
-		mv $(BUILD_FINAL_DIR) $(BUILD_BACKUP_DIR); \
-	fi;
-
-	if [ ! $(BUILD_TMP_DIR) = $(BUILD_FINAL_DIR) ]; then \
-		mv $(BUILD_TMP_DIR) $(BUILD_FINAL_DIR); \
-	fi;
-
-rollback:
-	@if [ -e $(BUILD_BACKUP_DIR) ]; then \
-		rm -rf $(BUILD_FINAL_DIR); \
-		mv $(BUILD_BACKUP_DIR) $(BUILD_FINAL_DIR); \
-	fi;
