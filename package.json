@@ -1,9 +1,0 @@
-{ "name" : "qc-frontend",
-  "version" : "0.1.0",
-  "dependencies" :
-    {   "clean-css": "3.2.8", 
-        "bower" : "1.4.1",
-        "react-tools" : "0.12",
-        "requirejs" : "2.1.17"
-    }
-}

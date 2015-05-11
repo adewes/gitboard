@@ -69,11 +69,7 @@ define(["js/settings",
                                         {this.formatErrorMessage()}
                                         {this.formatFieldError('login')}
                                         <fieldset>
-                                            <input type="login" 
-                                                   onChange={this.setLogin} 
-                                                   id="login" 
-                                                   className="form-control" 
-                                                   placeholder="Github Login" autofocus />
+                                            <input type="login" onChange={this.setLogin} id="login" className="form-control" placeholder="Github Login" autofocus />
                                             {this.formatFieldError('password')}
                                             <input type="password" onChange={this.setPassword} id="password" className="form-control" placeholder="Password" />
                                             {this.formatFieldError('otp')}
