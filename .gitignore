@@ -1,10 +1,8 @@
 **/node_modules
 npm*log
 venv/*
-**/build/*
 **/.sass-cache/*
 **/sass-cache/*
-frontend/build
 *.tmp
 **/.module-cache/
 *.swp
@@ -12,7 +10,5 @@ frontend/build
 *.local
 *.pyc
 *~
-.checkmate/*
 *#
 .npmignore
-**/.sass-cache
