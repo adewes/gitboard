@@ -30,14 +30,20 @@ else
 	BUILD_ENVIRONMENT=development
 endif
 
+ifeq ($(NAVIGATION),html5)
+	ENV_SETTINGS=settings_html5_navigation.js
+else
+	ENV_SETTINGS=settings_hashtag_navigation.js
+endif
+
 all: $(BUILD_ENVIRONMENT)
 
 clean:
 	rm -rf $(BUILD_DIR)
 
-production: backup npm bower assets scripts jsx templates scss optimize
+production: backup npm bower assets scripts jsx templates env_settings scss optimize
 
-development: npm bower assets scripts jsx templates scss watch
+development: npm bower assets scripts jsx templates env_settings scss watch
 
 optimize: optimize-css optimize-rjs
 
@@ -47,6 +53,9 @@ npm:
 scss: $(SOURCE_DIR)/scss/main.scss
 	mkdir -p $(BUILD_DIR)/static/css
 	scss $(SOURCE_DIR)/scss/main.scss $(BUILD_DIR)/static/css/main.css
+
+env_settings:
+	cp $(SOURCE_DIR)/js/$(ENV_SETTINGS) $(BUILD_DIR)/static/js/env_settings.js
 
 optimize-css:
 	mkdir -p $(BUILD_DIR)/static/css
