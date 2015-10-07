@@ -1,0 +1,28 @@
+.organization-item{
+
+    position:relative;
+    overflow:hidden;
+    img.avatar{
+        position:absolute;
+        opacity:0.5;
+        z-index:1;
+        right:10px;
+        top:10px;
+    }
+
+    a {
+        text-decoration: none;
+        color: inherit;
+        background:inherit;
+    }
+
+    .panel-body {
+    position:relative;
+        z-index:10;
+    }
+
+    p{
+        color:#777;
+        font-size:10px;
+    }
+}

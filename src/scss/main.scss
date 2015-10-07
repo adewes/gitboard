@@ -1,3 +1,6 @@
 // Import files
 @import "above_the_fold";
 @import "below_the_fold";
+
+body { padding-bottom: 50px; }
+footer {background:#fff; padding-top:10px;}

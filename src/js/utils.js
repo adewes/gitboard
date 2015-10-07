@@ -29,6 +29,28 @@ define(["js/settings",
 
     var utils = {
 
+        callbacks : {},
+
+        contains : function(array,value){
+            for (var i in array) {
+                if (array[i] === value)
+                    return true;
+            }
+            return false;
+        },
+
+        addCallback : function(name,callback){
+            if (this.callbacks[name] === undefined)
+                this.callbacks[name] = []
+            if (!this.contains(this.callbacks[name],callback))
+                this.callbacks[name].push(callback);
+        },
+
+        removeCallback : function(name,callback){
+            if (this.callbacks[name] && this.contains(this.callbacks[name],callback))
+                this.callbacks[name].splice(this.callbacks[name].indexOf(callback),1);
+        },
+
         setRouter : function(r){
             router = r;
         },
@@ -179,6 +201,67 @@ define(["js/settings",
             this.remove(key);
         },
 
+        setTitle: function(newTitle) {
+          // Set page title
+          var completeTitle = "QuantifiedCode";
+          if(newTitle !== undefined && newTitle.length) {
+            completeTitle = newTitle + " - " + completeTitle;
+          }
+          document.title = completeTitle;
+
+          // Set title in open graph meta tag
+          var element = document.querySelector('meta[property="og:title"]');
+          //create element if it does not exist
+          if(!element) {
+            element = document.createElement("meta");
+            var attribute = document.createAttribute("property");
+            attribute.value = "og:title";
+            element.setAttributeNode(attribute);
+            document.getElementsByTagName("head")[0].appendChild(element);
+          }
+          element.content = completeTitle;
+        },
+
+        setMetaTag: function(tag, value, og) {
+          og = og || false;
+          if(value) {
+            // Set standard meta tags
+            var element = document.querySelector('meta[name=' + tag + ']');
+            //create element if it does not exist
+            if(!element) {
+              element = document.createElement("meta");
+              element.name = tag;
+              document.getElementsByTagName("head")[0].appendChild(element);
+            }
+            element.content = value;
+
+            // Set OpenGraph properties
+            // Be aware: the og:title tag is set using setTitle
+            if (og == true) {
+                var element = document.querySelector('meta[property="og:' + tag + '"]');
+                //create element if it does not exist
+                if(!element) {
+                  element = document.createElement("meta");
+                  var attribute = document.createAttribute("property");
+                  attribute.value = "og:" + tag;
+                  element.setAttributeNode(attribute);
+                  document.getElementsByTagName("head")[0].appendChild(element);
+                }
+                element.content = value;
+            }
+
+          } else {
+            //remove tags which are not set
+            if(og == true) {
+                var oldElement = document.querySelector('meta[property="og:' + tag + '"]');
+            } else {
+                var oldElement = document.querySelector('meta[name=' + tag + ']');
+            }
+            if(oldElement) {
+              oldElement.parentNode.removeChild(oldElement);
+            }
+          }
+        },
 
         apiRequest: function(data,opts){
 

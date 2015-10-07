@@ -49,6 +49,9 @@ define(["js/settings",
 
             return <div className="container">
                         <div className="row">
+                            &nbsp;
+                        </div>
+                        <div className="row">
                             <div className="col-xs-4 col-xs-offset-4">
                                 <div className="well bs-component">
                                     <h3>Logout successful</h3>

@@ -1,0 +1,108 @@
+.sprintboard
+{
+
+    .issue-list.active{
+        background:#aaa;
+    }
+
+    .issue-list.active .issue-item{
+        pointer-events:none;
+    }
+
+    .issue-details img{
+        max-width:100%;
+    }
+
+    .issue-item{
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            background:inherit;
+        }
+
+        .panel-heading{
+            position:relative;
+        }
+
+        .panel-body{
+            padding:4px;
+        }
+
+        img.assignee {
+            position:absolute;
+            right:0;
+            top:0;
+        }
+
+
+        h5{
+            font-weight:bold !important;
+        }
+
+        .label-1,
+        .label-2,
+        .label-3,
+        .label-4,
+        .label-5,
+        .label-6,
+        .label-7,
+        .label-8,
+        .label-9,
+        .label-10,
+        .label-11,
+        .label-12
+        {
+            position:absolute;
+            top:0;
+            left:0;
+            width:5px;
+            height:16px;
+        }
+
+        .label-1{
+            left:0px;
+        }
+
+        .label-2{
+            left:5px;
+        }
+
+        .label-3{
+            left:10px;
+        }
+
+        .label-4{
+            left:15px;
+        }
+
+        .label-5{
+            left:20px;
+        }
+
+        .label-6{
+            left:25px;
+        }
+
+        .label-7{
+            left:30px;
+        }
+
+        .label-8{
+            left:35px;
+        }
+
+        .label-9{
+            left:40px;
+        }
+
+        .label-10{
+            left:45px;
+        }
+
+        .label-11{
+            left:50px;
+        }
+    }
+
+}

@@ -39,45 +39,52 @@ define(
 
     var routes = {
         '' : 
-            function(){
-                return {
-                    screen : 'repositories',
-                    data : {},
-                    component: Repositories}
+            function(){return {
+                data : {},
+                component: Repositories}
             },
         '/sprintboard/:repositoryId/:milestoneId': 
-            function(repositoryId,milestoneId){return {screen : 'sprintboard',anonOk : true,
+            function(repositoryId,milestoneId){return {
+                anonOk : true,
                 data : {repositoryId : repositoryId,milestoneId : milestoneId},
                 component: SprintBoard,
             }},
         '/repositories': 
-            function(){return {screen : 'repositories',
+            function(){return {
                 data : {},
                 component: Repositories
             }},
         '/repositories/:organizationId': 
-            function(organizationId){return {screen : 'repositories',
+            function(organizationId){return {
                 data : {organizationId : organizationId},
+                anonOk : true,
+                component : Repositories
+            }},
+        '/user_repositories/:userId': 
+            function(userId){return {
+                data : {userId : userId},
+                anonOk : true,
                 component : Repositories
             }},
         '/organizations': 
-            function(){return {screen : 'organizations',
+            function(){return {
                 data : {},
                 component : Organizations
             }},
         '/milestones/:repositoryId': 
-            function(repositoryId){return {screen : 'milestones',anonOk : true,
+            function(repositoryId){return {
+                anonOk : true,
                 data : {repositoryId : repositoryId},
                 component : Milestones
             }},
         '/login': 
-            function(){return {screen : 'login',
+            function(){return {
                 data : {},
                 anonOk: true,
                 component : Login
             }},
         '/logout' : 
-            function(){return {screen : 'logout',
+            function(){return {
                 data : {},
                 anonOk : true,
                 component : Logout

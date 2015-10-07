@@ -347,24 +347,18 @@ define(["react",
                 loadingMessage = this.getLoadingMessage();
 
             if (this.inlineComponent) {
-                if (loadingMessage === undefined) loadingMessage = "Loading data...";
-                return <p class="inlineLoader"><i className="fa fa-spin fa-refresh"/>{loadingMessage}</p>;
+                if (loadingMessage === undefined)
+                    loadingMessage = "Loading data...";
+                return <p className="alert alert-info"><i className="fa fa-spin fa-refresh"/> {loadingMessage}</p>;
             } else {
                 if (loadingMessage === undefined) {
                     loadingMessage = <div>
-                          <p>Please wait, loading data...</p>
-                          <hr />
-                          <p className="quote">
-                            {quotes[currentQuote % quotes.length].m}
-                            <br /><br />
-                            <i>{quotes[currentQuote % quotes.length].a}</i>
-                          </p>
+                          <p className="alert alert-info"><i className="fa fa-spin fa-refresh" /> Please wait, loading data...</p>
                         </div>;
                 }
                 return <div className="content">
                         <div className="text-center">
-                            <h2><i className="fa fa-spin fa-refresh" /></h2>
-                            <h3>{loadingMessage}</h3>
+                            {loadingMessage}
                         </div>
                 </div>;
             }

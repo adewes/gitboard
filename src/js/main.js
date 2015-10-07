@@ -132,31 +132,55 @@ define(
     var routesWithParams = {};
 
     var lastUrl;
+    var lastUrlPattern;
+
+    function generateCallBack(urlPattern, urlWithParams){
+      return function(){
+        var urlCallback = Routes[urlPattern];
+        var params = urlCallback.apply(
+          this,
+          Array.prototype.slice.call(arguments, 0, arguments.length-(Settings.html5history ? 0 : 1))
+        );
+
+        if (Utils.callbacks.onUrlChange && window.location.href != lastUrl){
+          for(var i in Utils.callbacks.onUrlChange){
+            var callback = Utils.callbacks.onUrlChange[i];
+            if (callback(urlPattern,urlWithParams,window.location.href) == false){
+              if (lastUrl)
+                Utils.replaceUrl(lastUrl);
+              return function(){};
+            }
+          }
+        }
+
+        if (Settings.html5history)
+          params.params = window.location.search;
+        else
+          params.params = arguments[arguments.length-1];
+
+        var url = window.location.href;
+        params.url = url;
+        //update title & meta tags
+        Utils.setTitle(params.title);
+        Utils.setMetaTag("description", (params.metaTags || {}).description);
+        Utils.setMetaTag("keywords", ((params.metaTags || {}).keywords || []).concat(Settings.globalKeyKeywords || []).join(","));
+        //render the view
+        render(params);
+        //scroll to top if we navigated to a different page
+        if(urlPattern !== lastUrlPattern) {
+          document.documentElement.scrollTop = 0;
+        }
+        //set lastUrl and lastUrlPattern
+        lastUrl = url;;
+        lastUrlPattern = urlPattern;
+      };
+    };
 
     for (var url in Routes){
         var urlWithParams = url+'/?(\\?.*)?';
         
         if (Settings.html5history)
             urlWithParams = url;
-
-        var generateCallBack = function(url, urlWithParams){
-            return function(){
-                var callBack = Routes[url];
-                var params = callBack.apply(
-                    this,
-                    Array.prototype.slice.call(arguments, 0, arguments.length-(Settings.html5history ? 0 : 1))
-                );
-
-                if (Settings.html5history)
-                    params.params = window.location.search;
-                else
-                    params.params = arguments[arguments.length-1];
-
-                params.url = url;
-
-                return render(params);
-            };
-        };
         var prefix = '';
         if (Settings.html5history)
             prefix = Settings.frontendUrl;
