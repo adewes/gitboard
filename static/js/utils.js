@@ -91,6 +91,8 @@ define(["js/settings",
                         delete params[param]
                 }
             }
+            if (!settings.html5history)
+                baseUrl = '#'+baseUrl;
             var urlParams = this.makeUrlParameters(params);
             if (urlParams)
                 return baseUrl+'?'+urlParams;
@@ -102,8 +104,11 @@ define(["js/settings",
         },
 
         redirectTo:function(url){
-            if (router)
+            if (router){
+                if (url[0] == '#')
+                    url = url.slice(1);
                 router.setRoute(url);
+            }
             else
                 window.location = url;
         },
