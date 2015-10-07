@@ -20,12 +20,7 @@
 BUILD_DIR=build
 SOURCE_DIR=src
 
-CSS_FILES = /bower_components/font-mfizz/css/font-mfizz.css \
-	        /bower_components/font-awesome/css/font-awesome.min.css \
-	        /bower_components/octicons/octicons/octicons.css \
-            /bower_components/bootstrap/dist/css/bootstrap.min.css \
-            /bower_components/bootstrap-material-design/dist/css/material.min.css \
-	        /assets/css/styles.css
+CSS_FILES = /css/main.css
 
 export PATH := 	./node_modules/.bin:$(PATH);
 
@@ -40,14 +35,18 @@ all: $(BUILD_ENVIRONMENT)
 clean:
 	rm -rf $(BUILD_DIR)
 
-production: backup npm bower assets scripts jsx templates optimize
+production: backup npm bower assets scripts jsx templates scss optimize
 
-development: npm bower assets scripts jsx templates optimize-css watch
+development: npm bower assets scripts jsx templates scss watch
 
 optimize: optimize-css optimize-rjs
 
 npm:
 	npm install
+
+scss: $(SOURCE_DIR)/scss/main.scss
+	mkdir -p $(BUILD_DIR)/static/css
+	scss $(SOURCE_DIR)/scss/main.scss $(BUILD_DIR)/static/css/main.css
 
 optimize-css:
 	mkdir -p $(BUILD_DIR)/static/css
@@ -80,5 +79,5 @@ watch:
 	@which inotifywait || (echo "Please install inotifywait";exit 2)
 	@while true ; do \
 		inotifywait -r src -e create,delete,move,modify || break; \
-		($(MAKE) assets scripts jsx templates) || break;\
+		($(MAKE) assets scripts jsx templates scss) || break;\
 	done

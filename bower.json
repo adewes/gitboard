@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "dependencies": {
     "director": "1.2.2",
-    "react": "0.12.0",
+    "react": "latest",
     "jquery": "2.1.1",
     "requirejs" : "2.1.11",
     "bootstrap-material-design": "latest",

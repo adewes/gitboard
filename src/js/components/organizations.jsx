@@ -39,7 +39,7 @@ define(["react",
 
             render : function(){
                 return <div className="col-md-3"><div className="panel panel-primary organization-item">
-                  <A href={"#/repositories/"+this.props.organization.login}>
+                  <A href={Utils.makeUrl("/repositories/"+this.props.organization.login)}>
                     <div className="panel-body">
                         <h5>{this.props.organization.login}</h5>
                     </div>
@@ -60,13 +60,12 @@ define(["react",
                             this.setState({user : data});
                         }.bind(this),
                     }];
-                if (state.user !== undefined){
-                    console.log("Adding organization");
+                if (state.user){
                     r.push(
                         {
                             name : 'organizations',
                             endpoint : this.apis.organization.getOrganizations,
-                            params : [state.user.login,{per_page : 100}],
+                            params : [{per_page : 100}],
                             success : function(data,xhr){
                                 var arr = [];
                                 for(var i in data) {

@@ -35,10 +35,10 @@ define(["js/utils","js/subject","js/settings"],function (Utils,Subject,Settings)
     OrganizationApi.prototype = new Subject.Subject();
     OrganizationApi.prototype.constructor = OrganizationApi;
 
-    OrganizationApi.prototype.getOrganizations = function(owner,data,onSuccess,onError){
+    OrganizationApi.prototype.getOrganizations = function(data,onSuccess,onError){
         return Utils.apiRequest({
             type : 'GET',
-            url : "/users/"+owner+"/orgs"+'?'+Utils.toUrlParams(data),
+            url : "/user/orgs"+'?'+Utils.toUrlParams(data),
             success : onSuccess,
             error: onError,
             },{});

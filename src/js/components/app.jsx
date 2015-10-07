@@ -55,6 +55,32 @@ define(["react",
             if (!bodyIsTool)
               $("body").addClass("app");
 
+            this.renderDependentComponents();
+        },
+
+        renderDependentComponents : function(){
+
+            var header = <Header params={this.props.params}
+                            data={this.props.data}
+                            app={this} />;
+            var menu = <Menu params={this.props.params}
+                             data={this.props.data}
+                             app={this} />;
+
+            //call React.render outside of the render function below.
+            //Calling it from within the render function is not supported by React
+            //and might break in a future version.
+            React.render(header,
+              document.getElementById('header')
+            );
+
+            React.render(menu,
+              document.getElementById('menu')
+            );
+        },
+
+        componentDidUpdate: function() {
+            this.renderDependentComponents();
         },
 
         render: function () {
@@ -68,26 +94,11 @@ define(["react",
             baseUrl   : the base URL for the given component
             */
 
-            var header = <Header params={this.props.params}
-                                 data={this.props.data}
-                                 app={this} />;
-            React.renderComponent(header,
-              document.getElementById('header')
-            );
-
-            var menu = <Menu params={this.props.params}
-                             data={this.props.data}
-                             app={this} />;
-            React.renderComponent(menu,
-              document.getElementById('menu')
-            );
-
             var props = this.props,
                 propsData = props.data;
 
             if (!Utils.isLoggedIn() && ! props.anonOk){
-                console.log("Not logged in!");
-                Utils.redirectTo("#/login");
+                Utils.redirectTo(Utils.makeUrl("/login"));
             }
 
             var Component = this.props.component;

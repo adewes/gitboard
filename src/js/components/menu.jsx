@@ -43,7 +43,7 @@ define(["react","js/utils",
             resources : function(props,state){
                 var logout  = function(){
                     Utils.logout();
-                    Utils.redirectTo(Utils.makeUrl('#/login'));
+                    Utils.redirectTo(Utils.makeUrl('/login'));
                 };
                 
                 if (Utils.isLoggedIn())
@@ -87,13 +87,13 @@ define(["react","js/utils",
                 if (Utils.isLoggedIn())
                 {
                     return <div><ul className="nav navbar-nav">
-                        <li><A href="#/organizations">Organizations</A></li>
-                        <li><A href="#/repositories">Repositories</A></li>
+                        <li><A href={Utils.makeUrl("/organizations")}>Organizations</A></li>
+                        <li><A href={Utils.makeUrl("/repositories")}>Repositories</A></li>
                     </ul>
                     <ul className="nav navbar-nav navbar-right">
                         {projectMenu}
-                        <li><A href="#/settings"><i className="fa fa-gears"></i></A></li>
-                        <li><A href="#/logout">Logout</A></li>
+                        <li><A href={Utils.makeUrl("/settings")}><i className="fa fa-gears"></i></A></li>
+                        <li><A href={Utils.makeUrl("/logout")}>Logout</A></li>
                     </ul>
                     </div>;
                 }
@@ -103,7 +103,7 @@ define(["react","js/utils",
                         <ul className="nav navbar-nav">
                         </ul>
                         <ul className="nav navbar-nav navbar-right">
-                            <li><A href="#/login">Login</A></li>
+                            <li><A href={Utils.makeUrl("/login")}>Login</A></li>
                             {flashMessagesMenu}
                         </ul>
                     </div>;

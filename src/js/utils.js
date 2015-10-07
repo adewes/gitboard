@@ -25,8 +25,13 @@ define(["js/settings",
     var ongoingRequests = {};
     var requestData = {};
     var requestNotifiers = [];
+    var router;
 
     var utils = {
+
+        setRouter : function(r){
+            router = r;
+        },
 
         getUrlParameters: function(query)
         {
@@ -86,7 +91,10 @@ define(["js/settings",
                         delete params[param]
                 }
             }
-            return baseUrl+"?"+this.makeUrlParameters(params);
+            var urlParams = this.makeUrlParameters(params);
+            if (urlParams)
+                return baseUrl+'?'+urlParams;
+            return baseUrl;
         },
 
         accessToken: function(value){
@@ -94,7 +102,10 @@ define(["js/settings",
         },
 
         redirectTo:function(url){
-            document.location = url;
+            if (router)
+                router.setRoute(url);
+            else
+                window.location = url;
         },
 
         replaceUrl : function(url){

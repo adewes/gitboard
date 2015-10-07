@@ -121,11 +121,8 @@ define(["js/settings",
                     var authorization = data[i];
                     if (authorization.note == 'gitboard'){
                         existingAuthorization = authorization;
+                        console.log(authorization);
                         break;
-                        console.log(token);
-                        Utils.login(token.token);
-                        Utils.redirectTo("#/");
-                        return;
                     }
                 }
 
@@ -133,7 +130,7 @@ define(["js/settings",
 
                     var onSuccess = function(data){
                         Utils.login(data.token);
-                        Utils.redirectTo("#/");
+                        Utils.redirectTo(Utils.makeUrl("/"));
                     }.bind(this);
 
                     var onError = function(xhr,status,message){

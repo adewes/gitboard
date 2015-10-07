@@ -79,7 +79,6 @@ define(
         window.A = "a";
 
     function render(props){
-        console.log(props);
         if (window.ga !== undefined){
             ga('send', 'pageview', {
              'page': location.pathname + location.search  + location.hash
@@ -121,11 +120,10 @@ define(
 
     router.configure({html5history : Settings.html5history,
                       notfound : function(url){
-                            window.location.pathname = Settings.frontendUrl;
+                            Utils.redirectTo(Utils.makeUrl('/'));
                         },
                       strict : false });
 
-    router.configure({notfound : function(url){Utils.redirectTo(Utils.makeUrl("/"));},strict : false });
     router.param('repositoryId', /([\w\d\-\:\.\/]+)/);
     router.param('milestoneId', /([\w\d\-\:\.]+)/);
     router.param('organizationId', /([\w\d\-\:\.]+)/);
@@ -167,6 +165,7 @@ define(
 
     router.mount(routesWithParams);
     router.init();
+    Utils.setRouter(router);
 
     if (!Settings.html5history){
         if (window.location.hash === ''){

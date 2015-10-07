@@ -7,40 +7,8 @@
 /*jshint newcap:false */
 /*global React, Router*/
 
-/*
-Copyright (c) 2015 - Andreas Dewes
-
-This file is part of Gitboard.
-
-Gitboard is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
-
 define(["react","jquery","bootstrap"],function (React,$,Bootstrap) {
-    'use'+' strict';
-
-    var BootstrapButton = React.createClass({
-      displayName: 'BootstrapButton',
-      render: function() {
-        // transferPropsTo() is smart enough to merge classes provided
-        // to this component.
-        return this.transferPropsTo(
-          <A role="button" className="btn">
-            {this.props.children}
-          </A>
-        );
-      }
-    });
+    'use strict';
 
     var BootstrapModal = React.createClass({
       // The following two methods are the only places we need to
@@ -68,13 +36,7 @@ define(["react","jquery","bootstrap"],function (React,$,Bootstrap) {
             this.setState({hidden : props.hidden});
       },
 
-      componentDidUpdate : function(){
-        if (!this.isMounted())
-            return;
-      },
-
       render: function() {
-
         if (this.state.hidden)
             return <div ref="modal"/>;
 
@@ -83,12 +45,12 @@ define(["react","jquery","bootstrap"],function (React,$,Bootstrap) {
 
         if (this.props.confirm) {
           confirmButton = (
-            <BootstrapButton
+            <button
               onClick={this.handleConfirm}
               disabled={this.props.disabled}
-              className="btn-primary">
+              className="btn btn-primary">
               {this.props.confirm}
-            </BootstrapButton>
+            </button>
           );
         }
 
@@ -99,23 +61,22 @@ define(["react","jquery","bootstrap"],function (React,$,Bootstrap) {
             type="button"
             className="close"
             disabled={this.props.disabled}
-            onClick={this.handleCancel}
-            dangerouslySetInnerHTML={{__html: '&times'}}/>
+            onClick={this.handleCancel}>
+              &times;
+          </button>
         }
 
         if (this.props.cancel) {
           cancelButton = (
-            <BootstrapButton disabled={this.props.disabled} onClick={this.handleCancel}>
+            <button className="btn" disabled={this.props.disabled} onClick={this.handleCancel}>
               {this.props.cancel}
-            </BootstrapButton>
+            </button>
           );
         }
 
+        var footer;
 
-        var footer = '';
-
-        if (this.props.onCancel || this.props.onConfirm)
-        {
+        if (this.props.onCancel || this.props.onConfirm) {
           footer = <div className="modal-footer">
             {cancelButton}
             {confirmButton}

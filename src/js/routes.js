@@ -24,6 +24,7 @@ define(
         "js/components/repositories",
         "js/components/organizations",
         "js/components/user/login",
+        "js/components/user/logout"
     ],
     function (
               Utils,
@@ -31,7 +32,8 @@ define(
               Milestones,
               Repositories,
               Organizations,
-              Login
+              Login,
+              Logout
              )
     {
 
@@ -39,7 +41,8 @@ define(
         '' : 
             function(){
                 return {
-                    screen : 'index',data : {},
+                    screen : 'repositories',
+                    data : {},
                     component: Repositories}
             },
         '/sprintboard/:repositoryId/:milestoneId': 
@@ -70,12 +73,14 @@ define(
         '/login': 
             function(){return {screen : 'login',
                 data : {},
+                anonOk: true,
                 component : Login
             }},
         '/logout' : 
             function(){return {screen : 'logout',
                 data : {},
-                component : Login
+                anonOk : true,
+                component : Logout
             }},
       };
 

@@ -38,7 +38,7 @@ define(["react",
 
             render : function(){
                 return <div className="col-md-3"><div className="panel panel-primary organization-item">
-                  <A href={"#/milestones/"+this.props.repository.full_name}>
+                  <A href={Utils.makeUrl("/milestones/"+this.props.repository.full_name)}>
                     <div className="panel-body">
                         <h5>{this.props.repository.name}</h5>
                     </div>
