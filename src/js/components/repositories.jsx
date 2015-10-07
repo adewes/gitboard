@@ -51,16 +51,9 @@ define(["react",
 
             mixins : [LoaderMixin],
 
-            resources : function(props,state){
-                r = [{
-                        name : 'user',
-                        endpoint : this.apis.user.getProfile,
-                        success : function(data,xhr){
-                            this.setState({user : data});
-                        }.bind(this),
-                    }];
-                if (state.user !== undefined || props.data.organizationId !== undefined)
-                    r.push({
+            resources : function(props){
+                if (props.data.organizationId !== undefined)
+                    return [{
                             name : 'repositories',
                             endpoint : props.data.organizationId !== undefined ? 
                                         this.apis.organization.getRepositories : 
@@ -77,8 +70,23 @@ define(["react",
                                 }
                                 this.setState({repositories : repos_array});
                             }.bind(this)
-                        });
-                return r;
+                        }];
+                else
+                    return [{
+                            name : 'repositories',
+                            endpoint : this.apis.user.getRepositories,
+                            params : [{per_page : 100}],
+                            success : function(data,xhr){
+
+                                var repos_array = [];
+                                for(var i in data) {
+                                    if(data.hasOwnProperty(i) && !isNaN(+i)) {
+                                        repos_array[+i] = data[i];
+                                    }
+                                }
+                                this.setState({repositories : repos_array});
+                            }.bind(this)
+                    }];
             },
 
             displayName: 'Repositories',

@@ -63,6 +63,7 @@ define(["react",
             var header = <Header params={this.props.params}
                             data={this.props.data}
                             app={this} />;
+
             var menu = <Menu params={this.props.params}
                              data={this.props.data}
                              app={this} />;

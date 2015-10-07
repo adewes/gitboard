@@ -2,225 +2,238 @@
  * @jsx React.DOM
  */
 
-/*
-Copyright (c) 2015 - Andreas Dewes
-
-This file is part of Gitboard.
-
-Gitboard is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
-
 define(["react",
         "js/utils",
         "jquery",
         "js/api/all",
         ],function (React,Utils,$,Apis) {
-
     'use strict';
+
+    var quotes = [
+        {
+            m : 'There are two ways of constructing a software design: One way is to make it so simple that there are obviously no deficiencies and the other way is to make it so complicated that there are no obvious deficiencies.',
+            a : 'C.A.R. Hoare, The 1980 ACM Turing Award Lecture'
+        },
+        {
+            m : 'The computing scientist’s main challenge is not to get confused by the complexities of his own making.',
+            a : 'E. W. Dijkstra'
+        },
+        {
+            m : 'The cheapest, fastest, and most reliable components are those that aren’t there.',
+            a : 'Gordon Bell'
+        },
+        {
+            m : 'Beauty is more important in computing than anywhere else in technology because software is so complicated. Beauty is the ultimate defence against complexity.',
+            a : 'David Gelernter'
+        },
+        {
+            m : 'The central enemy of reliability is complexity.',
+            a : 'Geer et. al.'
+        },
+        {
+            m : 'Software is getting slower more rapidly than hardware becomes faster',
+            a : 'Niklaus Wirth, A plea for lean software'
+        },
+        {
+            m : 'Simplicity is prerequisite for reliability.',
+            a : 'E. W. Dijkstra'
+        },
+        {
+            m : 'First, solve the problem. Then, write the code.',
+            a : 'John Johnson'
+        }
+    ];
+
+    var currentQuote = 0;
 
     var LoaderMixin = {
 
-        /*
-        A basic React component can be in one of the following three states:
-
-        - Loading data: The component waits for data from the API to arrive.
-        - Ready to use: The component has loaded all data and is ready to be used.
-        - Failed to load data: An error occured and the data could not be loaded.
-
-        This component helps to implement a generic workflow for all classes and display
-        a loading indicator while resources are being loaded from the backend.
-
-        How to use this component:
-
-        1) Define a `resources` function that returns a list of resource description that your
-           component uses. A resource description should contain at least a name and an endpoint
-           function that should be called to fetch the resource.
-        2) Alternatively, define a `onLoadResources` function that takes care of loading resources.
-           This function should wrap all success and error handlers with `looadingSuccess` or
-           `loadingError` functions, as discussed below.
-        3) When you finished loading resources, either manually call the `loadingSucceeded` 
-           function, or wrap your success handler using the `loadingSuccess` function.
-        4) If loading should have failed, either call `loadingFailed`, or wrap your error
-           handler using the `loadingError` function.
-        5) If you want to display a custom loading or error message, define the functions
-           `getLoadingMessage` or `getErrorMessage`. Use them to return a valid REACT component,
-           which will be rendered instead of the `state.loadingMessage` or `state.errorMessage`
-           texts. The `getErrorMessage` function will receive a copy of the error data object that
-           you provided to `loadingFailed`, if any.
-
-        Options when defining resources:
-
-        -params     : Parameters that will get passed to the specified API endpoints.
-        -endpoint   : The API endpoint to call to fetch the resource
-        -success    : The function to call if the loading succeeeds (if any)
-        -error      : The function to call if the loading fails (if any)
-        -mapping    : How the data should be mapped to the state object if the call succeeds.
-                      For every entry in this hash table, the key gives the name of the attribute
-                      in the `state` object and the `value` gives the name of the key in the data.
-                      If you choose `*` for the value, the whole data will be copied.
-                      The mapping will only be used if no `success` handler is defined.
-        -nonBlocking: This resource will not keep the component from being rendered while it is being
-                      loaded. Useful if you want to already display parts of your component even
-                      if the given resource is not yet available to it.
-        -nonCritical: Failing to load the resource will not result in the error header being displayed.
-        -before     : A function to be called before the API request is triggered. If this function
-                      returns false, the resource will not be loaded.
-
-        Global options:
-
-        -silentLoading: Will not display a loading message while resources are being loaded
-        */
-
-        updateLoadingState : function(role,state){
+        updateLoadingState : function(role,state,noUpdate){
             if (!this.isMounted())
                 return;
-            if (role == undefined)
-                role = "default";
 
             for (var key in this.loadingState){
                 var list = this.loadingState[key];
                 if (key == state){
-                if (!(role in list))
-                    list[role] = true;
-                }else{
-                if (role in list)
-                    delete list[role];
+                    if (!(role in list))
+                        list[role] = true;
+                } else if (role in list) {
+                     delete list[role];
+                }
+            }
+            if ((!Object.keys(this.loadingState.inProgress).length)){
+                var loadingFailed = false;
+                var d = this.coerceData();
+                var successCount = Object.keys(this.loadingState.succeeded).length
+                                  + Object.keys(this.loadingState.failedNonCritical).length;
+                if (this.resourcesList.length == successCount){
+                    if (this.afterLoadingSuccess) {
+                        var res = this.afterLoadingSuccess(d);
+                        if (res) {
+                            d = res;
+                        }
+                    }
+                }
+                else
+                    loadingFailed = true;
+                this.setState({data : d,loadingInProgress : false,loadingFailed :loadingFailed});
+            }
+        },
+
+        coerceData : function(){
+            var d = {};
+            for(var role in this.data){
+                if (role in this.loadingState.succeeded)
+                    $.extend(d,this.data[role]);
+            }
+            return d;
+        },
+
+        onLoadingError : function(handler,role,nonCritical){
+            return function(errorData){
+                if(!this.isMounted()) {
+                  return;
+                }
+                var stateErrorData = $.extend({}, this.state.errorData);
+                stateErrorData[role] = errorData;
+                this.setState({errorData: stateErrorData});
+                if (handler)
+                    handler.apply(this,arguments);
+                if (nonCritical)
+                    this.updateLoadingState(role,"failedNonCritical");
+                else
+                    this.updateLoadingState(role,"failed");
+            }.bind(this);
+        },
+
+        updateResource : function(role,data,props){
+            var resources = this.resources(props || this.props);
+            for(var i in resources){
+                var resource = resources[i];
+                if (resource.name == role){
+                    this.onResourceSuccess(resource,data);
+                    break;
                 }
             }
         },
 
-        onLoadingError : function(handler,role,nonCritical){
-            if (role == undefined)
-                role = "default";
-            return function(){
-                if (!this.isMounted())
-                    return;
-                if (nonCritical !== undefined)
-                    this.updateLoadingState(role,"failedNonCritical");
-                else
-                    this.updateLoadingState(role,"failed");
-                if (handler !== undefined)
-                    return handler.apply(this,arguments);
-                this.forceUpdate();
-            }.bind(this);
-        },
-
         onLoadingSuccess : function(handler,role){
-            if (role == undefined)
-                role = "default";
             return function(){
                 if (!this.isMounted())
                     return;
-                this.updateLoadingState(role,"succeeded");
+                if (this.state.errorData[role])
+                    delete this.state.errorData[role];
+                var update = true;
                 if (arguments.length > 0)
                 {
                     var data = arguments[0];
-                    if (this.requestIds !== undefined && this.requestIds[role] !== undefined)
-                        if (data.__requestId__ && data.__requestId__ !== this.requestIds[role] && ! data.__cached__){
-                            return;
-                        }
+
+                    if (this.reload && data.__cached__)
+                        update = false;
+
+                    //bug :/
+                    //if (this.requestIds && this.requestIds[role] && data.__requestId__ && data.__requestId__ !== this.requestIds[role])
+                    //    update = false;
                 }
-                if (handler !== undefined)
-                    return handler.apply(this,arguments);
+                //we call the success handler
+                if (update){
+                    if (handler)
+                        handler.apply(this,arguments);
+                    this.updateLoadingState(role,"succeeded");
+                }
             }.bind(this);
         },
+        
+        onResourceSuccess : function(resource,data){
+            var d = {};
 
-        autoLoadResources : function(props,state){
-            if (this.onLoadResources !== undefined)
+            var mapping = resource.mapping;
+            if (!mapping){
+                mapping = {};
+                mapping[resource.name] = resource.name;
+            }
+            for(var key in mapping){
+                d[key] = data[mapping[key]];
+            }
+
+            if (resource.success)
+            {
+                var res = resource.success(data,d);
+                if (res)
+                    $.extend(d,res);
+            }
+
+            this.data[resource.name] = d;
+        },
+
+        processResourcesList : function(props){
+
+            if (this.onLoadResources)
                 this.onLoadResources(props);
-            var resources = this.resources(props,state);
-            if (this.resources === undefined)
+
+            var resources = this.resourcesList;
+
+            if (!resources.length){
+                this.setState({data : {},loadingInProgress : false,loadingFailed : false});
                 return;
+            }
+
+            var loadingList = [];
             for(var i in resources){
                 var resource = resources[i];
-                if (resource.name in this.loadingState.succeeded ||
-                    resource.name in this.loadingState.failed ||
-                    resource.name in this.loadingState.inProgressNonBlocking ||
-                    resource.name in this.loadingState.inProgress)
-                    continue;
                 if (resource.before)
                     if (!resource.before(props,resource))
                         continue;
+
                 var params = [];
                 if (resource.params)
                     params = resource.params.slice(0);
 
-                var onSuccess = function(resource,data){
-                    if (resource.success) {
-                        resource.success(data);
-                        if (resource.mapping === undefined)
-                            return;
-                    }
-
-                    var mapping = resource.mapping;
-                    if (!mapping){
-                        mapping = {};
-                        mapping[resource.name] = resource.name;
-                    }
-                    var d = {};
-                    for(var key in mapping){
-                        d[key] = data[mapping[key]];
-                    }
-                    this.setState(d);
-
-                }.bind(this,resource);
-
-                params.push(this.onLoadingSuccess(onSuccess,resource.name));
+                params.push(this.onLoadingSuccess(this.onResourceSuccess.bind(this,resource),resource.name));
                 params.push(this.onLoadingError(resource.error,resource.name,resource.nonCritical));
-                this.updateLoadingState(resource.name,resource.nonBlocking !== undefined ? "inProgressNonBlocking" : "inProgress");
-                this.requestIds[resource.name] = resource.endpoint.apply(this,params);
+                this.updateLoadingState(resource.name,"inProgress");
+                //we call the resource endpoint with the given parameters
+                loadingList.push([resource,params]);
             }
-        },
-
-        componentDidMount : function(){
-            this.loadResources(this.props);
-        },
-
-        checkLoadingState : function(props,state){
-            var resources = this.resources(props,state);
-            for(var i in resources){
-                var resource = resources[i];
-                for (var state in this.loadingState){
-                    if (resource.name in this.loadingState[state]){
-                        if (state == 'inProgress'){
-                            this.loadingInProgress = true;
-                            return;
-                        }
-                    }
+            //We call the endpoints of the resources to be loaded
+            loadingList.map(function(p){
+                var resource = p[0];
+                var params = p[1];
+                this.params[resource.name] = params;
+                this.endpoints[resource.name] = resource.endpoint;
+                if (this.reload || 
+                    (resource.alwaysReload || (!this.lastData[resource.name])) ||
+                    ((JSON.stringify(this.lastParams[resource.name]) != JSON.stringify(params))
+                        || (resource.endpoint != this.lastEndpoints[resource.name]))){
+                    this.requestIds[resource.name] = resource.endpoint.apply(this,params);
                 }
-            }
-            this.loadingInProgress = false;
+                else{
+                    //we take the previous value
+                    this.data[resource.name] = $.extend({},this.lastData[resource.name]);
+                    this.data[resource.name].__cached__ = false;
+                    this.requestIds[resource.name] = this.lastData[resource.name].__requestId__;
+                    this.updateLoadingState(resource.name,"succeeded");
+                }
+            }.bind(this));
         },
 
-        loadResources : function(props){
+
+        reloadResources : function(){
+            this.reload = true;
             this.resetLoadingState();
-            if (this.resources)
-                this.autoLoadResources(props,this.state);
-            if (this.onLoadResources)
-                this.onLoadResources(props);
-        },
-
-        componentWillReceiveProps : function(props){
-            if (JSON.stringify([props.data,props.params]) == JSON.stringify([this.props.data,this.props.params]))
-                return false;
-            this.loadResources(props)
+            this.getResourcesList(this.props);
+            this.processResourcesList(this.props);
         },
 
         resetLoadingState : function(){
+            this.lastData = $.extend({},this.data);
+            this.lastParams = $.extend({},this.params);
+            this.lastEndpoints = $.extend({},this.endpoints);
+            this.data = {};
+            this.endpoints = {};
+            this.params = {};
             this.loadingState = {
                     inProgress : {},
-                    inProgressNonBlocking : {},
                     failed : {}, 
                     failedNonCritical : {},
                     succeeded : {},
@@ -229,73 +242,132 @@ define(["react",
 
         getInitialState : function(){
             return {
-                    loaderInitialized : false,
-                    loadingMessage : "",
-                    loadingErrorMessage : ""};
+                    loadingInProgress : true,
+                    loadingFailed : false,
+                    data : {},
+                    errorData: {}
+                   };
+        },
+
+        getResourcesList : function(props){
+            this.resourcesList = this.resources(props) || [];
         },
 
         componentWillMount : function(){
+            this.apis = Apis;
+            this.data = {};
+            this.params = {};
+            this.endpoints = {};
+            this.reload = false;
+            this.resourcesList = [];
+            this.requestIds = {};
             this._render = this.render;
             this.render = this.renderLoader;
-            this.apis = Apis;
-            this.loadingInProgress = true;
-            this.requestIds = {};
             this.resetLoadingState();
+            this.getResourcesList(this.props);
+            //cast to boolean:
+            this.showComponentWhileLoading = !!this.showComponentWhileLoading;
         },
 
-        renderLoader : function(){
-            if (this.loadingInProgress || Object.keys(this.loadingState.failed).length > 0){
+        componentWillReceiveProps : function(newProps){
+            this.reload = false;
+            this.resetLoadingState();
+            this.getResourcesList(newProps);
+            this.processResourcesList(newProps);
+        },
+
+        componentDidMount : function(){
+            this.processResourcesList(this.props);
+        },
+
+        renderLoader: function(){
+            var loadingInProgress = this.state.loadingInProgress;
+            var loadingFailed = this.state.loadingFailed;
+            if (!this.resourcesList.length)
+                loadingInProgress = false;
+            if (loadingFailed || (loadingInProgress && (!this.showComponentWhileLoading)))
                 return this.showLoader();
-            }
             return this._render();
         },
 
-        componentDidUpdate : function(prevProps,prevState){
-            var oldLoadingInProgress = this.loadingInProgress;
-            this.autoLoadResources(this.props,this.state);
-            this.checkLoadingState(this.props,this.state);
-            if (oldLoadingInProgress !== this.loadingInProgress)
-                this.forceUpdate();
-        },
-
         showLoader : function(){
-            if (this.silentLoading !== undefined)
-                return <div />;
-            if (Object.keys(this.loadingState.failed).length){
+            if (this.silentLoading)
+                return <div></div>;
+            if (this.state.loadingFailed)
                 return this.showErrorMessage();
-            }
             else
                 return this.showLoadingMessage();
         },
 
         showErrorMessage : function(){
-            var loadingErrorMessage = <h3>{this.state.loadingErrorMessage}</h3>;
-            if (this.getErrorMessage !== undefined)
-                loadingErrorMessage = this.getErrorMessage(this.state.loadingErrorData);
-            return <div className="content">
-                <div className="container">
-                    <div className="text-center">
-                        <h1>An error has occured...</h1>
-                        <h2><i className="fa fa-exclamation-triangle" /></h2>
-                        {loadingErrorMessage}
+
+            var reload = function(e){
+                e.preventDefault();
+                location.reload();
+            }.bind(this);
+            if (this.renderErrorPage)
+                return this.renderErrorPage(this.state.errorData);
+            var loadingErrorMessage;
+            if (this.getErrorMessage)
+                loadingErrorMessage = this.getErrorMessage(this.state.errorData);
+            if (!loadingErrorMessage)
+                loadingErrorMessage = '404 - Cannot load the requested resource.'
+            if (this.inlineComponent)
+                return <span className="alert alert-danger">{loadingErrorMessage}</span>;
+            else
+                return <div className="content">
+                    <div className="container">
+                        <div className="text-center">
+                            <h1><i className="fa fa-exclamation-triangle" /> An error has occured.</h1>
+                            <p className="space-top-20 space-bottom-20 alert alert-warning">{loadingErrorMessage}</p>
+                            <hr />
+                            <p>
+                                Sorry for the inconvenience. Please try reloading this page. If the problem persists
+                                please contact us, we will do our best to fix this issue for you.
+
+                            </p>
+                            <hr />
+                            <p>
+                                <a className="btn btn-lg btn-primary" onClick={reload}>reload this page</a>&nbsp;or&nbsp;
+                                <a className="btn btn-lg btn-info" href="/contact">contact us</a>
+                            </p>
+                        </div>
                     </div>
-                </div>
-            </div>;
+                </div>;
         },
 
         showLoadingMessage : function(){
-            var loadingMessage = <h3>{this.state.loadingMessage}</h3>;
-            if (this.getLoadingMessage !== undefined)
+            currentQuote++;
+
+            if (this.renderLoadingPlaceholder)
+                return this.renderLoadingPlaceholder();
+
+            var loadingMessage;
+            if (this.getLoadingMessage)
                 loadingMessage = this.getLoadingMessage();
-            return <div className="content">
-                <div className="container">
-                    <div className="text-center">
-                        <h1>Loading data...</h1>
-                        <h2><i className="fa fa-spin fa-refresh" /></h2>
-                        {loadingMessage}
-                    </div>
-                </div>
-            </div>;
+
+            if (this.inlineComponent) {
+                if (loadingMessage === undefined) loadingMessage = "Loading data...";
+                return <p class="inlineLoader"><i className="fa fa-spin fa-refresh"/>{loadingMessage}</p>;
+            } else {
+                if (loadingMessage === undefined) {
+                    loadingMessage = <div>
+                          <p>Please wait, loading data...</p>
+                          <hr />
+                          <p className="quote">
+                            {quotes[currentQuote % quotes.length].m}
+                            <br /><br />
+                            <i>{quotes[currentQuote % quotes.length].a}</i>
+                          </p>
+                        </div>;
+                }
+                return <div className="content">
+                        <div className="text-center">
+                            <h2><i className="fa fa-spin fa-refresh" /></h2>
+                            <h3>{loadingMessage}</h3>
+                        </div>
+                </div>;
+            }
         },
 
     };

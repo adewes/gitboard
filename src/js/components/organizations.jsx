@@ -52,32 +52,21 @@ define(["react",
 
             mixins : [LoaderMixin],
 
-            resources : function(props,state){
-                r = [{
-                        name : 'user',
-                        endpoint : this.apis.user.getProfile,
-                        success : function(data,xhr){
-                            this.setState({user : data});
-                        }.bind(this),
-                    }];
-                if (state.user){
-                    r.push(
-                        {
-                            name : 'organizations',
-                            endpoint : this.apis.organization.getOrganizations,
-                            params : [{per_page : 100}],
-                            success : function(data,xhr){
-                                var arr = [];
-                                for(var i in data) {
-                                    if(data.hasOwnProperty(i) && !isNaN(+i)) {
-                                        arr[+i] = data[i];
-                                    }
-                                }
-                                this.setState({organizations : arr});
-                            }.bind(this)
-                        });
-                }
-                return r;
+            resources : function(props){
+                return [{
+                    name : 'organizations',
+                    endpoint : this.apis.organization.getOrganizations,
+                    params : [{per_page : 100}],
+                    success : function(data,xhr){
+                        var arr = [];
+                        for(var i in data) {
+                            if(data.hasOwnProperty(i) && !isNaN(+i)) {
+                                arr[+i] = data[i];
+                            }
+                        }
+                        this.setState({organizations : arr});
+                    }.bind(this)
+                }];
             },
 
             displayName: 'Organizations',

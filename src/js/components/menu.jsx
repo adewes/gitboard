@@ -40,27 +40,30 @@ define(["react","js/utils",
 
             mixins : [LoaderMixin],
 
-            resources : function(props,state){
+            resources : function(props){
+
                 var logout  = function(){
                     Utils.logout();
                     Utils.redirectTo(Utils.makeUrl('/login'));
                 };
                 
-                if (Utils.isLoggedIn())
+                if (Utils.isLoggedIn()){
                     return [
                     {
                         name : 'user',
                         endpoint : this.apis.user.getProfile,
                         nonBlocking : true,
+                        nonCritical : true,
                         error : logout
                     }
                     ];
+                }
                 return [];
             },
 
             silentLoading : true,
-
             displayName: 'Menu',
+
             getInitialState: function () {
                 return {user: {admin: false}, project: {roles: {admin: []}}};
             },

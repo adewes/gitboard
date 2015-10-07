@@ -52,22 +52,20 @@ define(["react",
 
             mixins : [LoaderMixin],
 
-            resources : function(props,state){
-                r =  [
-                    {
-                        name : 'repository',
-                        endpoint : this.apis.repository.getDetails,
-                        params : [props.data.repositoryId,{}],
-                        success : function(data){
-                            this.setState({repository : data})
-                        }.bind(this)
-                    }
-                ]
-                if (state.repository !== undefined)
-                    r.push({
+            resources : function(props){
+                return [
+                        {
+                            name : 'repository',
+                            endpoint : this.apis.repository.getDetails,
+                            params : [props.data.repositoryId,{}],
+                            success : function(data){
+                                this.setState({repository : data})
+                            }.bind(this)
+                        },
+                        {
                         name : 'milestones',
                         endpoint : this.apis.milestone.getMilestones,
-                        params : [state.repository.full_name,{per_page : 100}],
+                        params : [props.data.repositoryId,{per_page : 100}],
                         success : function(data,xhr){
 
                             var arr = [];
@@ -78,10 +76,8 @@ define(["react",
                             }
                             this.setState({milestones : arr});
                         }.bind(this)
-                    });
-                return r;
+                       }];
             },
-
 
             displayName: 'Milestones',
 

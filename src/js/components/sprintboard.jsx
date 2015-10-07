@@ -44,7 +44,7 @@ define(["react",
 
             mixins : [LoaderMixin],
 
-            resources : function(props,state){
+            resources : function(props){
                 return [{
                     name : 'issueDetails',
                     endpoint : this.apis.issue.getDetails,
