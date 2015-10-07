@@ -8,20 +8,7 @@
 /*global React, Router*/
 
 define(["react","jquery","bootstrap"],function (React,$,Bootstrap) {
-    'use'+' strict';
-
-    var BootstrapButton = React.createClass({
-      displayName: 'BootstrapButton',
-      render: function() {
-        // transferPropsTo() is smart enough to merge classes provided
-        // to this component.
-        return this.transferPropsTo(
-          React.createElement(A, {role: "button", className: "btn"}, 
-            this.props.children
-          )
-        );
-      }
-    });
+    'use strict';
 
     var BootstrapModal = React.createClass({
       // The following two methods are the only places we need to
@@ -49,13 +36,7 @@ define(["react","jquery","bootstrap"],function (React,$,Bootstrap) {
             this.setState({hidden : props.hidden});
       },
 
-      componentDidUpdate : function(){
-        if (!this.isMounted())
-            return;
-      },
-
       render: function() {
-
         if (this.state.hidden)
             return React.createElement("div", {ref: "modal"});
 
@@ -64,10 +45,10 @@ define(["react","jquery","bootstrap"],function (React,$,Bootstrap) {
 
         if (this.props.confirm) {
           confirmButton = (
-            React.createElement(BootstrapButton, {
+            React.createElement("button", {
               onClick: this.handleConfirm, 
               disabled: this.props.disabled, 
-              className: "btn-primary"}, 
+              className: "btn btn-primary"}, 
               this.props.confirm
             )
           );
@@ -80,23 +61,22 @@ define(["react","jquery","bootstrap"],function (React,$,Bootstrap) {
             type: "button", 
             className: "close", 
             disabled: this.props.disabled, 
-            onClick: this.handleCancel, 
-            dangerouslySetInnerHTML: {__html: '&times'}})
+            onClick: this.handleCancel}, 
+              "×"
+          )
         }
 
         if (this.props.cancel) {
           cancelButton = (
-            React.createElement(BootstrapButton, {disabled: this.props.disabled, onClick: this.handleCancel}, 
+            React.createElement("button", {className: "btn", disabled: this.props.disabled, onClick: this.handleCancel}, 
               this.props.cancel
             )
           );
         }
 
+        var footer;
 
-        var footer = '';
-
-        if (this.props.onCancel || this.props.onConfirm)
-        {
+        if (this.props.onCancel || this.props.onConfirm) {
           footer = React.createElement("div", {className: "modal-footer"}, 
             cancelButton, 
             confirmButton

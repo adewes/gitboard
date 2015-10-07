@@ -7,6 +7,25 @@
 /*jshint newcap:false */
 /*global React, Router*/
 
+/*
+Copyright (c) 2015 - Andreas Dewes
+
+This file is part of Gitboard.
+
+Gitboard is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+*/
+
 define(["react",
         "js/utils",
         "js/components/mixins/loader",
@@ -20,7 +39,7 @@ define(["react",
 
             render : function(){
                 return React.createElement("div", {className: "col-md-3"}, React.createElement("div", {className: "panel panel-primary organization-item"}, 
-                  React.createElement(A, {href: "#/repositories/"+this.props.organization.login}, 
+                  React.createElement(A, {href: Utils.makeUrl("/repositories/"+this.props.organization.login)}, 
                     React.createElement("div", {className: "panel-body"}, 
                         React.createElement("h5", null, this.props.organization.login)
                     )
@@ -41,13 +60,12 @@ define(["react",
                             this.setState({user : data});
                         }.bind(this),
                     }];
-                if (state.user !== undefined){
-                    console.log("Adding organization");
+                if (state.user){
                     r.push(
                         {
                             name : 'organizations',
                             endpoint : this.apis.organization.getOrganizations,
-                            params : [state.user.login,{per_page : 100}],
+                            params : [{per_page : 100}],
                             success : function(data,xhr){
                                 var arr = [];
                                 for(var i in data) {

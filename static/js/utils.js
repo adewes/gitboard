@@ -1,3 +1,21 @@
+/*
+Copyright (c) 2015 - Andreas Dewes
+
+This file is part of Gitboard.
+
+Gitboard is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+*/
 define(["js/settings",
         "jquery"],function (settings,
                             $) {
@@ -7,8 +25,13 @@ define(["js/settings",
     var ongoingRequests = {};
     var requestData = {};
     var requestNotifiers = [];
+    var router;
 
     var utils = {
+
+        setRouter : function(r){
+            router = r;
+        },
 
         getUrlParameters: function(query)
         {
@@ -68,7 +91,10 @@ define(["js/settings",
                         delete params[param]
                 }
             }
-            return baseUrl+"?"+this.makeUrlParameters(params);
+            var urlParams = this.makeUrlParameters(params);
+            if (urlParams)
+                return baseUrl+'?'+urlParams;
+            return baseUrl;
         },
 
         accessToken: function(value){
@@ -76,7 +102,10 @@ define(["js/settings",
         },
 
         redirectTo:function(url){
-            document.location = url;
+            if (router)
+                router.setRoute(url);
+            else
+                window.location = url;
         },
 
         replaceUrl : function(url){

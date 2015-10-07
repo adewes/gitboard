@@ -7,6 +7,25 @@
 /*jshint newcap:false */
 /*global React, Router*/
 
+/*
+Copyright (c) 2015 - Andreas Dewes
+
+This file is part of Gitboard.
+
+Gitboard is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+*/
+
 define(["react","js/utils",
         "js/api/github/user",
         "js/components/generic/flash_messages",
@@ -24,7 +43,7 @@ define(["react","js/utils",
             resources : function(props,state){
                 var logout  = function(){
                     Utils.logout();
-                    Utils.redirectTo(Utils.makeUrl('#/login'));
+                    Utils.redirectTo(Utils.makeUrl('/login'));
                 };
                 
                 if (Utils.isLoggedIn())
@@ -68,13 +87,13 @@ define(["react","js/utils",
                 if (Utils.isLoggedIn())
                 {
                     return React.createElement("div", null, React.createElement("ul", {className: "nav navbar-nav"}, 
-                        React.createElement("li", null, React.createElement(A, {href: "#/organizations"}, "Organizations")), 
-                        React.createElement("li", null, React.createElement(A, {href: "#/repositories"}, "Repositories"))
+                        React.createElement("li", null, React.createElement(A, {href: Utils.makeUrl("/organizations")}, "Organizations")), 
+                        React.createElement("li", null, React.createElement(A, {href: Utils.makeUrl("/repositories")}, "Repositories"))
                     ), 
                     React.createElement("ul", {className: "nav navbar-nav navbar-right"}, 
                         projectMenu, 
-                        React.createElement("li", null, React.createElement(A, {href: "#/settings"}, React.createElement("i", {className: "fa fa-gears"}))), 
-                        React.createElement("li", null, React.createElement(A, {href: "#/logout"}, "Logout"))
+                        React.createElement("li", null, React.createElement(A, {href: Utils.makeUrl("/settings")}, React.createElement("i", {className: "fa fa-gears"}))), 
+                        React.createElement("li", null, React.createElement(A, {href: Utils.makeUrl("/logout")}, "Logout"))
                     )
                     );
                 }
@@ -84,7 +103,7 @@ define(["react","js/utils",
                         React.createElement("ul", {className: "nav navbar-nav"}
                         ), 
                         React.createElement("ul", {className: "nav navbar-nav navbar-right"}, 
-                            React.createElement("li", null, React.createElement(A, {href: "#/login"}, "Login")), 
+                            React.createElement("li", null, React.createElement(A, {href: Utils.makeUrl("/login")}, "Login")), 
                             flashMessagesMenu
                         )
                     );

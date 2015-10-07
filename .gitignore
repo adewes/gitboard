@@ -2,6 +2,7 @@
 npm*log
 venv/*
 **/.sass-cache/*
+build/
 **/sass-cache/*
 *.tmp
 **/.module-cache/

@@ -1,3 +1,21 @@
+/*
+Copyright (c) 2015 - Andreas Dewes
+
+This file is part of Gitboard.
+
+Gitboard is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+*/
 define(
     [
         "js/components/app",
@@ -61,7 +79,6 @@ define(
         window.A = "a";
 
     function render(props){
-        console.log(props);
         if (window.ga !== undefined){
             ga('send', 'pageview', {
              'page': location.pathname + location.search  + location.hash
@@ -103,11 +120,10 @@ define(
 
     router.configure({html5history : Settings.html5history,
                       notfound : function(url){
-                            window.location.pathname = Settings.frontendUrl;
+                            Utils.redirectTo(Utils.makeUrl('/'));
                         },
                       strict : false });
 
-    router.configure({notfound : function(url){Utils.redirectTo(Utils.makeUrl("/"));},strict : false });
     router.param('repositoryId', /([\w\d\-\:\.\/]+)/);
     router.param('milestoneId', /([\w\d\-\:\.]+)/);
     router.param('organizationId', /([\w\d\-\:\.]+)/);
@@ -149,6 +165,7 @@ define(
 
     router.mount(routesWithParams);
     router.init();
+    Utils.setRouter(router);
 
     if (!Settings.html5history){
         if (window.location.hash === ''){
