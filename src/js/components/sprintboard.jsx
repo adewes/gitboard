@@ -32,12 +32,13 @@ define(["react",
         "js/components/mixins/github_error_handler",
         "js/components/generic/modal",
         "jquery",
-        "marked"
+        "marked",
+        "moment"
         ],
-        function (React,Utils,LoaderMixin,GithubErrorHandlerMixin,Modal,$,marked) {
+        function (React,Utils,LoaderMixin,GithubErrorHandlerMixin,Modal,$,Marked,Moment) {
         'use'+' strict';
 
-        marked.setOptions({
+        Marked.setOptions({
           sanitize: false,
           gfm: true,
           tables: true,
@@ -77,7 +78,6 @@ define(["react",
 
             render :function(){
                 var issue = this.state.issue;
-                console.log(issue);
                 var markdown = <p>(no description given)</p>;
                 var assignee;
                 var labels;
@@ -87,7 +87,7 @@ define(["react",
                 try{
                     var markdownText = '(no description given)';
                     if (this.state.issue.body)
-                        markdownText = marked(this.state.issue.body);
+                        markdownText = Marked(this.state.issue.body);
                     markdown = <div key={this.state.issue.id} dangerouslySetInnerHTML={{__html : markdownText}}></div>;
                     return markdown;
                 }
@@ -123,7 +123,6 @@ define(["react",
         },
 
         closeModal : function(e){
-            console.log("closing modal");
             this.refs.issueDetails.close();
             this.setState({showDetails : false});
         },
@@ -219,32 +218,48 @@ define(["react",
             resources : function(props,state){
                 return [
                     {
+                        name : 'repository',
+                        endpoint : this.apis.repository.getDetails,
+                        params : [props.data.repositoryId,{}],
+                        success : function(data,d){
+                            return {repository : data}
+                        }
+                    },
+                    {
+                        name : 'milestone',
+                        endpoint : this.apis.milestone.getDetails,
+                        params : [props.data.repositoryId,props.data.milestoneId,{}],
+                        success : function(data,d){
+                            return {milestone : data}
+                        }
+                    },
+                    {
                         name : 'openIssues',
                         endpoint : this.apis.issue.getIssues,
                         params : [props.data.repositoryId,{state: 'open',per_page : 100,milestone : props.data.milestoneId}],
-                        success : function(data,xhr){
+                        success : function(data,d){
                             var arr = [];
                             for(var i in data) {
                                 if(data.hasOwnProperty(i) && !isNaN(+i)) {
                                     arr[+i] = data[i];
                                 }
                             }
-                            this.setState({openIssues : arr});
-                        }.bind(this),
+                            return {openIssues : arr};
+                        },
                     },
                     {
                         name : 'closedIssues',
                         endpoint : this.apis.issue.getIssues,
                         params : [props.data.repositoryId,{state :'closed',per_page : 100,milestone : props.data.milestoneId}],
-                        success : function(data,xhr){
+                        success : function(data,d){
                             var arr = [];
                             for(var i in data) {
                                 if(data.hasOwnProperty(i) && !isNaN(+i)) {
                                     arr[+i] = data[i];
                                 }
                             }
-                            this.setState({closedIssues : arr});
-                        }.bind(this),
+                            return {closedIssues : arr};
+                        },
                     }
                 ];
             },
@@ -274,15 +289,41 @@ define(["react",
             },
 
             render: function () {
-                var categories = this.categorizeIssues(this.state.openIssues,this.state.closedIssues);
+                var data = this.state.data;
+                var categories = this.categorizeIssues(data.openIssues,data.closedIssues);
                 var issueItems = {};
                 for (var category in categories){
                     var issues = categories[category];
                     issueItems[category] = issues.map(function(issue){return <IssueItem data={this.props.data} key={issue.number} issue={issue} />;}.bind(this));
+                    if (!issueItems[category].length)
+                        issueItems[category] = <div className="panel panel-default">
+                            <div className="panel-body">
+                                <i>No issues found.</i>
+                            </div>
+                        </div>
                 }
+
+                var due;
+                if (data.milestone.due_on !== null){
+                    var datestring = Moment(new Date(data.milestone.due_on)).fromNow();
+                    due = <span><i className="octicon octicon-clock" /> due {datestring}</span>;
+                }
+
                 return <div className="container sprintboard">
                     <div className="row">
-                        
+                        <div className="col-md-12">
+                            <h3><A href={Utils.makeUrl('/milestones/'+this.props.data.repositoryId)}>{data.repository.name}</A> - <A href={data.milestone.html_url} target="_blank">{data.milestone.title}</A></h3>
+                            <p>
+                                {due}
+                            </p>
+                            <div className="panel panel-default">
+                                <div className="panel-body">
+                                    <span>{data.milestone.description}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="row">
                         <IssueList setActiveDropzone={this.setActiveDropzone} name="todo" active={this.state.dropZone == "todo" ? true : false}>
                             <h4>To Do</h4>
                             {issueItems.toDo}

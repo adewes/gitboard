@@ -33,7 +33,7 @@ define(["react","js/utils",
         "jquery"
         ],
         function (React,Utils,UserApi,FlashMessages,LoaderMixin,$) {
-        'use'+' strict';
+        'use strict';
 
         var Menu = React.createClass({
 
@@ -75,6 +75,16 @@ define(["react","js/utils",
                 this.userApi = UserApi.getInstance();
             },
 
+            componentDidMount : function(){
+
+                $('a').on('click', function(){
+                        console.log("boo!");
+                           $(".btn-navbar").click(); //bootstrap 2.x
+                           $(".navbar-toggle").click(); //bootstrap 3.x by Richard
+                           this.forceUpdate({});
+                       }.bind(this));
+            },
+
             render: function () {
 
                 var adminMenu = undefined;
@@ -85,29 +95,28 @@ define(["react","js/utils",
 
                 var projectMenu = undefined;
 
-                if (Utils.isLoggedIn())
-                {
-                    return <div><ul className="nav navbar-nav">
+                var menu;
+                if (Utils.isLoggedIn()){
+                    menu = [<ul className="nav navbar-nav">
                         <li><A href={Utils.makeUrl("/repositories")}>Your Repositories</A></li>
                         <li><A href={Utils.makeUrl("/organizations")}>Your Organizations</A></li>
-                    </ul>
+                    </ul>,
                     <ul className="nav navbar-nav navbar-right">
                         {projectMenu}
                         <li><A href={Utils.makeUrl("/logout")}>Logout</A></li>
-                    </ul>
-                    </div>;
+                    </ul>];
                 }
-                else
-                {
-                    return <div>
-                        <ul className="nav navbar-nav">
-                        </ul>
-                        <ul className="nav navbar-nav navbar-right">
-                            <li><A href={Utils.makeUrl("/login")}>Login</A></li>
-                            {flashMessagesMenu}
-                        </ul>
-                    </div>;
+                else{
+                    menu = [<ul className="nav navbar-nav">
+                    </ul>,
+                    <ul className="nav navbar-nav navbar-right">
+                        <li><A href={Utils.makeUrl("/login")}>Login</A></li>
+                        {flashMessagesMenu}
+                    </ul>];
                 }
+                return <div ref="navMain" id="nav-main" className="nav-collapse">
+                        {menu}
+                    </div>;
             }
         });
 

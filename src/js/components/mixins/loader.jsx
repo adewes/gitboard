@@ -116,7 +116,11 @@ define(["react",
                 mapping[resource.name] = resource.name;
             }
             for(var key in mapping){
-                d[key] = data[mapping[key]];
+                try{
+                    d[key] = data[mapping[key]];
+                }catch(e){
+                    d[key] = undefined;
+                }
             }
 
             if (resource.success)

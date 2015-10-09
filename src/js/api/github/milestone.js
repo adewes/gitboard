@@ -44,6 +44,15 @@ define(["js/utils","js/subject","js/settings"],function (Utils,Subject,Settings)
             },{});
     }
 
+    MilestoneApi.prototype.getDetails = function(fullName,number,data,onSuccess,onError){
+        return Utils.apiRequest({
+            type : 'GET',
+            url : "/repos/"+fullName+"/milestones/"+number+'?'+Utils.toUrlParams(data),
+            success : onSuccess,
+            error: onError,
+            },{});
+    }
+
     return {getInstance:getInstance};
 
 });
