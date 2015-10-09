@@ -41,7 +41,7 @@ all: $(BUILD_ENVIRONMENT)
 clean:
 	rm -rf $(BUILD_DIR)
 
-production: backup npm bower assets scripts jsx templates env_settings scss optimize
+production: npm bower assets scripts jsx templates env_settings scss optimize
 
 development: npm bower assets scripts jsx templates env_settings scss watch
 
@@ -59,7 +59,7 @@ env_settings:
 
 optimize-css:
 	mkdir -p $(BUILD_DIR)/static/css
-	cleancss -o $(BUILD_DIR)/static/css/all.min.css $(addprefix $(BUILD_DIR)/static,$(CSS_FILES))
+	cleancss -o $(BUILD_DIR)/static/css/main.css $(addprefix $(BUILD_DIR)/static,$(CSS_FILES))
 
 optimize-rjs:
 	r.js -o $(BUILD_DIR)/static/js/build.js
