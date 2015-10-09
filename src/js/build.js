@@ -8,6 +8,7 @@
     keepBuildDir : true,
     optimize: 'uglify2',
     skipDirOptimize : true,
+    fileExclusionRegExp: /^optimized/,
     preserveLicenseComments : false,
     modules: [
       {
