@@ -102,8 +102,9 @@ define(
         else{
             var re = /^#(.*?)(\?.*)?$/i;
             var result = re.exec(window.location.hash);
-            if (result !== null)
+            if (result !== null){
                 props.baseUrl = result[1];
+            }
             else
                 props.baseUrl = "/app";
         }

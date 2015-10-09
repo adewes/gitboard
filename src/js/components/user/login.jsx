@@ -29,6 +29,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 define(["js/settings",
         "js/utils",
         "js/api/github/authorization",
+        "js/api/github/user",
         "js/components/mixins/form",
         "js/components/mixins/tabs",
         "js/flash_messages",
@@ -36,6 +37,7 @@ define(["js/settings",
                     settings,
                     Utils,
                     AuthorizationApi,
+                    UserApi,
                     FormMixin,
                     TabsMixin,
                     FlashMessagesService,
@@ -63,10 +65,10 @@ define(["js/settings",
                                                 data={this.props.data} />
                 },
                 {
-                    name : 'access_token',
+                    name : 'accessToken',
                     title : 'Access Token Login',
                     href  :  Utils.makeUrl(this.props.baseUrl,
-                                           {tab:'access_token'},
+                                           {tab:'accessToken'},
                                            this.props.params),
                     content : <AccessTokenLogin params={this.props.params}
                                                 baseUrl={this.props.baseUrl}
@@ -81,7 +83,7 @@ define(["js/settings",
                            &nbsp;
                        </div>
                        <div className="row">
-                           <div className="col-xs-4 col-xs-offset-4">
+                           <div className="col-md-4 col-md-offset-4">
                                <div className="well bs-component">
                                    {this.getTabs()}
                                    <hr />
@@ -101,32 +103,18 @@ define(["js/settings",
         mixins : [FormMixin,TabsMixin],
 
         fields: {
-            login: {
+            accessToken: {
                 required: true,
-                requiredMessage: "Please enter your username.",
+                requiredMessage: "Please enter a valid access token.",
             },
-            password: {
-                required: true,
-                requiredMessage: "Please enter your password.",
-                validator: function(value, name, data) {
-                    if (!value || value.length < 8)
-                        throw {message: "Password has to be at least 8 characters long."};
-                },
-            },
-            opt : {
-                required: false
-            }
         },
 
         getInitialState: function () {
-            return {login : '',
-                    password: '',
-                    accessToken : '',
-                    otp : ''};
+            return {accessToken : ''};
         },
 
         componentWillMount : function(){
-            this.authorizationApi = AuthorizationApi.getInstance();
+            this.userApi = UserApi.getInstance();
         },
 
         render: function () {
@@ -138,18 +126,38 @@ define(["js/settings",
                  roleName="form">
                     {this.formatErrorMessage()}
                     <fieldset>
-                        {this.formatFieldError('login')}
-                        <input type="login" 
-                               onChange={this.setter('login')} 
-                               id="login" 
+                        {this.formatFieldError('accessToken')}
+                        <input type="password" 
+                               onChange={this.setter('accessToken')} 
+                               id="accessToken" 
                                className="form-control" 
-                               placeholder="Github Login" autofocus />
-                        {this.formatFieldError('password')}
-                        <input type="password" onChange={this.setter('password')} id="password" className="form-control" placeholder="Password" />
-                        {this.formatFieldError('otp')}
-                        <input type="login" onChange={this.setter('otp')} id="otp" className="form-control" placeholder="One-Time-Password (if required)" />
-                        <button id="login-button" className="btn btn-primary" type="submit"><span className="text">Log in</span> <span className="trigger"></span></button>
+                               placeholder="Github Access Token" autofocus />
+                        <button id="login-button" className="btn btn-success" type="submit"><span className="text">Log in</span> <span className="trigger"></span></button>
                     </fieldset>
+                    <hr />
+                    <div className="panel panel-default">
+                        <div className="panel-heading">
+                            <h5>Generating an access token</h5>
+                        </div>
+                        <div className="panel-body">
+                            <ol className="list">
+                                <li>Click <a target="_blank" href={"https://github.com/settings/tokens/new?"+Utils.makeUrlParameters({scopes : settings.scopes.join(','),description : 'Gitboard Access Token'})}>here</a> to go to your Github token settings.</li>
+                                <li>Confirm the creation of the token. Scopes (we only need <strong>read:org</strong>) and description should already be correctly set.</li>
+                                <li>Copy the token and paste it into the form above.</li>
+                            </ol>
+                        </div>
+                    </div>
+                    <div className="panel panel-default">
+                        <div className="panel-heading">
+                            <h5>Security Notice</h5>
+                        </div>
+                        <div className="panel-body">
+                            <p>
+                                Your access token will not be transmitted anywhere and will be kept in the session storage
+                                of your browser for the duration of the session.
+                            </p>
+                        </div>
+                    </div>
                 </form>;
         },
 
@@ -157,61 +165,27 @@ define(["js/settings",
 
             e.preventDefault();
 
-            var formData = {login : this.state.login,password : this.state.password,otp : this.state.otp};
+            var formData = {accessToken : this.state.accessToken};
 
             if (!this.validate())
                 return;
 
             var onSuccess = function(data){
-                var existingAuthorization;
-                for(var i in data){
-                    var authorization = data[i];
-                    if (authorization.note == 'gitboard'){
-                        existingAuthorization = authorization;
-                        console.log(authorization);
-                        break;
-                    }
-                }
-
-                var createAuthorization = function(){
-
-                    var onSuccess = function(data){
-                        Utils.login(data.token);
-                        Utils.redirectTo(Utils.makeUrl("/"));
-                    }.bind(this);
-
-                    var onError = function(xhr,status,message){
-                        this.setErrorMessage("The login failed for an unknown reason. Sorry :/");
-                    }.bind(this);
-
-                    this.authorizationApi.createAuthorization(formData.login,formData.password,formData.otp,{note : 'gitboard',scopes : ['repo','read:org']},onSuccess,onError)
-
-
-                }.bind(this);
-
-                if (existingAuthorization){
-                    var onDeleteSuccess = function(){
-                        createAuthorization();
-                    }.bind(this);
-                    var onDeleteError = function(){
-                        this.setErrorMessage("Cannot delete existing authorization from Github. Sorry :/");
-                    }
-                    this.authorizationApi.deleteAuthorization(formData.login,formData.password,formData.otp,existingAuthorization.id,onDeleteSuccess,onDeleteError)
-
-                }
-                else
-                    createAuthorization();
+                Utils.redirectTo("/");
             }.bind(this);
 
-            var onError = function(xhr,status,message){
-                var otpHeader = xhr.getResponseHeader('X-Github-OTP');
-                if (otpHeader !== null && otpHeader.match(/required/i))
-                    this.addFieldError("otp","Please enter a valid one-time-password.");
-                else
-                    this.setErrorMessage("Wrong username or password. Please try again.");
+            var onError = function(){
+                FlashMessagesService.postMessage({
+                    type : "danger",
+                    description : "Login failed, please check the access token that you've provided."
+                });
+
             }.bind(this);
 
-            this.authorizationApi.getAuthorizations(formData.login,formData.password,formData.otp,onSuccess,onError);
+            console.log(formData.accessToken);
+
+            Utils.login(formData.accessToken)
+            this.userApi.getProfile(onSuccess,onError);
 
         },
     });
@@ -270,8 +244,28 @@ define(["js/settings",
                         <input type="password" onChange={this.setter('password')} id="password" className="form-control" placeholder="Password" />
                         {this.formatFieldError('otp')}
                         <input type="login" onChange={this.setter('otp')} id="otp" className="form-control" placeholder="One-Time-Password (if required)" />
-                        <button id="login-button" className="btn btn-primary" type="submit"><span className="text">Log in</span> <span className="trigger"></span></button>
+                        <button id="login-button" className="btn btn-success" type="submit"><span className="text">Log in</span> <span className="trigger"></span></button>
                     </fieldset>
+                    <hr />
+                    <div className="panel panel-default">
+                        <div className="panel-heading">
+                            <h5>Security Notice</h5>
+                        </div>
+                        <div className="panel-body">
+                            <p>
+                                Your Github login & password is <strong>only</strong> used to create an authorization
+                                through the Github API. The communication takes places <strong>directly
+                                between you and Github</strong> and the information is <strong>not</strong> transmitted
+                                anywhere else. Your username and password will <strong>not</strong> be stored in
+                                the session storage or anywhere else in your browser. Only the 
+                                generated access token will be kept in the session storage.
+                            </p>
+                            <p>
+                                If you do not feel comfortable entering your Github credentials (and we do not blame you for it),
+                                you can also log in by <strong>providing an <A href={Utils.makeUrl(this.props.baseUrl,{tab : 'accessToken'})}>access token</A></strong>.
+                            </p>
+                        </div>
+                    </div>
                 </form>;
         },
 
@@ -279,7 +273,9 @@ define(["js/settings",
 
             e.preventDefault();
 
-            var formData = {login : this.state.login,password : this.state.password,otp : this.state.otp};
+            var formData = {login : this.state.login,
+                            password : this.state.password,
+                            otp : this.state.otp};
 
             if (!this.validate())
                 return;
@@ -306,7 +302,7 @@ define(["js/settings",
                         this.setErrorMessage("The login failed for an unknown reason. Sorry :/");
                     }.bind(this);
 
-                    this.authorizationApi.createAuthorization(formData.login,formData.password,formData.otp,{note : 'gitboard',scopes : ['repo','read:org']},onSuccess,onError)
+                    this.authorizationApi.createAuthorization(formData.login,formData.password,formData.otp,{note : 'gitboard',scopes : settings.scopes},onSuccess,onError)
 
 
                 }.bind(this);

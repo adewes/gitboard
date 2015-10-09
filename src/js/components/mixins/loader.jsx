@@ -9,43 +9,6 @@ define(["react",
         ],function (React,Utils,$,Apis) {
     'use strict';
 
-    var quotes = [
-        {
-            m : 'There are two ways of constructing a software design: One way is to make it so simple that there are obviously no deficiencies and the other way is to make it so complicated that there are no obvious deficiencies.',
-            a : 'C.A.R. Hoare, The 1980 ACM Turing Award Lecture'
-        },
-        {
-            m : 'The computing scientist’s main challenge is not to get confused by the complexities of his own making.',
-            a : 'E. W. Dijkstra'
-        },
-        {
-            m : 'The cheapest, fastest, and most reliable components are those that aren’t there.',
-            a : 'Gordon Bell'
-        },
-        {
-            m : 'Beauty is more important in computing than anywhere else in technology because software is so complicated. Beauty is the ultimate defence against complexity.',
-            a : 'David Gelernter'
-        },
-        {
-            m : 'The central enemy of reliability is complexity.',
-            a : 'Geer et. al.'
-        },
-        {
-            m : 'Software is getting slower more rapidly than hardware becomes faster',
-            a : 'Niklaus Wirth, A plea for lean software'
-        },
-        {
-            m : 'Simplicity is prerequisite for reliability.',
-            a : 'E. W. Dijkstra'
-        },
-        {
-            m : 'First, solve the problem. Then, write the code.',
-            a : 'John Johnson'
-        }
-    ];
-
-    var currentQuote = 0;
-
     var LoaderMixin = {
 
         updateLoadingState : function(role,state,noUpdate){
@@ -337,7 +300,6 @@ define(["react",
         },
 
         showLoadingMessage : function(){
-            currentQuote++;
 
             if (this.renderLoadingPlaceholder)
                 return this.renderLoadingPlaceholder();

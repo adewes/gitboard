@@ -16,7 +16,7 @@ define(["react",
       displayName: 'Tabs',
 
       getDefaultProps: function (){
-          return {tabs : [], activeTab : '', classes : 'tabs', onClick: function(){return true;}};
+          return {tabs : [], activeTab : '', classes : 'nav nav-pills', onClick: function(){return true;}};
       },
 
       render: function() {

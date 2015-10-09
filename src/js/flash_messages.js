@@ -50,6 +50,6 @@ define(["js/utils","js/subject"],function (Utils,Subject) {
         return messageId;
     }
 
-    return {getInstance:getInstance};
+    return getInstance();
 
 });
