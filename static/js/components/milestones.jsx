@@ -29,45 +29,55 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 define(["react",
         "js/utils",
         "js/components/mixins/loader",
-        "jquery"
+        "js/components/mixins/github_error_handler",
+        "jquery",
+        "moment"
         ],
-        function (React,Utils,LoaderMixin,$) {
+        function (React,Utils,LoaderMixin,GithubErrorHandlerMixin,$,Moment) {
         'use'+' strict';
 
 
         var MilestoneItem = React.createClass({
 
             render : function(){
-                return <div className="col-md-3"><div className="panel panel-primary milestone-item">
-                  <A href={Utils.makeUrl("/sprintboard/"+this.props.repository.full_name+"/"+this.props.milestone.number)}>
-                    <div className="panel-body">
-                        <h5>{this.props.milestone.title}</h5>
+                var due;
+                if (this.props.milestone.due_on !== null){
+                    var datestring = Moment(new Date(this.props.milestone.due_on)).calendar();
+                    due = [<i className="octicon octicon-clock" />,' ',datestring];
+                }
+                return <div className="col-md-3">
+                    <div className="panel panel-primary milestone-item">
+                        <A href={Utils.makeUrl("/sprintboard/"+this.props.repository.full_name+"/"+this.props.milestone.number)}>
+                            <div className="panel-body">
+                                <h4>{this.props.milestone.title}</h4>
+                                <span className="label label-danger">{this.props.milestone.open_issues} open</span>&nbsp;
+                                <span className="label label-success">{this.props.milestone.closed_issues} closed</span>
+                                <span className="pull-right">{due}</span>
+                            </div>
+                        </A>
                     </div>
-                    </A>
-                </div></div>;
+                </div>;
             }
         });
 
         var Milestones = React.createClass({
 
-            mixins : [LoaderMixin],
+            mixins : [LoaderMixin,GithubErrorHandlerMixin],
 
-            resources : function(props,state){
-                r =  [
-                    {
-                        name : 'repository',
-                        endpoint : this.apis.repository.getDetails,
-                        params : [props.data.repositoryId,{}],
-                        success : function(data){
-                            this.setState({repository : data})
-                        }.bind(this)
-                    }
-                ]
-                if (state.repository !== undefined)
-                    r.push({
+            resources : function(props){
+                return [
+                        {
+                            name : 'repository',
+                            endpoint : this.apis.repository.getDetails,
+                            params : [props.data.repositoryId,{}],
+                            success : function(data){
+                                this.setState({repository : data})
+                            }.bind(this)
+                        },
+                        {
                         name : 'milestones',
                         endpoint : this.apis.milestone.getMilestones,
-                        params : [state.repository.full_name,{per_page : 100}],
+                        params : [props.data.repositoryId,{per_page : 100}],
                         success : function(data,xhr){
 
                             var arr = [];
@@ -78,10 +88,8 @@ define(["react",
                             }
                             this.setState({milestones : arr});
                         }.bind(this)
-                    });
-                return r;
+                       }];
             },
-
 
             displayName: 'Milestones',
 
@@ -89,6 +97,9 @@ define(["react",
                 var milestoneItems = this.state.milestones.map(function(milestone){
                     return <MilestoneItem milestone={milestone} repository={this.state.repository} />;
                 }.bind(this))
+
+                if (milestoneItems.length == 0)
+                    milestoneItems = [<p className="alert alert-info">Seems there is nothing to show here.</p>]
 
                 return <div className="container">
                     <div className="row">

@@ -1,40 +1,4 @@
-/*
 
-To get this list of colors inject jQuery at http://www.google.com/design/spec/style/color.html#color-color-palette
-
-Then, run this script to get the list.
-
-
-(function() {
-  var colors = {}, main = {};
-  $(".color-group").each(function() {
-    var color = $(this).find(".name").text().trim().toLowerCase().replace(" ", "-");
-    colors[color] = {};
-
-    $(this).find(".color").not(".main-color").each(function() {
-      var shade = $(this).find(".shade").text().trim(),
-          hex   = $(this).find(".hex").text().trim();
-
-      colors[color][shade] = hex;
-    });
-    main[color] = color + "-" + $(this).find(".main-color .shade").text().trim();
-
-  });
-  var LESS = "";
-  $.each(colors, function(name, shades) {
-    LESS += "\n\n";
-    $.each(shades, function(shade, hex) {
-      LESS += "@" + name + "-" + shade + ": " + hex + ";\n";
-    });
-    if (main[name]) {
-      LESS += "@" + name + ": " + main[name] + ";\n";
-    }
-  });
-  console.log(LESS);
-})();
-
-
-*/
 @font-face {
   font-family: 'Material-Design-Icons';
   src: url('../fonts/Material-Design-Icons.eot?3ocs8m');
@@ -48,7 +12,7 @@ Then, run this script to get the list.
   display: inline-block;
   font: normal normal normal 24px/1 'Material-Design-Icons';
   text-rendering: auto;
-  /* Better Font Rendering =========== */
+  
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-transform: translate(0, 0);
@@ -271,7 +235,6 @@ Then, run this script to get the list.
 .mdi-inverse {
   color: #ffffff;
 }
-/* Start Icons */
 .mdi-action-3d-rotation:before {
   content: "\e600";
 }
@@ -61348,11 +61311,11 @@ icon-material-blue-grey-A700 {
   color: #455a64;
 }
 .card {
-  /***** Make height equal to width (http://stackoverflow.com/a/6615994) ****/
+  
   display: inline-block;
   position: relative;
   width: 100%;
-  /**************************************************************************/
+  
   border-radius: 2px;
   color: rgba(0, 0, 0, 0.84);
   background: #ffffff;
@@ -73439,4 +73402,3 @@ hr.on-light {
 .shadow-z-5 {
   box-shadow: 0 27px 24px 0 rgba(0, 0, 0, 0.2), 0 40px 77px 0 rgba(0, 0, 0, 0.22);
 }
-/*# sourceMappingURL=material-fullpalette.css.map */

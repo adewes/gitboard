@@ -63,6 +63,7 @@ define(["react",
             var header = <Header params={this.props.params}
                             data={this.props.data}
                             app={this} />;
+
             var menu = <Menu params={this.props.params}
                              data={this.props.data}
                              app={this} />;
@@ -94,22 +95,22 @@ define(["react",
             baseUrl   : the base URL for the given component
             */
 
-            var props = this.props,
-                propsData = props.data;
+            var props = this.props;
 
             if (!Utils.isLoggedIn() && ! props.anonOk){
                 Utils.redirectTo(Utils.makeUrl("/login"));
             }
 
             var Component = this.props.component;
+
             if (this.props.callback){
                 Component = this.props.callback(this.props);
             }
 
             return <Component
                 app={this}
-                baseUrl={screen.baseUrl}
-                data={propsData}
+                baseUrl={props.baseUrl}
+                data={props.data}
                 params={props.params}/>;
         }
     });

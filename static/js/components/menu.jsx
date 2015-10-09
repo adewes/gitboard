@@ -30,37 +30,39 @@ define(["react","js/utils",
         "js/api/github/user",
         "js/components/generic/flash_messages",
         "js/components/mixins/loader",
-        "js/flash_messages",
         "jquery"
         ],
-        function (React,Utils,UserApi,FlashMessages,LoaderMixin,FlashMessagesService,$) {
+        function (React,Utils,UserApi,FlashMessages,LoaderMixin,$) {
         'use'+' strict';
 
         var Menu = React.createClass({
 
             mixins : [LoaderMixin],
 
-            resources : function(props,state){
+            resources : function(props){
+
                 var logout  = function(){
                     Utils.logout();
                     Utils.redirectTo(Utils.makeUrl('/login'));
                 };
                 
-                if (Utils.isLoggedIn())
+                if (Utils.isLoggedIn()){
                     return [
                     {
                         name : 'user',
                         endpoint : this.apis.user.getProfile,
                         nonBlocking : true,
+                        nonCritical : true,
                         error : logout
                     }
                     ];
+                }
                 return [];
             },
 
             silentLoading : true,
-
             displayName: 'Menu',
+
             getInitialState: function () {
                 return {user: {admin: false}, project: {roles: {admin: []}}};
             },
@@ -71,7 +73,6 @@ define(["react","js/utils",
 
             componentWillMount : function(){
                 this.userApi = UserApi.getInstance();
-                this.flashMessagesService = FlashMessagesService.getInstance();
             },
 
             render: function () {
@@ -87,12 +88,11 @@ define(["react","js/utils",
                 if (Utils.isLoggedIn())
                 {
                     return <div><ul className="nav navbar-nav">
-                        <li><A href={Utils.makeUrl("/organizations")}>Organizations</A></li>
-                        <li><A href={Utils.makeUrl("/repositories")}>Repositories</A></li>
+                        <li><A href={Utils.makeUrl("/repositories")}>Your Repositories</A></li>
+                        <li><A href={Utils.makeUrl("/organizations")}>Your Organizations</A></li>
                     </ul>
                     <ul className="nav navbar-nav navbar-right">
                         {projectMenu}
-                        <li><A href={Utils.makeUrl("/settings")}><i className="fa fa-gears"></i></A></li>
                         <li><A href={Utils.makeUrl("/logout")}>Logout</A></li>
                     </ul>
                     </div>;

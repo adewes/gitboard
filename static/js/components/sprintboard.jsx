@@ -29,22 +29,29 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 define(["react",
         "js/utils",
         "js/components/mixins/loader",
+        "js/components/mixins/github_error_handler",
         "js/components/generic/modal",
         "jquery",
         "marked"
         ],
-        function (React,Utils,LoaderMixin,Modal,$,marked) {
+        function (React,Utils,LoaderMixin,GithubErrorHandlerMixin,Modal,$,marked) {
         'use'+' strict';
 
         marked.setOptions({
-          sanitize: true
+          sanitize: false,
+          gfm: true,
+          tables: true,
+          pedantic: false,
+          breaks: false,
+          smartLists: true,
+          smartypants: false
         });
 
         var IssueDetails = React.createClass({
 
-            mixins : [LoaderMixin],
+            mixins : [LoaderMixin,GithubErrorHandlerMixin],
 
-            resources : function(props,state){
+            resources : function(props){
                 return [{
                     name : 'issueDetails',
                     endpoint : this.apis.issue.getDetails,
@@ -52,7 +59,7 @@ define(["react",
                     success : function(data){
                         this.setState({issue : data});
                     }.bind(this)
-                },{
+                },/*{
                     name : 'issueComments',
                     endpoint : this.apis.issue.getComments,
                     params : [props.data.repositoryId,props.issue.number,{per_page : 100}],
@@ -65,11 +72,18 @@ define(["react",
                         }
                         this.setState({comments : arr});
                     }.bind(this)
-                }];
+                }*/];
             },
 
             render :function(){
+                var issue = this.state.issue;
+                console.log(issue);
                 var markdown = <p>(no description given)</p>;
+                var assignee;
+                var labels;
+                if (issue.assignee !== null)
+                    assignee = [<img width="16" height="16" src={this.props.issue.assignee.avatar_url+'&s=16'} />,<span className="label">{issue.assignee.login}</span>];
+
                 try{
                     var markdownText = '(no description given)';
                     if (this.state.issue.body)
@@ -88,6 +102,13 @@ define(["react",
                 }
                 finally{
                     return <div className="issue-details">
+                        <div className="labels">
+                            <A className="pull-right" href={this.props.issue.html_url} target="_blank"><i className="octicon octicon-mark-github" /></A>
+                            {assignee} {labels}
+                        </div>
+                        <div className="btn-group">
+                            
+                        </div>
                         {markdown}
                     </div>;
                 }
@@ -143,7 +164,7 @@ define(["react",
                     onConfirm={this.closeModal}
                     title={this.props.issue.title}>
                         <IssueDetails issue={this.props.issue} data={this.props.data}/>
-                  </Modal>   
+                  </Modal>
             }
             return <div className="panel panel-primary issue-item" onDragStart={this.onDragStart}
                         onDragEnd={this.onDragEnd}
@@ -179,7 +200,7 @@ define(["react",
             render : function(){
                 return <div onDragEnter={this.onDragEnter}
                             onDragLeave={this.onDragLeave}
-                            className={"col-xs-3 issue-list"+(this.props.active ? ' active' : '')}>{this.props.children}</div>;
+                            className={"col-md-3 issue-list"+(this.props.active ? ' active' : '')}>{this.props.children}</div>;
             }
         });
 
@@ -259,23 +280,27 @@ define(["react",
                     var issues = categories[category];
                     issueItems[category] = issues.map(function(issue){return <IssueItem data={this.props.data} key={issue.number} issue={issue} />;}.bind(this));
                 }
-                return <div className="container-wide sprintboard">
+                return <div className="container sprintboard">
                     <div className="row">
+                        
                         <IssueList setActiveDropzone={this.setActiveDropzone} name="todo" active={this.state.dropZone == "todo" ? true : false}>
-                        <h4>To Do</h4>
-                        {issueItems.toDo}
+                            <h4>To Do</h4>
+                            {issueItems.toDo}
                         </IssueList>
+                        
                         <IssueList setActiveDropzone={this.setActiveDropzone} name="doing" active={this.state.dropZone == "doing" ? true : false}>
-                        <h4>Doing</h4>
-                        {issueItems.doing}
+                            <h4>Doing</h4>
+                            {issueItems.doing}
                         </IssueList>
+                        
                         <IssueList setActiveDropzone={this.setActiveDropzone} name="done" active={this.state.dropZone == "done" ? true : false}>
-                        <h4>Done / Awaiting Review</h4>
-                        {issueItems.awaitingReview}
+                            <h4>Done / Awaiting Review</h4>
+                            {issueItems.awaitingReview}
                         </IssueList>
+                        
                         <IssueList setActiveDropzone={this.setActiveDropzone} name="closed" active={this.state.dropZone == "closed" ? true : false}>
-                        <h4>Closed</h4>
-                        {issueItems.done}
+                            <h4>Closed</h4>
+                            {issueItems.done}
                         </IssueList>
                     </div>
                 </div>;

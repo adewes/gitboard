@@ -32,8 +32,7 @@ define(["react","js/utils","js/flash_messages","jquery"],function (React,Utils,F
     var FlashMessagesMixin = {
 
         componentWillMount : function(){
-            this.flashMessagesService = FlashMessagesService.getInstance();
-            this.flashMessagesService.subscribe(this.updateStatus);
+            FlashMessagesService.subscribe(this.updateStatus);
         },
 
         componentDidMount : function(){
@@ -45,12 +44,12 @@ define(["react","js/utils","js/flash_messages","jquery"],function (React,Utils,F
         },
 
         componentWillUnmount : function(){
-            this.flashMessagesService.unsubscribe(this.updateStatus);
+            FlashMessagesService.unsubscribe(this.updateStatus);
             clearInterval(this.timerId);
         },
 
         updateStatus : function(subject,property,value){
-            if (subject === this.flashMessagesService){
+            if (subject === FlashMessagesService){
                 if (property === 'newMessage'){
                   var newMessages = this.state.messages.slice(0);
                   newMessages.push(value);

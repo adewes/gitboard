@@ -1,21 +1,3 @@
-/*
- * Font Mfizz v1.2
- * Copyright 2013 Mfizz Inc, Joe Lauer
- * MIT License
- *
- * Project: http://mfizz.com/oss/font-mfizz
- *
- * The font designed for technology and software geeks representing programming
- * languages, operating systems, software engineering, and technology.
- *
- * Mfizz Inc
- * Web: http://mfizz.com/
- * Twitter: http://twitter.com/mfizz_inc
- *
- * Joe Lauer
- * Web: http://lauer.bz/
- * Twitter: http://twitter.com/jjlauer
- */
 
 @font-face {
   font-family: "FontMfizz";
@@ -27,7 +9,6 @@
   font-weight: normal;
   font-style: normal;
 }
-
 .icon-microscope:before,
 .icon-cplusplus:before,
 .icon-wireless:before,
@@ -129,7 +110,6 @@
   display: inline-block;
   text-decoration: inherit;
 }
-
 .icon-microscope:before { content: "\f100"; }
 .icon-cplusplus:before { content: "\f101"; }
 .icon-wireless:before { content: "\f102"; }
@@ -221,8 +201,6 @@
 .icon-google-code:before { content: "\f158"; }
 .icon-kde:before { content: "\f159"; }
 .icon-grails-alt:before { content: "\f15a"; }
-
-/* These classes only added to fix FontFamily to display FontMfizz during debug/inspection */
 .icon-osx,
 .icon-bomb,
 .icon-mobile-phone-broadcast,

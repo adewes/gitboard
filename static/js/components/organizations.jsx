@@ -29,19 +29,28 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 define(["react",
         "js/utils",
         "js/components/mixins/loader",
+        "js/components/mixins/github_error_handler",
         "jquery"
         ],
-        function (React,Utils,LoaderMixin,$) {
+        function (React,Utils,LoaderMixin,GithubErrorHandlerMixin,$) {
         'use'+' strict';
 
 
         var OrganizationItem = React.createClass({
 
             render : function(){
+                console.log(this.props.organization);
+                var description;
+                if (this.props.organization.description)
+                    description = <p>{this.props.organization.description}</p>;
+                else
+                    description = <p>no description available</p>;
                 return <div className="col-md-3"><div className="panel panel-primary organization-item">
+                  <img className="avatar" width="64" height="64" src={this.props.organization.avatar_url+'&s=64'} />
                   <A href={Utils.makeUrl("/repositories/"+this.props.organization.login)}>
                     <div className="panel-body">
-                        <h5>{this.props.organization.login}</h5>
+                        <h4>{this.props.organization.login}</h4>
+                        {description}
                     </div>
                     </A>
                 </div></div>;
@@ -50,34 +59,23 @@ define(["react",
 
         var Organizations = React.createClass({
 
-            mixins : [LoaderMixin],
+            mixins : [LoaderMixin,GithubErrorHandlerMixin],
 
-            resources : function(props,state){
-                r = [{
-                        name : 'user',
-                        endpoint : this.apis.user.getProfile,
-                        success : function(data,xhr){
-                            this.setState({user : data});
-                        }.bind(this),
-                    }];
-                if (state.user){
-                    r.push(
-                        {
-                            name : 'organizations',
-                            endpoint : this.apis.organization.getOrganizations,
-                            params : [{per_page : 100}],
-                            success : function(data,xhr){
-                                var arr = [];
-                                for(var i in data) {
-                                    if(data.hasOwnProperty(i) && !isNaN(+i)) {
-                                        arr[+i] = data[i];
-                                    }
-                                }
-                                this.setState({organizations : arr});
-                            }.bind(this)
-                        });
-                }
-                return r;
+            resources : function(props){
+                return [{
+                    name : 'organizations',
+                    endpoint : this.apis.organization.getOrganizations,
+                    params : [{per_page : 100}],
+                    success : function(data,xhr){
+                        var arr = [];
+                        for(var i in data) {
+                            if(data.hasOwnProperty(i) && !isNaN(+i)) {
+                                arr[+i] = data[i];
+                            }
+                        }
+                        this.setState({organizations : arr});
+                    }.bind(this)
+                }];
             },
 
             displayName: 'Organizations',

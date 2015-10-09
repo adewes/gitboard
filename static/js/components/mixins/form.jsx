@@ -2,32 +2,27 @@
  * @jsx React.DOM
  */
 
-/*
-Copyright (c) 2015 - Andreas Dewes
-
-This file is part of Gitboard.
-
-Gitboard is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
-
-define(["react",
-        "js/utils","jquery"
-        ],function (React,Utils,$) {
-
+define([
+  "react",
+  "js/utils",
+  "jquery",
+  "js/components/generic/modal"
+],function (
+  React,
+  Utils,
+  $,
+  Modal
+) {
     'use strict';
 
     var FormMixin = {
+
+        isFieldError : function(field){
+            if (this.state.fieldErrors !== undefined)
+                if (field in this.state.fieldErrors)
+                    return true;
+            return false;
+        },
 
         formatFieldError : function(field){
             if (this.state.fieldErrors !== undefined)
@@ -36,34 +31,72 @@ define(["react",
             return undefined;
         },
 
+        setter : function(name, trim){
+            return function(e){
+                e.preventDefault();
+                var newValue = trim === true ? $.trim(e.target.value) : e.target.value;
+                if (newValue == this.state[name])
+                    return; //nothing changed...
+                var update = {}
+                update[name] = newValue;
+                this.setState(update);
+                if(this.props.onChange) {
+                    var newValues = $.extend({}, this.getValues());
+                    newValues[name] = newValue;
+                    this.props.onChange(newValues);
+                }
+            }.bind(this);
+        },
+
+        getInitialState : function(){
+            return {disabled: false};
+        },
+
+        getValues : function() {
+            var values = {}
+            for(var name in this.fields){
+                values[name] = this.state[name];
+            }
+            return values;
+        },
+
         formatErrorMessage : function(){
             if (this.state.errorMessage !== undefined)
                 return <p className="alert alert-warning">{this.state.errorMessage}</p>;
             return undefined;
         },
 
-        clearFieldError : function(field){
-            var newErrors = $.extend({},this.state.fieldErrors);
+        formatFieldGroupError : function(field, classes){
+            if (this.isFieldError(field))
+                return "form-group has-warning " + classes;
+            return "form-group " + classes;
+        },
+
+        clearFieldError: function(field){
+            var newErrors = $.extend({}, this.state.fieldErrors);
             delete newErrors[field];
             this.setState({fieldErrors:newErrors});
         },
 
-        clearAllErrors : function(){
-            this.setState({fieldErrors:{},errorMessage : undefined});
+        clearAllErrors: function(){
+            this.setState({
+                fieldErrors: {},
+                errorMessage: undefined,
+            });
         },
 
-        addFieldError : function(field, message){
+        addFieldError: function(field, message){
             var newErrors = this.state.fieldErrors;
             newErrors[field] = message;
             this.setState({fieldErrors:newErrors});
         },
 
-        setErrorMessage : function(message){
-            this.setState({errorMessage : message});
+        setErrorMessage: function(message){
+            this.setState({errorMessage: message});
         },
 
-        clearErrorMessage : function(){
-            this.setState({errorMessage : undefined});
+        clearErrorMessage: function(){
+            this.setState({errorMessage: undefined});
         },
 
         hasErrors : function(){
@@ -72,53 +105,109 @@ define(["react",
             return false;
         },
 
-        componentDidMount : function(){
+        componentDidMount: function(){
             this.clearAllErrors();
+            if (this.props.apiErrorData !== undefined)
+                this.parseApiErrorData(this.props.apiErrorData);
         },
 
-        parseApiErrorData : function(data){
+        componentWillReceiveProps : function(props){
+            if (props.apiErrorData) {
+                this.clearAllErrors();
+                this.parseApiErrorData(props.apiErrorData);
+            }
+        },
+
+        renderWithModal : function(){
+            var modal = <Modal
+                ref="leavePageModal"
+                confirm="Leave page"
+                cancel="Stay here"
+                disabled={false}
+                onCancel={function(){this.leavePage = false;this.newUrl = undefined;}.bind(this)}
+                onConfirm={function(){Utils.redirectTo(this.newUrl);}.bind(this)}
+                title={[<i className="fa fa-exclamation-triangle" />," Unsaved data"]}>
+                    <p>There is <strong>unsaved data</strong> in the form you were editing. This data will get lost if you leave this page! Are you sure you want to leave?</p>
+          </Modal>;
+          return <div>
+                {modal}
+                {this._renderform()}
+            </div>
+        },
+
+        componentWillMount : function(){
+            this._renderform = this.render;
+            this.render = this.renderWithModal;
+            
+            if (this.isDirty === undefined)
+                this.isDirty = function(){return false;};
+
+            this.callback = function(url,fullUrl,newUrl){
+                if (!this.isMounted() || ! this.isDirty() || this.leavePage)
+                    return true;
+                this.refs.leavePageModal.open();
+                this.leavePage = true;
+                this.newUrl = newUrl;
+                return false;
+            }.bind(this);
+            Utils.addCallback("onUrlChange",this.callback);
+        },
+
+        componentWillUnmount : function(){
+            Utils.removeCallback("onUrlChange",this.callback);
+        },
+
+        parseApiErrorData: function(data){
             if (data === undefined)
                 return this.clearAllErrors();
-            var fieldErrors = {};
             this.setState({
                 fieldErrors: data.errors || {},
                 errorMessage: data.message || undefined,
             });
         },
 
-        validate : function(data){
+        disable : function(){
+            this.setState({disabled : true});
+        },
+
+        enable : function(){
+            this.setState({disabled : false});
+        },
+
+        validate: function(data) {
+            if(data === undefined) data = this.state;
             this.clearAllErrors();
             var validated = true;
             var fieldErrors = {}
             for(var name in this.fields){
                 var field = this.fields[name];
-                if (!(name in data) || data[name] === undefined || data[name] == ''){
+                if (!(name in data) || data[name] === undefined || data[name] === ''){
                     if (field.required){
                         validated = false;
-                        fieldErrors[name] = "please enter a "+field.name;
+                        fieldErrors[name] = field.requiredMessage || ("Please enter a "+ (field.name || name)+".");
                     }
                     continue;
-                }
-                else
-                {
+                } else {
                     if ('regex' in field){
+                        "^[\\w\\d-]{4,30}$"
                         var regex = RegExp(field['regex']);
                         if(!regex.test(data[name])){
                             validated = false;
-                            fieldErrors[name] = "invalid value for "+field.name;
+                            fieldErrors[name] = "Invalid value for " + (field.name || name) + ".";
                         }
                     }
                     if ('validator' in field){
-                        try{
-                            field.validator(data[name],name,data);
-                        }
-                        catch(e){
-                            fieldErrors[name] = e.message;
+                        try {
+                            field.validator.bind(this)(data[name], name, data);
+                        } catch(e) {
+                            if (typeof e == "string")
+                                fieldErrors[name] = e
+                            else
+                                fieldErrors[name] = e.message;
                             validated = false;
                         }
                     }
                 }
-
             }
             this.setState({fieldErrors : fieldErrors});
             return validated;

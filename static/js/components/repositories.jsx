@@ -29,56 +29,62 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 define(["react",
         "js/utils",
         "js/components/mixins/loader",
+        "js/components/mixins/github_error_handler",
         "jquery"
         ],
-        function (React,Utils,LoaderMixin,$) {
+        function (React,Utils,LoaderMixin,GithubErrorHandlerMixin,$) {
         'use'+' strict';
 
         var RepositoryItem = React.createClass({
 
             render : function(){
-                return <div className="col-md-3"><div className="panel panel-primary organization-item">
-                  <A href={Utils.makeUrl("/milestones/"+this.props.repository.full_name)}>
-                    <div className="panel-body">
-                        <h5>{this.props.repository.name}</h5>
+                return <div className="col-md-3">
+                    <div className="panel panel-primary repository-item">
+                        <A href={Utils.makeUrl("/milestones/"+this.props.repository.full_name)}>
+                            <div className="panel-body">
+                                <h4>{this.props.repository.name}</h4>
+                                <span className="label label-default">{this.props.repository.open_issues} open issues</span>
+                            </div>
+                        </A>
                     </div>
-                    </A>
-                </div></div>;
+                </div>;
             }
         });
 
         var Repositories = React.createClass({
 
-            mixins : [LoaderMixin],
+            mixins : [LoaderMixin,GithubErrorHandlerMixin],
 
-            resources : function(props,state){
-                r = [{
-                        name : 'user',
-                        endpoint : this.apis.user.getProfile,
-                        success : function(data,xhr){
-                            this.setState({user : data});
-                        }.bind(this),
-                    }];
-                if (state.user !== undefined || props.data.organizationId !== undefined)
-                    r.push({
+            resources : function(props){
+
+                var processRepositories =  function(data,xhr){
+                    var repos_array = [];
+                    for(var i in data) {
+                        if (data[i].open_issues == 0 || data[i].has_issues == false)
+                            continue;
+                        if(data.hasOwnProperty(i) && !isNaN(+i)) {
+                            repos_array[+i] = data[i];
+                        }
+                    }
+                    this.setState({repositories : repos_array});
+                }.bind(this);
+
+                if (props.data.organizationId !== undefined || props.data.userId !== undefined)
+                    return [{
                             name : 'repositories',
-                            endpoint : props.data.organizationId !== undefined ? 
-                                        this.apis.organization.getRepositories : 
-                                        this.apis.user.getRepositories,
-                            params : [props.data.organizationId || state.user.login,
-                                      {per_page : 100}],
-                            success : function(data,xhr){
-
-                                var repos_array = [];
-                                for(var i in data) {
-                                    if(data.hasOwnProperty(i) && !isNaN(+i)) {
-                                        repos_array[+i] = data[i];
-                                    }
-                                }
-                                this.setState({repositories : repos_array});
-                            }.bind(this)
-                        });
-                return r;
+                            endpoint : (props.data.organizationId ? this.apis.organization.getRepositories :
+                                                                   this.apis.user.getUserRepositories),
+                            params : [props.data.organizationId ? props.data.organizationId : props.data.userId,
+                                      {per_page : 100,sort: 'pushed'}],
+                            success : processRepositories
+                        }];
+                else
+                    return [{
+                            name : 'repositories',
+                            endpoint : this.apis.user.getRepositories,
+                            params : [{per_page : 100}],
+                            success : processRepositories
+                    }];
             },
 
             displayName: 'Repositories',
@@ -87,6 +93,9 @@ define(["react",
                 var repositoryItems = this.state.repositories.map(function(repository){
                     return <RepositoryItem repository={repository} />;
                 }.bind(this))
+
+                if (repositoryItems.length == 0)
+                    repositoryItems = [<p className="alert alert-info">Seems there is nothing to show here.</p>]
 
                 return <div className="container">
                     <div className="row">

@@ -1,13 +1,11 @@
 .modal-backdrop{
     z-index: -1;
 }
-
 .modal .modal-body {
     max-height: 420px !important;
     overflow: auto;
     z-index:1060;
 }
-
 .container-wide{
     width:auto;
     max-width:1600px;
@@ -15,152 +13,15 @@
     padding:15px;
     margin:0 auto;
 }
-
 .navbar{
     position:fixed;
     width:100%;
     margin-top:-60px;
 }
-
 .container{
     width:auto;
     max-width:1600px;
 }
-
 body{
     margin-top:60px !important;
-}
-
-.sprintboard .issue-item .panel-heading{
-    position:relative;
-}
-
-.sprintboard .issue-item .panel-body{
-    padding:4px;
-}
-
-.sprintboard .issue-item img.assignee {
-    position:absolute;
-    right:0;
-    top:0;
-}
-
-.issue-list.active{
-    background:#aaa;
-}
-
-.issue-list.active .issue-item{
-    pointer-events:none;
-}
-
-.sprintboard .issue-item a{
-    text-decoration: none;
-    color: inherit;
-    background:inherit;
-}
-
-.sprintboard .issue-item h5{
-    font-weight:bold !important;
-}
-
-.sprintboard .issue-details img{
-    max-width:100%;
-}
-
-.sprintboard .issue-item .label-1,
-.sprintboard .issue-item .label-2,
-.sprintboard .issue-item .label-3,
-.sprintboard .issue-item .label-4,
-.sprintboard .issue-item .label-5,
-.sprintboard .issue-item .label-6,
-.sprintboard .issue-item .label-7,
-.sprintboard .issue-item .label-8,
-.sprintboard .issue-item .label-9,
-.sprintboard .issue-item .label-10,
-.sprintboard .issue-item .label-11,
-.sprintboard .issue-item .label-12
-{
-    position:absolute;
-    top:0;
-    left:0;
-    width:5px;
-    height:16px;
-}
-
-.sprintboard .issue-item .label-1{
-    left:0px;
-}
-
-.sprintboard .issue-item .label-2{
-    left:5px;
-}
-
-.sprintboard .issue-item .label-3{
-    left:10px;
-}
-
-.sprintboard .issue-item .label-4{
-    left:15px;
-}
-
-.sprintboard .issue-item .label-5{
-    left:20px;
-}
-
-.sprintboard .issue-item .label-6{
-    left:25px;
-}
-
-.sprintboard .issue-item .label-7{
-    left:30px;
-}
-
-.sprintboard .issue-item .label-8{
-    left:35px;
-}
-
-.sprintboard .issue-item .label-9{
-    left:40px;
-}
-
-.sprintboard .issue-item .label-10{
-    left:45px;
-}
-
-.sprintboard .issue-item .label-11{
-    left:50px;
-}
-
-/*Request Indicator*/
-
-p.request-indicator {
-
-    width: auto;
-    position: absolute;
-    top: 0;
-    left: 50%;
-    margin-left: -70px;
-    border: 1px solid get-color(gold, dark);
-    border-top: none;
-    padding: 5px 15px;
-    font-size: 12px;
-    z-index: 1000;
-    background: get-color(gold, light);
-    color: get-color(grayscale, dark);
-    text-align: center;
-
-    -webkit-box-shadow: 0px 2px 3px 0px get-color(black, $alpha: 0.3);
-    -moz-box-shadow:    0px 2px 3px 0px get-color(black, $alpha: 0.3);
-    box-shadow:         0px 2px 3px 0px get-color(black, $alpha: 0.3);
-
-    > a {
-        color: get-color(grayscale, dark);
-
-        &:hover {
-            text-decoration: none;
-        }
-        > .fa-spin, > .fa-exclamation-triangle {
-            margin-right: 5px;
-        }
-    }
 }
