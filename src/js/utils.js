@@ -122,7 +122,7 @@ define(["js/settings",
         },
 
         accessToken: function(value){
-            return this.store("accessToken",value);
+            return this.sessionStore("accessToken",value);
         },
 
         redirectTo:function(url){
@@ -141,7 +141,7 @@ define(["js/settings",
 
         getFromCache : function(url){
             var key = "cache_"+url;
-            var cache = this.store(key);
+            var cache = this.sessionStore(key);
             if (cache !== undefined){
                 if (cache[1]+cache[2] >= (new Date()).getTime())
                     return cache;
@@ -157,8 +157,8 @@ define(["js/settings",
             //default cache validity: 1 hour
             validity = (typeof validity === "undefined") ? settings.cacheValidity : validity;
             var key = "cache_"+url;
-            var cache = this.store(key);
-            var cacheUrls = this.store("cache_urls") || [];
+            var cache = this.sessionStore(key);
+            var cacheUrls = this.sessionStore("cache_urls") || [];
             if (cache === undefined)
             {
                 cacheUrls.push(key);
@@ -168,8 +168,8 @@ define(["js/settings",
 
             while(true){
                 try{
-                    this.store(key,cache);
-                    this.store("cache_urls",cacheUrls);
+                    this.sessionStore(key,cache);
+                    this.sessionStore("cache_urls",cacheUrls);
                     break;
                 }
                 catch(e){
@@ -393,7 +393,7 @@ define(["js/settings",
                             newData = $.extend({'__etag__' : xhr.getResponseHeader('etag')},newData);
                         if (onSuccess)
                             onSuccess(newData);
-                        this.storeToCache(url,newData);
+                        this.sessionStoreToCache(url,newData);
                     }.bind(this,url,cachedData,originalOnSuccess)
 
                     var onError = function(url,cachedData,onError,xhr,status,e){
@@ -417,15 +417,14 @@ define(["js/settings",
         },
 
         logout : function(){
-            localStorage.clear();
-            this.store("accessToken",undefined);
+            var authorizationId = this.sessionStore('authorizationId');
+            sessionStorage.clear();
         },
 
         login : function(accessToken) {
             //we clear the local storage to make sure no information about other users is present
-            localStorage.clear();
-            console.log(accessToken);
-            this.store("accessToken",accessToken);
+            sessionStorage.clear();
+            this.sessionStore("accessToken",accessToken);
         },
 
         isLoggedIn : function(){
@@ -436,17 +435,25 @@ define(["js/settings",
             sessionStorage.removeItem(namespace);
         },
 
-        store: function (namespace, data) {
+        store: function (storage,namespace, data) {
             if (data !== undefined) {
-                return localStorage.setItem(namespace, JSON.stringify(data));
+                return storage.setItem(namespace, JSON.stringify(data));
             }
 
-            var store = localStorage.getItem(namespace);
-            return (store && JSON.parse(store)) || undefined;
+            var value = storage.getItem(namespace);
+            return (value && JSON.parse(value)) || undefined;
+        },
+
+        sessionStore :function (namespace,data){
+            return this.store(sessionStorage,namespace,data);
+        },
+
+        localStore : function(namespace,data){
+            return this.store(localStorage,namespace,data)
         },
 
         delete : function(namespace){
-            localStorage.removeItem(namespace);
+            sessionStorage.removeItem(namespace);
         }
 
  };

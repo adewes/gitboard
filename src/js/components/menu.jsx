@@ -75,25 +75,14 @@ define(["react","js/utils",
                 this.userApi = UserApi.getInstance();
             },
 
-            componentDidMount : function(){
-
-                $('a').on('click', function(){
-                        console.log("boo!");
-                           $(".btn-navbar").click(); //bootstrap 2.x
-                           $(".navbar-toggle").click(); //bootstrap 3.x by Richard
-                           this.forceUpdate({});
-                       }.bind(this));
-            },
-
             render: function () {
 
-                var adminMenu = undefined;
+                var projectMenu;
+                var adminMenu;
 
                 var FlashMessagesMenu = FlashMessages.FlashMessagesMenu;
                 var flashMessagesMenu = <FlashMessagesMenu baseUrl={this.props.baseUrl} params={this.props.params} />;
                 flashMessagesMenu = undefined;  /* quick switch to activate or deactivate */
-
-                var projectMenu = undefined;
 
                 var menu;
                 if (Utils.isLoggedIn()){
