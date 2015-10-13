@@ -24,7 +24,7 @@ define(["jquery","js/env_settings"],function ($,envSettings,Utils) {
         source : 'https://api.github.com',
         useCache : true,
         cacheValidity : 3600*24, //cache expires after 24 hours
-        cacheRefreshLimit  : 0.5, //how long until we fetch the new value of something?
+        cacheRefreshLimit  : 0.0, //how long until we fetch the new value of something?
     };
     return $.extend($.extend({},settings),envSettings);
 })

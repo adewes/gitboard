@@ -53,6 +53,16 @@ define(["js/utils","js/subject","js/settings"],function (Utils,Subject,Settings)
             },{});
     }
 
+    IssueApi.prototype.updateIssue = function(fullName,issueNumber,data,onSuccess,onError){
+        return Utils.apiRequest({
+            type : 'PATCH',
+            url : "/repos/"+fullName+"/issues/"+issueNumber,
+            data : JSON.stringify(data),
+            success : onSuccess,
+            error: onError,
+            },{});
+    }
+
     IssueApi.prototype.getComments = function(fullName,issueNumber,data,onSuccess,onError){
         return Utils.apiRequest({
             type : 'GET',

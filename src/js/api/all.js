@@ -22,12 +22,14 @@ define(["js/api/github/authorization",
         "js/api/github/repository",
         "js/api/github/milestone",
         "js/api/github/organization",
+        "js/api/github/label",
         ],function (AuthorizationApi,
                     UserApi,
                     IssueApi,
                     RepositoryApi,
                     MilestoneApi,
-                    OrganizationApi
+                    OrganizationApi,
+                    LabelApi
                     ) {
     'use strict';
 
@@ -37,6 +39,7 @@ define(["js/api/github/authorization",
         issue : IssueApi.getInstance(),
         repository : RepositoryApi.getInstance(),
         milestone : MilestoneApi.getInstance(),
-        organization : OrganizationApi.getInstance()
+        organization : OrganizationApi.getInstance(),
+        label : LabelApi.getInstance()
     };
 });

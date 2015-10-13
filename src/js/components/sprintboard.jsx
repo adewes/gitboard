@@ -136,12 +136,14 @@ define(["react",
                 this.refs.issueDetails.open();
         },
 
-        onDragStart: function(){
-            console.log("Starting to drag!");
+        onDragStart: function(e){
+            this.props.dragStart(this.props.issue);
+            e.target.style.opacity = 0.5;
         },
 
-        onDragEnd : function(){
-            console.log("onDragEnd");
+        onDragEnd : function(e){
+            this.props.dragEnd(this.props.issue);
+            e.target.style.opacity = 1.0;
         },
 
         render : function(){
@@ -149,6 +151,7 @@ define(["react",
             if (this.props.issue.assignee !== undefined && this.props.issue.assignee !== null)
                 assigneeInfo = <img className="assignee" width="16" height="16" src={this.props.issue.assignee.avatar_url+'&s=16'} />;
             var labelInfo = [];
+            this.props.issue.labels.sort(function(a,b){return a.name < b.name;});
             for (var i in this.props.issue.labels){
                 var label = this.props.issue.labels[i];
                 labelInfo.push(<span className={"label-"+(parseInt(i)+1)} style={{background:'#'+label.color}}></span>);
@@ -165,7 +168,8 @@ define(["react",
                         <IssueDetails issue={this.props.issue} data={this.props.data}/>
                   </Modal>
             }
-            return <div className="panel panel-primary issue-item" onDragStart={this.onDragStart}
+            return <div className="panel panel-primary issue-item"
+                        onDragStart={this.onDragStart}
                         onDragEnd={this.onDragEnd}
                         draggable={true}>
               {modal}                 
@@ -184,35 +188,148 @@ define(["react",
         var IssueList = React.createClass({
 
             onDragEnter : function(e){
-                console.log("Entering");
-                this.props.setActiveDropzone(this.props.name);
+                this.props.dragEnter();
             },
 
             onDragLeave : function(e){
-            },
-
-            onDragEnd : function(e){
-                console.log("Drag ended");
-                this.props.setActiveDropzone(undefined);
+                this.props.dragLeave();
             },
 
             render : function(){
-                return <div onDragEnter={this.onDragEnter}
+                return <div className={"col-md-3 issue-list"+(this.props.active ? ' active' : '')}
                             onDragLeave={this.onDragLeave}
-                            className={"col-md-3 issue-list"+(this.props.active ? ' active' : '')}>{this.props.children}</div>;
+                            onDragEnter={this.onDragEnter}>
+                    {this.props.children}
+                </div>;
             }
         });
 
         var Board = React.createClass({
 
+            displayName: 'SprintBoard',
             mixins : [LoaderMixin],
 
-            setActiveDropzone : function(name){
-                this.setState({dropZone : name})
-            },
+            categoryData : function(){
 
-            getInitialState : function(){
-                return {dropZone : undefined};
+                var hasLabel = function(issue,label){
+                    for (var i in issue.labels){
+                        var issueLabel = issue.labels[i];
+                        if (label.toLowerCase() == issueLabel.name.toLowerCase())
+                            return true;
+                    }
+                    return false;
+                }
+
+                var setImmediateState = function(issue,state){
+                    if (issue.state != state)
+                        issue.state = state;
+                }
+
+                var setState = function(issue,state,onSuccess,onError){
+                    this.apis.issue.updateIssue(this.props.data.repositoryId,issue.number,{state : state},onSuccess);
+                }.bind(this);
+
+                var categoryLabels = ['doing','to-do','todo','awaiting-review','done'];
+
+                var setImmediateLabel = function(issue,label){
+                    if (Array.isArray(label)){
+                        var labels = label;
+                    }else{
+                        var labels = [label];
+                    }
+                    var found = false;
+                    for (var i in labels){
+                        var l = labels[i];
+                        if (hasLabel(issue,l)){
+                            found = true;
+                            break;
+                        }
+                    }
+                    var labelsToRemove = [];
+                    var labelsToAdd = [];
+                    if (!found){
+                        labelsToAdd.push(labels[0]);
+                        if (!issue.labels)
+                            issue.labels = [];
+                        var newLabel = this.state.data.labelsByName[labels[0]] || {name : labels[0]};
+                        issue.labels.push(newLabel);
+                        labelsToRemove = issue.labels.filter(function(label){
+                                            return (label.name != labels[0]
+                                                   && categoryLabels.indexOf(label.name) != -1) ?
+                                                   true : false;})
+                                         .map(function(label){return label.name;});
+                        issue.labels = issue.labels.filter(function(label){
+                            return (labelsToRemove.indexOf(label.name) == -1) ? true: false})
+                    }
+                    return [labelsToAdd,labelsToRemove];
+                }.bind(this)
+
+                var setLabel = function(issue,labelsToAdd,labelsToRemove,onSuccess,onError){
+                    var removeCallback = function(){
+                        this.reloadResources();
+                        if (onSuccess)
+                            onSuccess();
+                    }.bind(this);
+                    if (labelsToRemove.length)
+                        for(var i in labelsToRemove){
+                            removeCallback = function(oldCallback){
+                                this.apis.label.removeLabel(this.props.data.repositoryId,issue.number,labelsToRemove[i],oldCallback);
+                            }.bind(this,removeCallback);
+                        }
+                    if (labelsToAdd.length)
+                        this.apis.label.addLabels(this.props.data.repositoryId,issue.number,labelsToAdd,removeCallback);
+                    else
+                        removeCallback();
+                }.bind(this);
+
+                return {
+                    done : {
+                        title : 'Done',
+                        isMemberOf : function(issue){
+                            return issue.state == 'closed';
+                        }.bind(this),
+                        moveTo : function(issue,onSuccess,onError){
+                            setImmediateState(issue,'closed');
+                            var labelsToModify = setImmediateLabel(issue,['done']);
+                            setState(issue,'closed',function(){setLabel(issue,labelsToModify[0],labelsToModify[1]);});
+                            this.forceUpdate();
+                        }.bind(this)
+                    },
+                    doing : {
+                        title : 'Doing',
+                        isMemberOf : function(issue){
+                            return hasLabel(issue,'doing') && issue.state == 'open';
+                        },
+                        moveTo : function(issue,onSuccess,onError){
+                            setImmediateState(issue,'open');
+                            var labelsToModify = setImmediateLabel(issue,['doing']);
+                            setState(issue,'open',function(){setLabel(issue,labelsToModify[0],labelsToModify[1]);});
+                            this.forceUpdate();
+                        }.bind(this)
+                    },
+                    toDo : {
+                        title : 'To Do',
+                        isMemberOf : function(issue){
+                            return (hasLabel(issue,'to-do') || hasLabel(issue,'todo')) && issue.state == 'open';
+                        },
+                        moveTo : function(issue,onSuccess,onError){
+                            setImmediateState(issue,'open');
+                            var labelsToModify = setImmediateLabel(issue,['to-do','todo']);
+                            setState(issue,'open',function(){setLabel(issue,labelsToModify[0],labelsToModify[1]);});
+                        }.bind(this)
+                    },
+                    awaitingReview : {
+                        title : 'Awaiting Review',
+                        moveTo : function(issue,onSuccess,onError){
+                            setImmediateState(issue,'open');
+                            var labelsToModify = setImmediateLabel(issue,['done','awaiting-review']);
+                            setState(issue,'open',function(){setLabel(issue,labelsToModify[0],labelsToModify[1]);});
+                        }.bind(this),
+                        isMemberOf : function(issue){
+                            return (hasLabel(issue,'done') || hasLabel(issue,'awaiting-review')) && issue.state == 'open';
+                        }
+                    }
+                }
             },
 
             resources : function(props,state){
@@ -223,6 +340,14 @@ define(["react",
                         params : [props.data.repositoryId,{}],
                         success : function(data,d){
                             return {repository : data}
+                        }
+                    },
+                    {
+                        name: 'labels',
+                        endpoint : this.apis.label.getRepositoryLabels,
+                        params : [props.data.repositoryId,{}],
+                        success : function(data,d){
+                            return {labels : data};
                         }
                     },
                     {
@@ -264,37 +389,76 @@ define(["react",
                 ];
             },
 
-            displayName: 'SprintBoard',
+            afterLoadingSuccess : function(data){
+                data.allIssues = data.openIssues.slice();
+                Array.prototype.push.apply(data.allIssues,data.closedIssues);
+                data.labelsByName = {};
+                for(var i in data.labels){
+                    data.labelsByName[data.labels[i].name] = data.labels[i];
+                }
+                return data;
+            },
 
-            categorizeIssues : function(openIssues,closedIssues){
-                var categories = {doing : [],done : [],awaitingReview : [],toDo : []};
-                for (var i in openIssues){
-                    var issue = openIssues[i];
+            getInitialState : function(){
+                return {dropZone : undefined};
+            },
+
+            dragStart : function(issue){
+                this.setState({draggedIssue : issue});
+            },
+
+            dragEnd : function(issue){
+                this.moveIssue(issue,this.state.dropZone);
+                this.setState({dropZone : undefined,draggedIssue : undefined});
+            },
+
+            dragEnter : function(list){
+                this.setState({dropZone : list})
+            },
+
+            dragLeave : function(list){
+            },
+
+            categorizeIssues : function(issues,draggedIssue,dropZone){
+                var categoryData = this.categoryData();
+                var categories = {};
+                for(var category in categoryData)
+                    categories[category] = [];
+                for (var i in issues){
+                    var issue = issues[i];
                     var category = 'toDo';
-                    for (var j in issue.labels){
-                        var label = issue.labels[j];
-                        if (label.name == 'doing'){
-                            category = 'doing';
-                            break;
-                        }
-                        else if (label.name == 'done' || label.name == 'awaiting-review'){
-                            category = 'awaitingReview';
+                    for (var cat in categoryData){
+                        if (categoryData[cat].isMemberOf(issue)){
+                            category = cat;
                             break;
                         }
                     }
                     categories[category].push(issue);
                 }
-                categories.done = closedIssues;
+                if (draggedIssue && dropZone && !Utils.contains(categories[dropZone],draggedIssue)){
+                    categories[dropZone].push(draggedIssue);
+                }
                 return categories;
+            },
+
+            moveIssue : function(issue,to){
+                var categoryData = this.categoryData();
+                categoryData[to].moveTo(issue,this.state.dropZone);
             },
 
             render: function () {
                 var data = this.state.data;
-                var categories = this.categorizeIssues(data.openIssues,data.closedIssues);
+                var categorizedIssues = this.categorizeIssues(data.allIssues,this.state.draggedIssue,this.state.dropZone);
                 var issueItems = {};
-                for (var category in categories){
-                    var issues = categories[category];
-                    issueItems[category] = issues.map(function(issue){return <IssueItem data={this.props.data} key={issue.number} issue={issue} />;}.bind(this));
+                for (var category in categorizedIssues){
+                    var issues = categorizedIssues[category];
+                    issueItems[category] = issues.sort(function(issueA,issueB){return (new Date(issueA.created_at))-(new Date(issueB.created_at));}).map(function(issue){
+                        return <IssueItem data={this.props.data}
+                                          key={issue.number}
+                                          issue={issue}
+                                          dragStart={this.dragStart}
+                                          dragged={issue.id == (this.state.draggedIssue && this.state.draggedIssue.id == issue.id ? true : false)}
+                                          dragEnd={this.dragEnd} />;}.bind(this));
                     if (!issueItems[category].length)
                         issueItems[category] = <div className="panel panel-default">
                             <div className="panel-body">
@@ -308,6 +472,23 @@ define(["react",
                     var datestring = Moment(new Date(data.milestone.due_on)).fromNow();
                     due = <span><i className="octicon octicon-clock" /> due {datestring}</span>;
                 }
+
+                var titles = {"toDo": "To Do",
+                              "doing" : "Doing",
+                              "awaitingReview" : "Awaiting Review",
+                              "done" : "Done"};
+
+                var issueLists = Object.keys(titles).map(function(category){
+                    return <IssueList key={category} 
+                                dragEnd={this.dragEnd.bind(this,category)}
+                                dragEnter={this.dragEnter.bind(this,category)}
+                                dragLeave={this.dragLeave.bind(this,category)}
+                                name={category}
+                                active={this.state.dropZone == category ? true : false}>
+                            <h4>{titles[category]}</h4>
+                            {issueItems[category]}
+                        </IssueList>
+                }.bind(this))
 
                 return <div className="container sprintboard">
                     <div className="row">
@@ -324,25 +505,7 @@ define(["react",
                         </div>
                     </div>
                     <div className="row">
-                        <IssueList setActiveDropzone={this.setActiveDropzone} name="todo" active={this.state.dropZone == "todo" ? true : false}>
-                            <h4>To Do</h4>
-                            {issueItems.toDo}
-                        </IssueList>
-                        
-                        <IssueList setActiveDropzone={this.setActiveDropzone} name="doing" active={this.state.dropZone == "doing" ? true : false}>
-                            <h4>Doing</h4>
-                            {issueItems.doing}
-                        </IssueList>
-                        
-                        <IssueList setActiveDropzone={this.setActiveDropzone} name="done" active={this.state.dropZone == "done" ? true : false}>
-                            <h4>Done / Awaiting Review</h4>
-                            {issueItems.awaitingReview}
-                        </IssueList>
-                        
-                        <IssueList setActiveDropzone={this.setActiveDropzone} name="closed" active={this.state.dropZone == "closed" ? true : false}>
-                            <h4>Closed</h4>
-                            {issueItems.done}
-                        </IssueList>
+                        {issueLists}
                     </div>
                 </div>;
             }

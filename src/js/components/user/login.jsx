@@ -223,6 +223,8 @@ define(["js/settings",
 
         componentWillMount : function(){
             this.authorizationApi = AuthorizationApi.getInstance();
+            if (Utils.isLoggedIn())
+                Utils.redirectTo(Utils.makeUrl("/"));
         },
 
         render: function () {

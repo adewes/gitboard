@@ -289,12 +289,14 @@ define(["js/settings",
                 fullData = $.extend($.extend({},data),{
                     url : settings.source+data['url'],
                     dataType : 'json',
+                    cache : false,
                     headers : headers
                     });
             }
             else{
                 fullData = $.extend($.extend({},data),{
                    url : settings.source+data['url'],
+                   cached : false, //we disable the caching
                    beforeSend : function(xhr){
                        xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
                    }.bind(this)
@@ -393,7 +395,7 @@ define(["js/settings",
                             newData = $.extend({'__etag__' : xhr.getResponseHeader('etag')},newData);
                         if (onSuccess)
                             onSuccess(newData);
-                        this.sessionStoreToCache(url,newData);
+                        this.storeToCache(url,newData);
                     }.bind(this,url,cachedData,originalOnSuccess)
 
                     var onError = function(url,cachedData,onError,xhr,status,e){

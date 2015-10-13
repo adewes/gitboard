@@ -1,8 +1,26 @@
+body{
+    min-height:100%;
+    height:100%;
+}
+
 .sprintboard
 {
 
+    @media (min-width: 992px){
+
+        .row{
+            overflow: hidden;
+        }
+
+        [class*="col-"]{
+            margin-bottom: -99999px;
+            padding-bottom: 99999px;
+        }
+
+    }
+
     .issue-list.active{
-        background:#aaa;
+        background:#ddd;
     }
 
     .issue-list.active .issue-item{
