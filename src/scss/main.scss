@@ -1,6 +1,47 @@
 // Import files
 @import "above_the_fold";
 @import "below_the_fold";
+@import url(https://fonts.googleapis.com/css?family=Roboto+Condensed:400,300italic,300);
 
-body { padding-bottom: 50px; }
+
+body{
+    padding-bottom: 50px; 
+}
+
+body,h1,h2,h3,h4,h5,h6 { 
+    font-family: 'Roboto Condensed', sans-serif;
+    font-weight:400;
+}
+
 footer {background:#fff; padding-top:10px;}
+
+a {color:#006; font-weight:bolder;}
+a:hover,a:active {color: #008; text-decoration:none;}
+a:visited {color:#006;}
+
+@media (min-width: 1000px) {
+  .narrow-container {
+    width: 970px;
+  }
+
+  .jumbotron{
+    margin-top:30px;
+    margin-bottom:50px !important;
+    }
+}
+
+#app{
+  padding-top:20px !important;
+}
+
+.left-tilt{
+  -ms-transform: rotate(-1deg); /* IE 9 */
+  -webkit-transform: rotate(-1deg); /* Chrome, Safari, Opera */
+  transform: rotate(-1deg);
+}
+
+.right-tilt{
+  -ms-transform: rotate(1deg); /* IE 9 */
+  -webkit-transform: rotate(1deg); /* Chrome, Safari, Opera */
+  transform: rotate(1deg);
+}

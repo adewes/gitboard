@@ -126,7 +126,7 @@ define(
                       strict : false });
 
     router.param('repositoryId', /([\w\d\-\:\.\/]+)/);
-    router.param('milestoneId', /([\w\d\-\:\.]+)/);
+    router.param('milestoneId', /(\d+)/);
     router.param('organizationId', /([\w\d\-\:\.]+)/);
 
     //We add URL-style parameters to all routes by decorating the original handler function.

@@ -15,7 +15,7 @@
 </head>
 
 <body>
-      <nav class="navbar navbar-default navbar-static-top" role="navigation">
+      <nav class="navbar navbar-default navbar-static-top navbar-inverse" role="navigation">
         <div class="container">
           <!-- Brand and toggle get grouped for better mobile display -->
           <div id="nav-head" class="navbar-header">
@@ -28,17 +28,125 @@
               <a class="navbar-brand" href="#">Gitboard</a>
           </div>
           <div class="collapse navbar-collapse" id="menu">
-            <ul class="nav navbar-nav">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="app.html#/login">Login</a></li>
             </ul>
-
           </div><!--/.nav-collapse -->
         </div>
       </nav>
 
-      <div id="header">
-      </div>
-
       <section id="app">
+      <hr />
+      <div class="narrow-container container left-tilt">
+        <div class="jumbotron">
+            <h1 class="text-center">Github + Kanban = <strong>Gitboard</strong></h1>
+            <hr />
+            <p class="text-center">Gitboard is a simple and intuitive <strong>Kanban board</strong> for your <strong>Github issues</strong>. Easily manage to-dos, milestones and teams and keep up-to-date on your progress. Gitboard is <strong>open-source</strong> and runs <strong>securely</strong> inside your browser.</p>
+            <p class="text-center">
+                <a class="btn btn-primary btn-lg btn-success" href="app.html#/sprintboard/adewes/gitboard/1" role="button">See an example</a>
+                <a class="btn btn-primary btn-lg btn-success" href="app.html#/login" role="button">Log in</a>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="features">
+          <div class="narrow-container container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h1>Features</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+
+                </div>
+                <div class="col-md-6">
+                <h2>Works out of the box</h2>
+                </div>
+            </div>
+          </div>
+      </section>
+
+      <section id="features">
+          <div class="narrow-container container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h1>Questions &amp; Answers</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Is Gitboard commercial?</h3>
+                        </div>
+                        <div class="panel-body">
+                            <p>No! Gitboard is <strong>open-source software</strong> and licensed under a <strong>Affero General Public License</strong>. That means you can download, modify and republish Gitboard without charge, as long as you conform to the requirements of the license.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Does Gitboard require a server to run on?</h3>
+                        </div>
+                        <div class="panel-body">
+                            <p>No! Gitboard is a <strong>single-page application</strong> that runs entirely in your browser. All communication with the Github API is done directly, without use of a third-party server.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Is Gitboard secure?</h3>
+                        </div>
+                        <div class="panel-body">
+                            <p>Yes! Gitboard communicates directly with the Github API without using a third-party. You access credentials therefore stay on your computer. Gitboard does not store any user information or passwords in plaintext and will erase all data from your browser after you log out.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">How can I contribute to Github?</h3>
+                        </div>
+                        <div class="panel-body">
+                            <p>As Gitboard is open-source, contributions are highly welcome! Our <a href="https://github.com/adewes/gitboard">Github page</a> contains all the information you need to get started. If you get stuck, feel free to send us an e-mail (see Github).
+                            </p>
+                            <p>
+                            <a class="btn btn-primary btn-lg btn-info" href="https://github.com/adewes/gitboard" role="button">Fork on <i class="octicon octicon-mark-github"></i></a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Which technologies is Gitboard built with?</h3>
+                        </div>
+                        <div class="panel-body">
+                            <p>Gitboard is built with React.js, Bootstrap (+Material Design) and various JS libraries such as jQuery, Moments.js and Marked.js. It uses SASS for CSS, Bower for dependency management and Make for building.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">How can I contribute to Github?</h3>
+                        </div>
+                        <div class="panel-body">
+                            <p>As Gitboard is open-source, contributions are highly welcome! Our <a href="https://github.com/adewes/gitboard">Github page</a> contains all the information you need to get started. If you get stuck, feel free to send us an e-mail (see Github).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+          </div>
       </section>
 
 
@@ -55,9 +163,6 @@
           </div>
         </div>
       </footer>
-
-    <script src="static/js/config.js"></script>
-    <script data-main="js/main" src="static/bower_components/requirejs/require.js"></script>
 
   </body>
 </html>

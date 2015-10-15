@@ -49,6 +49,12 @@ define(
                 data : {repositoryId : repositoryId,milestoneId : milestoneId},
                 component: SprintBoard,
             }},
+        '/sprintboard/:repositoryId': 
+            function(repositoryId){return {
+                anonOk : true,
+                data : {repositoryId : repositoryId,milestoneId : null},
+                component: SprintBoard,
+            }},
         '/repositories': 
             function(){return {
                 data : {},

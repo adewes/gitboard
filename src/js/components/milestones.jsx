@@ -42,7 +42,7 @@ define(["react",
             render : function(){
                 var due;
                 if (this.props.milestone.due_on !== null){
-                    var datestring = Moment(new Date(this.props.milestone.due_on)).calendar();
+                    var datestring = Moment(new Date(this.props.milestone.due_on)).fromNow();
                     due = [<i className="octicon octicon-clock" />,' ',datestring];
                 }
                 return <div className="col-md-3">
@@ -112,6 +112,11 @@ define(["react",
                     </div>
                     <div className="row">
                         {milestoneItems}
+                    </div>
+                    <div className="row">
+                        <div className="col-md-12">
+                            <A href={Utils.makeUrl('/sprintboard/'+data.repository.full_name)}>show issues without a milestone</A>
+                        </div>
                     </div>
                 </div>;
             }

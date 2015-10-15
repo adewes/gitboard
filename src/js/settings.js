@@ -20,7 +20,7 @@ define(["jquery","js/env_settings"],function ($,envSettings,Utils) {
     'use strict';
 
     var settings = {
-        scopes: ['read:org'],
+        scopes: ['read:org','repo'],
         source : 'https://api.github.com',
         useCache : true,
         cacheValidity : 3600*24, //cache expires after 24 hours

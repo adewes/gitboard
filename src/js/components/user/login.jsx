@@ -80,9 +80,6 @@ define(["js/settings",
 
             return <div className="container">
                        <div className="row">
-                           &nbsp;
-                       </div>
-                       <div className="row">
                            <div className="col-md-4 col-md-offset-4">
                                <div className="well bs-component">
                                    {this.getTabs()}
@@ -142,7 +139,7 @@ define(["js/settings",
                         <div className="panel-body">
                             <ol className="list">
                                 <li>Click <a target="_blank" href={"https://github.com/settings/tokens/new?"+Utils.makeUrlParameters({scopes : settings.scopes.join(','),description : 'Gitboard Access Token'})}>here</a> to go to your Github token settings.</li>
-                                <li>Confirm the creation of the token. Scopes (we only need <strong>read:org</strong>) and description should already be correctly set.</li>
+                                <li>Confirm the creation of the token. Scopes (we need <strong>read:org + repo</strong>) and description should already be correctly set.</li>
                                 <li>Copy the token and paste it into the form above.</li>
                             </ol>
                         </div>
