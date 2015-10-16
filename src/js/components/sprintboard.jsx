@@ -49,6 +49,41 @@ define(["react",
           smartypants: false
         });
 
+        function getContrastYIQ(hexcolor){
+            //source: http://stackoverflow.com/questions/11867545/change-text-color-based-on-brightness-of-the-covered-background-area
+            var r = parseInt(hexcolor.substr(0,2),16);
+            var g = parseInt(hexcolor.substr(2,2),16);
+            var b = parseInt(hexcolor.substr(4,2),16);
+            var yiq = ((r*299)+(g*587)+(b*114))/1000;
+            return (yiq >= 128) ? 'black' : 'white';
+        }
+
+        var Dropdown = React.createClass({
+            render :function(){
+                return <div className="btn-group">
+                    <a href="javascript:void(0)" className="btn btn-xs btn-default dropdown-toggle" data-target="#" data-toggle="dropdown">adewes </a>
+                    <a href="bootstrap-elements.html" data-target="#" className="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown"><span className="caret"></span></a>
+                    <ul className="dropdown-menu">
+                        <li><a href="javascript:void(0)">Action</a></li>
+                        <li><a href="javascript:void(0)">Another action</a></li>
+                        <li><a href="javascript:void(0)">Something else here</a></li>
+                        <li className="divider"></li>
+                        <li><a href="javascript:void(0)">Separated link</a></li>
+                    </ul>
+                </div>
+            }
+        });
+
+        var IssueFooter = React.createClass({
+            render : function(){
+                var issue = this.props.issue;
+                return <div>
+                    <span className="time-estimate">5h</span> <span className="time-spent">7h</span>
+                    <span className="pull-right"><A target="_blank" href={issue.html_url}>#{issue.number}</A></span>
+                </div>;
+            }
+        });
+
         var IssueDetails = React.createClass({
 
             mixins : [LoaderMixin,GithubErrorHandlerMixin],
@@ -83,7 +118,10 @@ define(["react",
                 var issue = this.state.issue;
                 var markdown = <p>(no description given)</p>;
                 var assignee;
-                var labels;
+
+                var labels = issue.labels.map(function(label){
+                    return <span className="issue-label" style={{background:'#'+label.color,color : getContrastYIQ(label.color)}}>{label.name}</span>
+                });
                 if (issue.assignee !== null)
                     assignee = [<img width="16" height="16" src={this.props.issue.assignee.avatar_url+'&s=16'} />,<span className="label">{issue.assignee.login}</span>];
 
@@ -105,12 +143,22 @@ define(["react",
                 }
                 finally{
                     return <div className="issue-details">
-                        <div className="labels">
-                            <A className="pull-right" href={this.props.issue.html_url} target="_blank"><i className="octicon octicon-mark-github" /></A>
-                            {assignee} {labels}
+                        <div className="issue-labels">
+                            {labels}
                         </div>
-                        <div className="btn-group">
-                            
+                        <div className="selectors">
+                            <div className="selector">
+                                <span className="legend">assignee</span>
+                                <Dropdown />
+                            </div>
+                            <div className="selector">
+                                <span className="legend">time estimate</span>
+                                <Dropdown />
+                            </div>
+                            <div className="selector">
+                                <span className="legend">time spent</span>
+                                <Dropdown />
+                            </div>
                         </div>
                         {markdown}
                     </div>;
@@ -165,10 +213,16 @@ define(["react",
                 modal = <Modal
                     ref="issueDetails"
                     cancel="Close"
+                    raw={true}
                     onCancel={this.closeModal}
                     onConfirm={this.closeModal}
                     title={this.props.issue.title}>
-                        <IssueDetails issue={this.props.issue} data={this.props.data}/>
+                        <div className="modal-body">
+                            <IssueDetails issue={this.props.issue} data={this.props.data}/>
+                        </div>
+                        <div className="modal-footer">
+                            <IssueFooter issue={this.props.issue} data={this.props.data}/>
+                        </div>
                   </Modal>
             }
             return <div className="panel panel-primary issue-item"
@@ -178,10 +232,13 @@ define(["react",
               {modal}                 
               <A href="#" onClick={this.showIssueDetails}>
                 <div className="panel-heading">
-                    {labelInfo} <span className="assignee">{assigneeInfo}</span>
+                    {labelInfo} <p className="right-symbols"><span className="assignee">{assigneeInfo}</span></p>
                 </div>
                 <div className="panel-body">
                     <h5>{this.props.issue.title}</h5>
+                </div>
+                <div className="panel-footer">
+                    <span className="time-estimate">5h</span> <span className="time-spent">7h</span>
                 </div>
                 </A>
             </div>;
@@ -487,7 +544,7 @@ define(["react",
                     milestoneTitle = ['- ',<A href={data.milestone.html_url} target="_blank">{data.milestone.title}</A>];
                     if (data.milestone.due_on !== null){
                         var datestring = Moment(new Date(data.milestone.due_on)).fromNow();
-                        due = <span><i className="octicon octicon-clock" /> due {datestring}</span>;
+                        due = <span className="due"><i className="octicon octicon-clock" /> due {datestring}</span>;
                     }
 
                     if (data.milestone.description)
@@ -513,6 +570,7 @@ define(["react",
                                 name={category}
                                 active={this.state.dropZone == category ? true : false}>
                             <h4>{categoryData[category].title}</h4>
+                            <p className="estimates"><span className="time-estimate">5h</span><span className="time-spent">7h</span></p>
                             {issueItems[category]}
                         </IssueList>
                 }.bind(this))
@@ -523,6 +581,7 @@ define(["react",
                             <h3><A href={Utils.makeUrl('/milestones/'+this.props.data.repositoryId)}>{data.repository.name}</A> {milestoneTitle} <A href="" onClick={addNewIssue.bind(this,category)}><i className="fa fa-plus-circle" /></A></h3>
                             <p>
                                 {due}
+                                &nbsp; <span className="time-estimate">23h</span> <span className="time-spent">11h</span>
                             </p>
                             {milestoneDescription}
                         </div>

@@ -28,7 +28,7 @@ define(["react","jquery","bootstrap"],function (React,$,Bootstrap) {
       },
 
       getDefaultProps : function(){
-        return {closable : true,disabled : false};
+        return {closable : true,disabled : false,raw : false};
       },
 
       componentWillReceiveProps : function(props){
@@ -59,10 +59,10 @@ define(["react","jquery","bootstrap"],function (React,$,Bootstrap) {
         if (this.props.closable){
           closeButton = <button
             type="button"
-            className="close"
+            className="close pull-right"
             disabled={this.props.disabled}
             onClick={this.handleCancel}>
-              &times;
+              <i className="fa fa-times" />
           </button>
         }
 
@@ -76,7 +76,7 @@ define(["react","jquery","bootstrap"],function (React,$,Bootstrap) {
 
         var footer;
 
-        if (this.props.onCancel || this.props.onConfirm) {
+        if ((this.props.onCancel || this.props.onConfirm) && !this.props.raw){
           footer = <div className="modal-footer">
             {cancelButton}
             {confirmButton}
@@ -89,18 +89,18 @@ define(["react","jquery","bootstrap"],function (React,$,Bootstrap) {
         else
             content = this.props.children;
 
+        if (!this.props.raw)
+            content = [<div className="modal-body">{content}</div>,footer]
+
         return (
           <div className="modal show" ref="modal">
             <div className="modal-dialog">
               <div className="modal-content">
                 <div className="modal-header">
-                  {closeButton}
-                  <h3>{this.props.title}</h3>
+                  
+                  <h3>{this.props.title}{closeButton}</h3>
                 </div>
-                <div className="modal-body">
-                    {content}
-                </div>
-                {footer}
+                {content}
               </div>
             </div>
             <div className="modal-backdrop in" onClick={this.props.closable ? this.handleCancel : function(e){e.preventDefault();}}></div>

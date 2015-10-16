@@ -279,9 +279,6 @@ define(["js/settings",
             if (!this.validate())
                 return;
 
-            //we get the old authorizationId (if it exists)
-            var authorizationId = Utils.localStore('authorizationId');
-
             var onError = function(xhr,status,message){
                 var otpHeader = xhr.getResponseHeader('X-Github-OTP');
                 if (otpHeader !== null && otpHeader.match(/required/i))
@@ -296,17 +293,26 @@ define(["js/settings",
                 Utils.redirectTo(Utils.makeUrl("/"));
             }.bind(this);
 
-            this.authorizationApi.createAuthorization(formData.login,formData.password,formData.otp,{note : 'Gitboard Access Token - '+navigator.userAgent,scopes : settings.scopes},onSuccess,onError)
+            var description = 'Gitboard Access Token - '+navigator.userAgent;
 
-            //we delete the token that we created earlier, if one exists
-            if (authorizationId){
-                var onDeleteSuccess = function(){
-                }.bind(this);
-                var onDeleteError = function(){
-                    console.log("Failed deleting old authorization");
-                }.bind(this);
-                this.authorizationApi.deleteAuthorization(formData.login,formData.password,formData.otp,authorizationId,onDeleteSuccess,onDeleteError)
-            }
+            var createAuthorization = function(){
+                this.authorizationApi.createAuthorization(formData.login,formData.password,formData.otp,{note : description,scopes : settings.scopes},onSuccess,onError)
+            }.bind(this);
+
+            var checkAuthorizations = function(authorizations){
+                for(var i in authorizations){
+                    var authorization = authorizations[i];
+                    if (authorization.note == description){
+                        //if we find an existing authorization, we delete it and create a new one
+                        this.authorizationApi.deleteAuthorization(formData.login,formData.password,formData.otp,authorization.id,createAuthorization,onError);
+                        return;
+                    }
+                }
+                //if we didn't find any existing authorization with that exact description, we just create one
+                createAuthorization();
+            }.bind(this);
+
+            this.authorizationApi.getAuthorizations(formData.login,formData.password,formData.otp,checkAuthorizations,onError);
 
 
         },

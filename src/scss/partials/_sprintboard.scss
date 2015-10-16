@@ -16,7 +16,6 @@ body{
             margin-bottom: -99999px;
             padding-bottom: 99999px;
         }
-
     }
 
     .issue-list.active{
@@ -31,7 +30,97 @@ body{
         max-width:100%;
     }
 
+    span.due{
+        color:#555;
+        font-weight:100;
+    }
+
+    span.estimates{
+        font-size:12px;
+    }
+
+    span.time-estimate,
+    span.time-spent
+    {
+        color:#555;
+        font-weight:100;
+    }
+
+    span.time-estimate:before,
+    span.time-spent:before
+    {
+        font-family:FontAwesome;
+        padding-right:4px;
+        color:#aaa;
+    }
+
+    span.time-spent{
+        padding-left:4px;
+    }
+
+    span.time-estimate:before
+    {
+        content:'\f251';
+    }
+
+    span.time-spent:before
+    {
+        content:'\f101';
+    }
+
     .issue-item{
+
+        div.issue-labels{
+            font-size:12px;
+            padding-top:4px;
+            padding-bottom:4px;
+        }
+
+        .issue-label{
+            border-radius:4px;
+            margin-right:4px;
+            padding:2px;
+            font-weight:300;
+        }
+
+        div.selectors{
+
+            clear:both;
+            margin-bottom:10px;
+
+            div.selector{
+                float:left;
+                padding-top:0;
+                margin-top:0;
+                padding-right:10px;
+
+                div.btn-group{
+                    margin:0;
+                    padding:0;
+                }
+                span.legend{
+                    display:block;
+                    font-size:12px;
+                    color:#999;
+                    padding:0;
+                    margin:0;
+                }
+            }
+        }
+
+        div.selectors:after {
+            visibility: hidden;
+            display: block;
+            font-size: 0;
+            content: " ";
+            clear: both;
+            height: 0;
+        }
+
+        a.github-link{
+            color:#777;
+            padding-left:4px;
+        }
 
         a {
             text-decoration: none;
@@ -43,14 +132,23 @@ body{
             position:relative;
         }
 
+        .panel-footer{
+            padding:2px;
+            font-size:12px;
+        }
+
         .panel-body{
             padding:4px;
         }
 
-        img.assignee {
+        p.right-symbols{
             position:absolute;
-            right:0;
+            right:2px;
             top:0;
+            text-align: right;
+        }
+
+        img.assignee {
         }
 
 
