@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="76.199997"
+   height="76.199997"
+   id="svg4603"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="card.svg">
+  <defs
+     id="defs4605">
+    <clipPath
+       id="SVGID_2_">
+      <use
+         height="1052.3622"
+         width="744.09448"
+         y="0"
+         x="0"
+         style="overflow:visible"
+         xlink:href="#SVGID_1_"
+         overflow="visible"
+         id="use4327" />
+    </clipPath>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="5.6"
+     inkscape:cx="29.76843"
+     inkscape:cy="45.716426"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1871"
+     inkscape:window-height="1056"
+     inkscape:window-x="1649"
+     inkscape:window-y="24"
+     inkscape:window-maximized="1"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:showpageshadow="false" />
+  <metadata
+     id="metadata4608">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-473.32857,-482.83361)">
+    <circle
+       style="fill:#efefef"
+       sodipodi:ry="38.099998"
+       sodipodi:rx="38.099998"
+       sodipodi:cy="461.20001"
+       sodipodi:cx="113.2"
+       transform="translate(398.22857,59.733599)"
+       cx="113.2"
+       cy="461.20001"
+       r="38.099998"
+       id="circle4199"
+       d="m 151.3,461.20001 c 0,21.04205 -17.05795,38.1 -38.1,38.1 -21.042051,0 -38.100002,-17.05795 -38.100002,-38.1 0,-21.04205 17.057951,-38.1 38.100002,-38.1 21.04205,0 38.1,17.05795 38.1,38.1 z" />
+    <g
+       transform="translate(398.22857,59.733599)"
+       id="g4319">
+      <defs
+         id="defs4321">
+        <circle
+           sodipodi:ry="34.400002"
+           sodipodi:rx="34.400002"
+           sodipodi:cy="461.20001"
+           sodipodi:cx="113"
+           id="SVGID_1_"
+           cx="113"
+           cy="461.20001"
+           r="34.400002" />
+      </defs>
+      <use
+         height="1052.3622"
+         width="744.09448"
+         y="0"
+         x="0"
+         style="fill:#f0dcc8;overflow:visible"
+         xlink:href="#SVGID_1_"
+         overflow="visible"
+         id="use4324" />
+      <clipPath
+         id="clipPath4590">
+        <use
+           height="1052.3622"
+           width="744.09448"
+           y="0"
+           x="0"
+           style="overflow:visible"
+           xlink:href="#SVGID_1_"
+           overflow="visible"
+           id="use4592" />
+      </clipPath>
+      <path
+         style="fill:#efefef"
+         inkscape:connector-curvature="0"
+         clip-path="url(#SVGID_2_)"
+         d="M 156.9,482 H 99.3 c -3.4,0 -6.2,-2.8 -6.2,-6.2 v -28.1 c 0,-3.4 2.8,-6.2 6.2,-6.2 h 57.6 c 3.4,0 6.2,2.8 6.2,6.2 v 28.1 c 0,3.4 -2.8,6.2 -6.2,6.2 z"
+         id="path4329" />
+    </g>
+    <polygon
+       style="fill:#595757"
+       transform="translate(398.22857,59.733599)"
+       points="112.2,441.5 93.1,461.7 93.1,467.6 117.4,441.5 "
+       id="polygon4331" />
+    <polygon
+       style="fill:#f8b62d"
+       transform="translate(398.22857,59.733599)"
+       points="97.2,450.2 102.3,449.4 104.6,444.8 106.9,449.4 112.1,450.2 108.4,453.8 109.2,458.9 104.6,456.5 100,458.9 100.9,453.8 "
+       id="polygon4333" />
+    <circle
+       style="fill:#b098b7"
+       sodipodi:ry="12.1"
+       sodipodi:rx="12.1"
+       sodipodi:cy="455.79999"
+       sodipodi:cx="133"
+       transform="translate(398.22857,59.733599)"
+       cx="133"
+       cy="455.79999"
+       r="12.1"
+       id="circle4335"
+       d="m 145.1,455.79999 c 0,6.68264 -5.41735,12.1 -12.1,12.1 -6.68265,0 -12.1,-5.41736 -12.1,-12.1 0,-6.68265 5.41735,-12.1 12.1,-12.1 6.68265,0 12.1,5.41735 12.1,12.1 z" />
+    <circle
+       style="fill:#ffffff"
+       sodipodi:ry="9.3999996"
+       sodipodi:rx="9.3999996"
+       sodipodi:cy="455.79999"
+       sodipodi:cx="133"
+       transform="translate(398.22857,59.733599)"
+       cx="133"
+       cy="455.79999"
+       r="9.3999996"
+       id="circle4337"
+       d="m 142.4,455.79999 c 0,5.19147 -4.20852,9.4 -9.4,9.4 -5.19148,0 -9.4,-4.20853 -9.4,-9.4 0,-5.19148 4.20852,-9.4 9.4,-9.4 5.19148,0 9.4,4.20852 9.4,9.4 z" />
+    <rect
+       style="fill:#898989"
+       x="498.62857"
+       y="530.53357"
+       width="25.6"
+       height="0.89999998"
+       id="rect4339" />
+    <rect
+       style="fill:#898989"
+       x="498.62857"
+       y="532.83362"
+       width="38.5"
+       height="0.89999998"
+       id="rect4341" />
+    <rect
+       style="fill:#898989"
+       x="498.62857"
+       y="535.43359"
+       width="31.799999"
+       height="0.89999998"
+       id="rect4343" />
+    <path
+       style="fill:#947326"
+       inkscape:connector-curvature="0"
+       d="m 496.92857,541.73359 30.2,9.7 c 0,0 7.3,-3.7 11.5,-9.7 h -41.7 z"
+       id="path4345" />
+  </g>
+</svg>

@@ -8,6 +8,11 @@ body{
     padding-bottom: 50px; 
 }
 
+.navbar-gitboard{
+    background: $logo-color !important;
+    color:#fff !important;
+}
+
 body,h1,h2,h3,h4,h5,h6 { 
     font-family: 'Roboto Condensed', sans-serif;
     font-weight:300;

@@ -6,13 +6,13 @@ p.request-indicator {
     top: 0;
     left: 50%;
     margin-left: -70px;
-    border: 1px solid get-color(gold, dark);
+    border: 0px solid get-color(gold, dark);
     border-top: none;
     padding: 5px 15px;
     font-size: 12px;
     z-index: 1000;
-    background: get-color(gold, light);
-    color: get-color(grayscale, dark);
+    background: get-color(yellow, light);
+    color: #000;
     text-align: center;
 
     -webkit-box-shadow: 0px 2px 3px 0px get-color(black, $alpha: 0.3);
@@ -20,7 +20,7 @@ p.request-indicator {
     box-shadow:         0px 2px 3px 0px get-color(black, $alpha: 0.3);
 
     > a {
-        color: get-color(grayscale, dark);
+        color: #000;
 
         &:hover {
             text-decoration: none;
