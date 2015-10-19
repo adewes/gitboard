@@ -56,6 +56,7 @@ body{
 
     span.time-spent{
         padding-left:4px;
+        color:#000;
     }
 
     span.time-estimate:before
@@ -65,46 +66,54 @@ body{
 
     span.time-spent:before
     {
-        content:'\f101';
+        content:'\f253';
+    }
+
+    .issue-item.dragged{
+        -ms-transform: rotate(-2deg); /* IE 9 */
+        -webkit-transform: rotate(-2deg); /* Chrome, Safari, Opera */
+        transform: rotate(-2deg);
+        background:#fdd;
     }
 
     .issue-item{
 
-        div.issue-labels{
+        .modal{
+            overflow:visible;
+        }
+
+        span.issue-labels{
             font-size:12px;
-            padding-top:4px;
-            padding-bottom:4px;
+            padding:0;
+            margin-left:10px;
         }
 
         .issue-label{
-            border-radius:4px;
             margin-right:4px;
             padding:2px;
             font-weight:300;
+        }
+
+        .btn-group{
+            margin-top:0;
         }
 
         div.selectors{
 
             clear:both;
             margin-bottom:10px;
+            z-index:9999;
 
-            div.selector{
-                float:left;
-                padding-top:0;
-                margin-top:0;
-                padding-right:10px;
-
-                div.btn-group{
-                    margin:0;
-                    padding:0;
-                }
-                span.legend{
-                    display:block;
-                    font-size:12px;
-                    color:#999;
-                    padding:0;
-                    margin:0;
-                }
+            div.btn-group{
+                margin:0;
+                padding:0;
+            }
+            span.legend{
+                display:block;
+                font-size:12px;
+                color:#999;
+                padding:0;
+                margin:0;
             }
         }
 
