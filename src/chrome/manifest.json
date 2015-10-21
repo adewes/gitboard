@@ -1,0 +1,18 @@
+{
+  "name": "Gitboard",
+  "description": "Gitboard is a simple and intuitive Kanban board for your Github issues.",
+  "version": "0.1",
+  "manifest_version" : 2,
+  "background": {
+      "scripts": ["js/loader.js"]
+  },
+  "browser_action" : {
+    "default_title": "launch Gitboard",
+    "default_icon": "static/assets/images/homepage/logo-32.png"
+  },
+  "permissions": [
+          "storage"
+        ],
+  "icons": {"16": "static/assets/images/homepage/logo-16.png",
+            "128": "static/assets/images/homepage/logo-128.png"}
+}

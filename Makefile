@@ -41,6 +41,14 @@ all: $(BUILD_ENVIRONMENT)
 clean:
 	rm -rf $(BUILD_DIR)
 
+chrome-development: npm bower assets scripts jsx templates env_settings scss chrome watch
+
+chrome-production: npm bower assets scripts jsx templates env_settings scss chrome optimize
+
+chrome-app-development: npm bower assets scripts jsx templates env_settings scss chrome-app watch
+
+chrome-app-production: npm bower assets scripts jsx templates env_settings scss chrome-app optimize
+
 production: npm bower assets scripts jsx templates env_settings scss optimize
 
 development: npm bower assets scripts jsx templates env_settings scss watch
@@ -53,6 +61,12 @@ npm:
 scss: $(SOURCE_DIR)/scss/main.scss
 	mkdir -p $(BUILD_DIR)/static/css
 	scss $(SOURCE_DIR)/scss/main.scss $(BUILD_DIR)/static/css/main.css
+
+chrome:
+	cp $(SOURCE_DIR)/chrome/* $(BUILD_DIR) -rf
+
+chrome-app:
+	cp $(SOURCE_DIR)/chrome-app/* $(BUILD_DIR) -rf
 
 env_settings:
 	cp $(SOURCE_DIR)/js/$(ENV_SETTINGS) $(BUILD_DIR)/static/js/env_settings.js
@@ -88,5 +102,5 @@ watch:
 	@which inotifywait || (echo "Please install inotifywait";exit 2)
 	@while true ; do \
 		inotifywait -r src -e create,delete,move,modify || break; \
-		($(MAKE) assets scripts jsx templates scss) || break;\
+		($(MAKE) assets scripts jsx templates chrome chrome-app scss) || break;\
 	done
