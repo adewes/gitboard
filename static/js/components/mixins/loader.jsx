@@ -116,7 +116,11 @@ define(["react",
                 mapping[resource.name] = resource.name;
             }
             for(var key in mapping){
-                d[key] = data[mapping[key]];
+                try{
+                    d[key] = data[mapping[key]];
+                }catch(e){
+                    d[key] = undefined;
+                }
             }
 
             if (resource.success)
@@ -313,16 +317,17 @@ define(["react",
                     loadingMessage = "Loading data...";
                 return <p className="alert alert-info"><i className="fa fa-spin fa-refresh"/> {loadingMessage}</p>;
             } else {
-                if (loadingMessage === undefined) {
-                    loadingMessage = <div>
-                          <p className="alert alert-info"><i className="fa fa-spin fa-refresh" /> Please wait, loading data...</p>
-                        </div>;
-                }
-                return <div className="content">
-                        <div className="text-center">
-                            {loadingMessage}
+                if (loadingMessage === undefined)
+                    loadingMessage = <h3><i className="fa fa-spin fa-refresh" /> Please wait, loading data...</h3>;
+                return <div className="container">
+                        <div className="row">
+                            <div className="col-md-4 col-md-offset-4">
+                                <div className="well bs-component">
+                                    {loadingMessage}
+                                </div>
+                           </div>
                         </div>
-                </div>;
+                    </div>;
             }
         },
 

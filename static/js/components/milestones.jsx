@@ -42,7 +42,7 @@ define(["react",
             render : function(){
                 var due;
                 if (this.props.milestone.due_on !== null){
-                    var datestring = Moment(new Date(this.props.milestone.due_on)).calendar();
+                    var datestring = Moment(new Date(this.props.milestone.due_on)).fromNow();
                     due = [<i className="octicon octicon-clock" />,' ',datestring];
                 }
                 return <div className="col-md-3">
@@ -71,7 +71,7 @@ define(["react",
                             endpoint : this.apis.repository.getDetails,
                             params : [props.data.repositoryId,{}],
                             success : function(data){
-                                this.setState({repository : data})
+                                return {repository : data};
                             }.bind(this)
                         },
                         {
@@ -86,7 +86,7 @@ define(["react",
                                     arr[+i] = data[i];
                                 }
                             }
-                            this.setState({milestones : arr});
+                            return {milestones : arr};
                         }.bind(this)
                        }];
             },
@@ -94,8 +94,11 @@ define(["react",
             displayName: 'Milestones',
 
             render: function () {
-                var milestoneItems = this.state.milestones.map(function(milestone){
-                    return <MilestoneItem milestone={milestone} repository={this.state.repository} />;
+
+                var data = this.state.data;
+
+                var milestoneItems = data.milestones.map(function(milestone){
+                    return <MilestoneItem milestone={milestone} repository={data.repository} />;
                 }.bind(this))
 
                 if (milestoneItems.length == 0)
@@ -104,11 +107,16 @@ define(["react",
                 return <div className="container">
                     <div className="row">
                         <div className="col-md-12">
-                            <h3>Your Milestones</h3>
+                            <h3>Milestones - {data.repository.name}</h3>
                         </div>
                     </div>
                     <div className="row">
                         {milestoneItems}
+                    </div>
+                    <div className="row">
+                        <div className="col-md-12">
+                            <A href={Utils.makeUrl('/sprintboard/'+data.repository.full_name)}>show issues without a milestone</A>
+                        </div>
                     </div>
                 </div>;
             }

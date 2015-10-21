@@ -126,8 +126,6 @@ define(["react","js/utils","js/flash_messages","jquery"],function (React,Utils,F
 
         render : function() {
 
-
-            //<A className="alert-link" href="" onClick={this.fadeOut}>{this.props.message.data.description}<i className="fa fa-times" /></A>
             return <div className={"flash alert alert-"+(this.props.message.data.type !== undefined ? this.props.message.data.type : "info")}>
                       <div className="container">
                         <div className="row">
@@ -155,7 +153,9 @@ define(["react","js/utils","js/flash_messages","jquery"],function (React,Utils,F
             this.fadeOut();
         },
 
-        fadeOut : function(){
+        fadeOut : function(event){
+          if (event)
+            event.preventDefault();
           if (! this.isMounted())
             return;
           try{

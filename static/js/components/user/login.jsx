@@ -80,9 +80,6 @@ define(["js/settings",
 
             return <div className="container">
                        <div className="row">
-                           &nbsp;
-                       </div>
-                       <div className="row">
                            <div className="col-md-4 col-md-offset-4">
                                <div className="well bs-component">
                                    {this.getTabs()}
@@ -142,7 +139,7 @@ define(["js/settings",
                         <div className="panel-body">
                             <ol className="list">
                                 <li>Click <a target="_blank" href={"https://github.com/settings/tokens/new?"+Utils.makeUrlParameters({scopes : settings.scopes.join(','),description : 'Gitboard Access Token'})}>here</a> to go to your Github token settings.</li>
-                                <li>Confirm the creation of the token. Scopes (we only need <strong>read:org</strong>) and description should already be correctly set.</li>
+                                <li>Confirm the creation of the token. Scopes (we need <strong>read:org + repo</strong>) and description should already be correctly set.</li>
                                 <li>Copy the token and paste it into the form above.</li>
                             </ol>
                         </div>
@@ -223,6 +220,8 @@ define(["js/settings",
 
         componentWillMount : function(){
             this.authorizationApi = AuthorizationApi.getInstance();
+            if (Utils.isLoggedIn())
+                Utils.redirectTo(Utils.makeUrl("/"));
         },
 
         render: function () {
@@ -280,47 +279,6 @@ define(["js/settings",
             if (!this.validate())
                 return;
 
-            var onSuccess = function(data){
-                var existingAuthorization;
-                for(var i in data){
-                    var authorization = data[i];
-                    if (authorization.note == 'gitboard'){
-                        existingAuthorization = authorization;
-                        console.log(authorization);
-                        break;
-                    }
-                }
-
-                var createAuthorization = function(){
-
-                    var onSuccess = function(data){
-                        Utils.login(data.token);
-                        Utils.redirectTo(Utils.makeUrl("/"));
-                    }.bind(this);
-
-                    var onError = function(xhr,status,message){
-                        this.setErrorMessage("The login failed for an unknown reason. Sorry :/");
-                    }.bind(this);
-
-                    this.authorizationApi.createAuthorization(formData.login,formData.password,formData.otp,{note : 'gitboard',scopes : settings.scopes},onSuccess,onError)
-
-
-                }.bind(this);
-
-                if (existingAuthorization){
-                    var onDeleteSuccess = function(){
-                        createAuthorization();
-                    }.bind(this);
-                    var onDeleteError = function(){
-                        this.setErrorMessage("Cannot delete existing authorization from Github. Sorry :/");
-                    }
-                    this.authorizationApi.deleteAuthorization(formData.login,formData.password,formData.otp,existingAuthorization.id,onDeleteSuccess,onDeleteError)
-
-                }
-                else
-                    createAuthorization();
-            }.bind(this);
-
             var onError = function(xhr,status,message){
                 var otpHeader = xhr.getResponseHeader('X-Github-OTP');
                 if (otpHeader !== null && otpHeader.match(/required/i))
@@ -329,7 +287,33 @@ define(["js/settings",
                     this.setErrorMessage("Wrong username or password. Please try again.");
             }.bind(this);
 
-            this.authorizationApi.getAuthorizations(formData.login,formData.password,formData.otp,onSuccess,onError);
+            var onSuccess = function(data){
+                Utils.login(data.token);
+                Utils.localStore("authorizationId",data.id);
+                Utils.redirectTo(Utils.makeUrl("/"));
+            }.bind(this);
+
+            var description = 'Gitboard Access Token - '+navigator.userAgent;
+
+            var createAuthorization = function(){
+                this.authorizationApi.createAuthorization(formData.login,formData.password,formData.otp,{note : description,scopes : settings.scopes},onSuccess,onError)
+            }.bind(this);
+
+            var checkAuthorizations = function(authorizations){
+                for(var i in authorizations){
+                    var authorization = authorizations[i];
+                    if (authorization.note == description){
+                        //if we find an existing authorization, we delete it and create a new one
+                        this.authorizationApi.deleteAuthorization(formData.login,formData.password,formData.otp,authorization.id,createAuthorization,onError);
+                        return;
+                    }
+                }
+                //if we didn't find any existing authorization with that exact description, we just create one
+                createAuthorization();
+            }.bind(this);
+
+            this.authorizationApi.getAuthorizations(formData.login,formData.password,formData.otp,checkAuthorizations,onError);
+
 
         },
 

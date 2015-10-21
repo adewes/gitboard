@@ -69,8 +69,8 @@ define(["react",
                     this.setState({repositories : repos_array});
                 }.bind(this);
 
-                if (props.data.organizationId !== undefined || props.data.userId !== undefined)
-                    return [{
+                if (props.data.organizationId || props.data.userId){
+                    var r =  [{
                             name : 'repositories',
                             endpoint : (props.data.organizationId ? this.apis.organization.getRepositories :
                                                                    this.apis.user.getUserRepositories),
@@ -78,6 +78,26 @@ define(["react",
                                       {per_page : 100,sort: 'pushed'}],
                             success : processRepositories
                         }];
+                    if (props.data.organizationId)
+                        r.push({
+                            name : 'organization',
+                            endpoint : this.apis.organization.getDetails,
+                            params : [props.data.organizationId,{}],
+                            success : function(data,d){
+                                return {organization : data};
+                            }
+                        })
+                    else
+                        r.push({
+                            name: 'user',
+                            endpoint : this.apis.user.getProfile,
+                            params : [],
+                            success : function(data,d){
+                                return {user : data};
+                            }
+                        })
+                    return r;
+                }
                 else
                     return [{
                             name : 'repositories',
@@ -97,10 +117,17 @@ define(["react",
                 if (repositoryItems.length == 0)
                     repositoryItems = [<p className="alert alert-info">Seems there is nothing to show here.</p>]
 
+                var data = this.state.data;
+                var title;
+                if (data.organization)
+                    title = 'Repositories - '+(data.organization.name || data.organization.login);
+                else
+                    title = 'Your repositories';
+
                 return <div className="container">
                     <div className="row">
                         <div className="col-md-12">
-                            <h3>Your repositories</h3>
+                            <h3>{title}</h3>
                         </div>
                     </div>
                     <div className="row">

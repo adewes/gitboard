@@ -93,6 +93,7 @@ static/js/api/github/issue.js
 static/js/api/github/repository.js
 static/js/api/github/milestone.js
 static/js/api/github/organization.js
+static/js/api/github/label.js
 static/js/api/all.js
 static/js/components/mixins/loader.js
 static/js/components/menu.js
@@ -101,8 +102,8 @@ static/bower_components/bootstrap/dist/js/bootstrap.js
 static/js/components/generic/modal.js
 static/js/components/mixins/github_error_handler.js
 static/bower_components/marked/lib/marked.js
-static/js/components/sprintboard.js
 static/bower_components/momentjs/moment.js
+static/js/components/sprintboard.js
 static/js/components/milestones.js
 static/js/components/repositories.js
 static/js/components/organizations.js

@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="76.199997"
+   height="76.199997"
+   id="svg4881"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="New document 14">
+  <defs
+     id="defs4883">
+    <clipPath
+       id="SVGID_4_">
+      <use
+         height="1052.3622"
+         width="744.09448"
+         y="0"
+         x="0"
+         style="overflow:visible"
+         xlink:href="#SVGID_3_"
+         overflow="visible"
+         id="use4449" />
+    </clipPath>
+    <clipPath
+       id="clipPath4857">
+      <use
+         height="1052.3622"
+         width="744.09448"
+         y="0"
+         x="0"
+         style="overflow:visible"
+         xlink:href="#SVGID_3_"
+         overflow="visible"
+         id="use4859" />
+    </clipPath>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.35"
+     inkscape:cx="38.099998"
+     inkscape:cy="38.099996"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="472"
+     inkscape:window-height="383"
+     inkscape:window-x="689"
+     inkscape:window-y="343"
+     inkscape:window-maximized="0" />
+  <metadata
+     id="metadata4886">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-336.9,-494.26218)">
+    <circle
+       style="fill:#efefef"
+       sodipodi:ry="38.099998"
+       sodipodi:rx="38.099998"
+       sodipodi:cy="799.5"
+       sodipodi:cx="568"
+       transform="translate(-193,-267.13782)"
+       cx="568"
+       cy="799.5"
+       r="38.099998"
+       id="circle4193"
+       d="m 606.1,799.5 c 0,21.04205 -17.05795,38.1 -38.1,38.1 -21.04205,0 -38.1,-17.05795 -38.1,-38.1 0,-21.04205 17.05795,-38.1 38.1,-38.1 21.04205,0 38.1,17.05795 38.1,38.1 z" />
+    <g
+       transform="translate(-193,-267.13782)"
+       id="g4441">
+      <defs
+         id="defs4443">
+        <circle
+           sodipodi:ry="34.400002"
+           sodipodi:rx="34.400002"
+           sodipodi:cy="799.90002"
+           sodipodi:cx="568.40002"
+           id="SVGID_3_"
+           cx="568.40002"
+           cy="799.90002"
+           r="34.400002" />
+      </defs>
+      <use
+         height="1052.3622"
+         width="744.09448"
+         y="0"
+         x="0"
+         style="fill:#c8e6e1;overflow:visible"
+         xlink:href="#SVGID_3_"
+         overflow="visible"
+         id="use4446" />
+      <clipPath
+         id="clipPath4866">
+        <use
+           height="1052.3622"
+           width="744.09448"
+           y="0"
+           x="0"
+           style="overflow:visible"
+           xlink:href="#SVGID_3_"
+           overflow="visible"
+           id="use4868" />
+      </clipPath>
+      <path
+         style="fill:#efefef"
+         inkscape:connector-curvature="0"
+         clip-path="url(#SVGID_4_)"
+         d="m 557.1,824.2 h -29.5 c -2.9,0 -5.2,-2.3 -5.2,-5.2 v -56.6 c 0,-2.9 2.3,-5.2 5.2,-5.2 h 41.1 c 2.9,0 5.2,2.3 5.2,5.2 v 45.1 l -16.8,16.7 z"
+         id="path4451" />
+      <polygon
+         style="fill:#c9caca"
+         clip-path="url(#SVGID_4_)"
+         points="574,807.5 557.1,824.2 557.1,807.5 "
+         id="polygon4453" />
+    </g>
+    <rect
+       style="fill:#898989"
+       x="358.5"
+       y="511.86218"
+       width="19.1"
+       height="0.89999998"
+       id="rect4455" />
+    <rect
+       style="fill:#898989"
+       x="349.5"
+       y="517.66217"
+       width="20.299999"
+       height="0.89999998"
+       id="rect4457" />
+    <rect
+       style="fill:#898989"
+       x="349.5"
+       y="523.06219"
+       width="26.9"
+       height="0.89999998"
+       id="rect4459" />
+    <rect
+       style="fill:#898989"
+       x="349.5"
+       y="528.46216"
+       width="17.4"
+       height="0.89999998"
+       id="rect4461" />
+    <rect
+       style="fill:#898989"
+       x="345.90002"
+       y="532.96216"
+       width="29.5"
+       height="0.89999998"
+       id="rect4463" />
+    <path
+       style="fill:#ffffff"
+       inkscape:connector-curvature="0"
+       d="m 395.8,543.86218 0,0 c -4.9,0 -8.9,-4 -8.9,-8.9 v -7.6 c 0,-4.9 4,-8.9 8.9,-8.9 l 0,0 c 4.9,0 8.9,4 8.9,8.9 v 7.6 c 0,4.9 -4,8.9 -8.9,8.9 z"
+       id="path4465" />
+    <circle
+       style="fill:#c9caca"
+       sodipodi:ry="0.80000001"
+       sodipodi:rx="0.80000001"
+       sodipodi:cy="790.40002"
+       sodipodi:cx="588.79999"
+       transform="translate(-193,-267.13782)"
+       cx="588.79999"
+       cy="790.40002"
+       r="0.80000001"
+       id="circle4467"
+       d="m 589.59999,790.40002 c 0,0.44183 -0.35817,0.8 -0.8,0.8 -0.44183,0 -0.8,-0.35817 -0.8,-0.8 0,-0.44182 0.35817,-0.8 0.8,-0.8 0.44183,0 0.8,0.35818 0.8,0.8 z" />
+    <path
+       style="fill:#dcdddd"
+       inkscape:connector-curvature="0"
+       d="m 386.9,526.66218 v 6.8 c 0,0 1.8,-0.8 1.8,-3.4 0.1,-2.7 -1.8,-3.4 -1.8,-3.4 z"
+       id="path4469" />
+    <path
+       style="fill:#dcdddd"
+       inkscape:connector-curvature="0"
+       d="m 404.7,526.66218 v 6.8 c 0,0 -1.8,-0.8 -1.8,-3.4 0,-2.7 1.8,-3.4 1.8,-3.4 z"
+       id="path4471" />
+  </g>
+</svg>
