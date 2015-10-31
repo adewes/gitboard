@@ -112,20 +112,30 @@ define(["react",
         });
 
         var CategorySelector = React.createClass({
-            render : function(){
-                var choices = {
-                    'todo' : 'To Do',
-                    'doing' : 'Doing',
-                    'awaiting-review' : 'Awaiting Review',
-                    'done' : 'Done'
-                };
-                var timeLinks = Object.keys(choices).map(function(key){
-                    var title = choices[key];
-                    return <A href="#">{title}</A>;
-                });
 
-                return <Dropdown disabled={!Utils.isLoggedIn()} onClick={this.props.onClick} title="To Do">
-                    {timeLinks}
+            render : function(){
+
+                var categoryData = this.props.categoryData;
+
+                var setCategory = function(category,event){
+                    event.preventDefault();
+                    this.props.setCategory(category);
+                }.bind(this);
+
+                var category = Object.keys(categoryData)[0];
+                for (var cat in categoryData){
+                    if (categoryData[cat].isMemberOf(this.props.issue)){
+                        category = cat;
+                        break;
+                    }
+                }
+
+                var categoryLinks = Object.keys(categoryData).map(function(key){
+                    var params = categoryData[key];
+                    return <A href="#" onClick={setCategory.bind(this,key)}>{params.title}</A>;
+                });
+                return <Dropdown disabled={!Utils.isLoggedIn()} onClick={this.props.onClick} title={categoryData[category].title}>
+                    {categoryLinks}
                 </Dropdown>;
             }
         });
@@ -232,6 +242,22 @@ define(["react",
                                                 this.props.onChange);
                 }.bind(this);
 
+                var setTime = function(time,type){
+
+                }.bind(this);
+
+                var setTimeEstimate = function(time){
+                    return setTime(time,'estimate');
+                };
+
+                var setTimeSpent = function(time){
+                    return setTime(time,'spent');
+                };
+
+                var setCategory = function(category){
+                    this.props.categoryData[category].moveTo(issue);
+                }.bind(this);
+
                 if (issue.assignee !== null)
                     assignee = [<img width="16" height="16" src={issue.assignee.avatar_url+'&s=16'} />,<span className="label">{issue.assignee.login}</span>];
                 var selectors;
@@ -241,9 +267,18 @@ define(["react",
                                           assignTo={assignTo}
                                           onClick={this.props.onContentChange}
                                           collaborators={this.props.collaborators}/>
-                        <TimeSelector type="estimate" issue={issue} onClick={this.props.onContentChange}/>
-                        <TimeSelector type="spent" issue={issue} onClick={this.props.onContentChange} />
-                        <CategorySelector issue={issue} onClick={this.props.onContentChange} />
+                        <TimeSelector type="estimate"
+                                      issue={issue}
+                                      setTime={setTimeEstimate}
+                                      onClick={this.props.onContentChange}/>
+                        <TimeSelector type="spent"
+                                      issue={issue}
+                                      setTime={setTimeSpent}
+                                      onClick={this.props.onContentChange} />
+                        <CategorySelector issue={issue}
+                                          setCategory={setCategory}
+                                          categoryData={this.props.categoryData}
+                                          onClick={this.props.onContentChange} />
                         <MilestoneSelector issue={issue}
                                            setMilestone={setMilestone}
                                            milestones={this.props.milestones}
@@ -283,18 +318,28 @@ define(["react",
         },
 
         closeModal : function(e){
+            Utils.redirectTo(Utils.makeUrl(this.props.baseUrl,{},this.props.params,['issueId']));
             this.refs.issueDetails.close();
             this.setState({showDetails : false});
         },
 
         getInitialState : function(){
-            return {showDetails : false};
+            return {showDetails : this.props.showDetails || false};
         },
 
         componentDidUpdate : function(prevProps,prevState){
             if (this.state.showDetails){
                 this.refs.issueDetails.open();
             }
+        },
+
+        componentDidMount : function(){
+            if (this.state.showDetails)
+                this.refs.issueDetails.open();
+        },
+
+        componentWillReceiveProps : function(props){
+            this.setState({showDetails : props.showDetails});
         },
 
         onDragStart: function(e){
@@ -325,7 +370,7 @@ define(["react",
                     var maxHeight = $(window).height(); 
                     var element = $('.modal-body');
                     element.css({overflow:'auto',
-                                 height:Math.min(maxHeight-100,element[0].scrollHeight+50)+'px'});
+                                 height:Math.min(maxHeight-100,element[0].scrollHeight+0)+'px'});
                 }.bind(this)
                 modal = <Modal
                     ref="issueDetails"
@@ -338,6 +383,8 @@ define(["react",
                             <IssueDetails issue={issue}
                                           onContentChange={resize}
                                           onChange={this.props.onChange}
+                                          key={issue.number}
+                                          categoryData={this.props.categoryData}
                                           collaborators={this.props.collaborators}
                                           milestones={this.props.milestones}
                                           data={this.props.data}/>
@@ -352,7 +399,7 @@ define(["react",
                         onDragEnd={this.onDragEnd}
                         draggable={true}>
               {modal}                 
-              <A href="#" onClick={this.showIssueDetails}>
+              <A href={Utils.makeUrl(this.props.baseUrl,{issueId : issue.number},this.props.params)}>
                 <div className="panel-heading">
                     {labelInfo} <p className="right-symbols"><span className="assignee">{assigneeInfo}</span></p>
                 </div>
@@ -661,7 +708,7 @@ define(["react",
         moveIssue : function(issue,to){
             var categoryData = this.categoryData();
             if (categoryData[to] !== undefined)
-                categoryData[to].moveTo(issue,this.state.dropZone);
+                categoryData[to].moveTo(issue);
         },
 
         render: function () {
@@ -673,6 +720,8 @@ define(["react",
                 this.reloadResources();
             }.bind(this);
 
+            var categoryData = this.categoryData();
+
             for (var category in categorizedIssues){
                 var issues = categorizedIssues[category];
                 issueItems[category] = issues.sort(function(issueA,issueB){return (new Date(issueA.created_at))-(new Date(issueB.created_at));}).map(function(issue){
@@ -680,7 +729,11 @@ define(["react",
                                       key={issue.number}
                                       onChange={reloadResources}
                                       issue={issue}
+                                      baseUrl={this.props.baseUrl}
+                                      params={this.props.params}
+                                      showDetails={this.props.params.issueId && this.props.params.issueId == issue.number ? true : false}
                                       collaborators={data.collaborators}
+                                      categoryData={categoryData}
                                       milestones={data.milestones}
                                       dragStart={this.dragStart}
                                       dragged={issue.id == (this.state.draggedIssue && this.state.draggedIssue.id == issue.id ? true : false)}
@@ -712,7 +765,6 @@ define(["react",
 
             }
 
-            var categoryData = this.categoryData();
 
             var addIssue = function(category,event){
                 event.preventDefault();
