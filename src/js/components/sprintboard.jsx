@@ -32,11 +32,21 @@ define(["react",
         "js/components/mixins/github_error_handler",
         "js/components/generic/modal",
         "js/flash_messages",
+        "js/helpers/issue_manager",
         "jquery",
         "marked",
         "moment"
         ],
-        function (React,Utils,LoaderMixin,GithubErrorHandlerMixin,Modal,FlashMessagesService,$,Marked,Moment) {
+        function (React,
+                  Utils,
+                  LoaderMixin,
+                  GithubErrorHandlerMixin,
+                  Modal,
+                  FlashMessagesService,
+                  IssueManager,
+                  $,
+                  Marked,
+                  Moment) {
         'use'+' strict';
 
         Marked.setOptions({
@@ -115,16 +125,16 @@ define(["react",
 
             render : function(){
 
-                var categoryData = this.props.categoryData;
+                var categoryData = this.props.issueManager.issueCategories;
 
                 var setCategory = function(category,event){
                     event.preventDefault();
-                    this.props.setCategory(category);
+                    this.props.issueManager.moveTo(this.props.issue,category);
                 }.bind(this);
 
                 var category = Object.keys(categoryData)[0];
                 for (var cat in categoryData){
-                    if (categoryData[cat].isMemberOf(this.props.issue)){
+                    if (this.props.issueManager.isMemberOf(this.props.issue,cat)){
                         category = cat;
                         break;
                     }
@@ -148,7 +158,7 @@ define(["react",
 
                 var setMilestone = function(milestone,event){
                     event.preventDefault();
-                    this.props.setMilestone(milestone);
+                    this.props.issueManager.setMilestone(this.props.issue,milestone);
                 }.bind(this);
 
                 if (this.props.milestones){
@@ -172,7 +182,7 @@ define(["react",
 
                 var assignTo = function(collaborator,event){
                     event.preventDefault();
-                    this.props.assignTo(collaborator);
+                    this.props.issueManager.assignTo(this.props.issue,collaborator);
                 }.bind(this);
 
                 var userHtml = function(user){
@@ -222,65 +232,28 @@ define(["react",
                 var markdown = <p>(no description given)</p>;
                 var assignee;
 
-                var assignTo = function(collaborator){
-                    issue.assignee = collaborator;
-                    this.forceUpdate();
-                    this.apis.issue.updateIssue(this.props.data.repositoryId,
-                                                issue.number,
-                                                {assignee : collaborator ? collaborator.login : null},
-                                                this.props.onChange,
-                                                this.props.onChange);
-                }.bind(this);
-
-                var setMilestone = function(milestone){
-                    issue.milestone = milestone;
-                    this.forceUpdate();
-                    this.apis.issue.updateIssue(this.props.data.repositoryId,
-                                                issue.number,
-                                                {milestone : milestone ? milestone.number : null},
-                                                this.props.onChange,
-                                                this.props.onChange);
-                }.bind(this);
-
-                var setTime = function(time,type){
-
-                }.bind(this);
-
-                var setTimeEstimate = function(time){
-                    return setTime(time,'estimate');
-                };
-
-                var setTimeSpent = function(time){
-                    return setTime(time,'spent');
-                };
-
-                var setCategory = function(category){
-                    this.props.categoryData[category].moveTo(issue);
-                }.bind(this);
-
                 if (issue.assignee !== null)
                     assignee = [<img width="16" height="16" src={issue.assignee.avatar_url+'&s=16'} />,<span className="label">{issue.assignee.login}</span>];
                 var selectors;
                 if (Utils.isLoggedIn() || true){
                     selectors = <div className="btn-group btn-group">
                         <AssigneeSelector issue={issue}
-                                          assignTo={assignTo}
                                           onClick={this.props.onContentChange}
+                                          issueManager={this.props.issueManager}
                                           collaborators={this.props.collaborators}/>
                         <TimeSelector type="estimate"
+                                      issueManager={this.props.issueManager}
                                       issue={issue}
-                                      setTime={setTimeEstimate}
                                       onClick={this.props.onContentChange}/>
                         <TimeSelector type="spent"
                                       issue={issue}
-                                      setTime={setTimeSpent}
+                                      issueManager={this.props.issueManager}
                                       onClick={this.props.onContentChange} />
                         <CategorySelector issue={issue}
-                                          setCategory={setCategory}
-                                          categoryData={this.props.categoryData}
+                                          issueManager={this.props.issueManager}
                                           onClick={this.props.onContentChange} />
                         <MilestoneSelector issue={issue}
-                                           setMilestone={setMilestone}
+                                           issueManager={this.props.issueManager}
                                            milestones={this.props.milestones}
                                            onClick={this.props.onContentChange} />
                     </div>;
@@ -382,9 +355,8 @@ define(["react",
                         <div className="modal-body">
                             <IssueDetails issue={issue}
                                           onContentChange={resize}
-                                          onChange={this.props.onChange}
                                           key={issue.number}
-                                          categoryData={this.props.categoryData}
+                                          issueManager={this.props.issueManager}
                                           collaborators={this.props.collaborators}
                                           milestones={this.props.milestones}
                                           data={this.props.data}/>
@@ -421,7 +393,8 @@ define(["react",
         },
 
         onDragLeave : function(e){
-            this.props.dragLeave();
+            if (this.props.dragLeave)
+                this.props.dragLeave();
         },
 
         render : function(){
@@ -437,137 +410,6 @@ define(["react",
 
         displayName: 'SprintBoard',
         mixins : [LoaderMixin,GithubErrorHandlerMixin],
-
-        categoryData : function(){
-
-            var hasLabel = function(issue,label){
-                for (var i in issue.labels){
-                    var issueLabel = issue.labels[i];
-                    if (label.toLowerCase() == issueLabel.name.toLowerCase())
-                        return true;
-                }
-                return false;
-            }
-
-            var setImmediateState = function(issue,state){
-                if (issue.state != state)
-                    issue.state = state;
-            }
-
-            var onError = function(xhr){
-                FlashMessagesService.postMessage({
-                    type : "danger",
-                    description : "An error occurred when trying to update the issue. Please try again..."
-                });
-                this.reloadResources();
-            }.bind(this);
-
-            var setState = function(issue,state,onSuccess){
-                this.apis.issue.updateIssue(this.props.data.repositoryId,issue.number,{state : state},onSuccess,onError);
-            }.bind(this);
-
-            var categoryLabels = ['doing','to-do','todo','awaiting-review','done'];
-
-            var setImmediateLabel = function(issue,label){
-                if (Array.isArray(label)){
-                    var labels = label;
-                }else{
-                    var labels = [label];
-                }
-                var found = false;
-                for (var i in labels){
-                    var l = labels[i];
-                    if (hasLabel(issue,l)){
-                        found = true;
-                        break;
-                    }
-                }
-                var labelsToRemove = [];
-                var labelsToAdd = [];
-                if (!found){
-                    labelsToAdd.push(labels[0]);
-                    if (!issue.labels)
-                        issue.labels = [];
-                    var newLabel = this.state.data.labelsByName[labels[0]] || {name : labels[0]};
-                    issue.labels.push(newLabel);
-                }
-                labelsToRemove = issue.labels.filter(function(label){
-                                    return (label.name != labels[0]
-                                           && categoryLabels.indexOf(label.name) != -1) ?
-                                           true : false;})
-                                 .map(function(label){return label.name;});
-                issue.labels = issue.labels.filter(function(label){
-                    return (labelsToRemove.indexOf(label.name) == -1) ? true: false})
-                return [labelsToAdd,labelsToRemove];
-            }.bind(this)
-
-            var setLabel = function(issue,labelsToAdd,labelsToRemove,onSuccess){
-                var removeCallback = function(){
-                    this.reloadResources();
-                    if (onSuccess)
-                        onSuccess();
-                }.bind(this);
-                if (labelsToRemove.length)
-                    for(var i in labelsToRemove){
-                        removeCallback = function(oldCallback){
-                            this.apis.label.removeLabel(this.props.data.repositoryId,issue.number,labelsToRemove[i],oldCallback,onError);
-                        }.bind(this,removeCallback);
-                    }
-                if (labelsToAdd.length)
-                    this.apis.label.addLabels(this.props.data.repositoryId,issue.number,labelsToAdd,removeCallback,onError);
-                else
-                    removeCallback();
-            }.bind(this);
-
-            return {
-                toDo : {
-                    title : 'To Do',
-                    isMemberOf : function(issue){
-                        return (hasLabel(issue,'to-do') || hasLabel(issue,'todo')) && issue.state == 'open';
-                    },
-                    moveTo : function(issue){
-                        setImmediateState(issue,'open');
-                        var labelsToModify = setImmediateLabel(issue,['to-do','todo']);
-                        setState(issue,'open',function(){setLabel(issue,labelsToModify[0],labelsToModify[1]);});
-                    }.bind(this)
-                },
-                doing : {
-                    title : 'Doing',
-                    isMemberOf : function(issue){
-                        return hasLabel(issue,'doing') && issue.state == 'open';
-                    },
-                    moveTo : function(issue){
-                        setImmediateState(issue,'open');
-                        var labelsToModify = setImmediateLabel(issue,['doing']);
-                        setState(issue,'open',function(){setLabel(issue,labelsToModify[0],labelsToModify[1]);});
-                        this.forceUpdate();
-                    }.bind(this)
-                },
-                awaitingReview : {
-                    title : 'Awaiting Review',
-                    moveTo : function(issue){
-                        setImmediateState(issue,'open');
-                        var labelsToModify = setImmediateLabel(issue,['done','awaiting-review']);
-                        setState(issue,'open',function(){setLabel(issue,labelsToModify[0],labelsToModify[1]);});
-                    }.bind(this),
-                    isMemberOf : function(issue){
-                        return (hasLabel(issue,'done') || hasLabel(issue,'awaiting-review')) && issue.state == 'open';
-                    }
-                },
-                done : {
-                    title : 'Done',
-                    isMemberOf : function(issue){
-                        return issue.state == 'closed';
-                    }.bind(this),
-                    moveTo : function(issue){
-                        setImmediateState(issue,'closed');
-                        var labelsToModify = setImmediateLabel(issue,['done']);
-                        setState(issue,'closed',function(){setLabel(issue,labelsToModify[0],labelsToModify[1]);});
-                        this.forceUpdate();
-                    }.bind(this)
-                },
-            }
-        },
 
         resources : function(props,state){
             var convertToArray = function(data){
@@ -658,7 +500,15 @@ define(["react",
             for(var i in data.labels){
                 data.labelsByName[data.labels[i].name] = data.labels[i];
             }
+            this.issueManager = new IssueManager({repositoryId : this.props.data.repositoryId,
+                                                  labelsByName : data.labelsByName,
+                                                  onResourceChange : this.reloadResources,
+                                                  onImmediateChange : this.updateView});
             return data;
+        },
+
+        updateView : function(){
+            this.forceUpdate();
         },
 
         getInitialState : function(){
@@ -670,8 +520,14 @@ define(["react",
             this.setState({draggedIssue : issue});
         },
 
+        moveTo : function(issue,category){
+            if (this.issueManager.issueCategories[category]){
+                this.issueManager.moveTo(issue,category,this.reloadResources,this.onIssueError);
+            }
+        },
+
         dragEnd : function(issue){
-            this.moveIssue(issue,this.state.dropZone);
+            this.moveTo(issue,this.state.dropZone);
             this.state.draggedIssue.dragged = false;
             this.setState({dropZone : undefined,draggedIssue : undefined});
         },
@@ -680,19 +536,24 @@ define(["react",
             this.setState({dropZone : list})
         },
 
-        dragLeave : function(list){
+        onIssueError : function(xhr){
+            FlashMessagesService.postMessage({
+                type : "danger",
+                description : "An error occurred when trying to update the issue. Please try again..."
+            });
+            this.reloadResources();
         },
 
         categorizeIssues : function(issues,draggedIssue,dropZone){
-            var categoryData = this.categoryData();
+            var categoryData = this.issueManager.issueCategories;
             var categories = {};
             for(var category in categoryData)
                 categories[category] = [];
             for (var i in issues){
                 var issue = issues[i];
-                var category = 'toDo';
+                var category = 'toDo';//the default category
                 for (var cat in categoryData){
-                    if (categoryData[cat].isMemberOf(issue)){
+                    if (this.issueManager.isMemberOf(issue,cat)){
                         category = cat;
                         break;
                     }
@@ -705,35 +566,24 @@ define(["react",
             return categories;
         },
 
-        moveIssue : function(issue,to){
-            var categoryData = this.categoryData();
-            if (categoryData[to] !== undefined)
-                categoryData[to].moveTo(issue);
-        },
-
         render: function () {
             var data = this.state.data;
             var categorizedIssues = this.categorizeIssues(data.allIssues,this.state.draggedIssue,this.state.dropZone);
             var issueItems = {};
 
-            var reloadResources = function(){
-                this.reloadResources();
-            }.bind(this);
-
-            var categoryData = this.categoryData();
+            var categoryData = this.issueManager.issueCategories;
 
             for (var category in categorizedIssues){
                 var issues = categorizedIssues[category];
                 issueItems[category] = issues.sort(function(issueA,issueB){return (new Date(issueA.created_at))-(new Date(issueB.created_at));}).map(function(issue){
                     return <IssueItem data={this.props.data}
                                       key={issue.number}
-                                      onChange={reloadResources}
                                       issue={issue}
                                       baseUrl={this.props.baseUrl}
                                       params={this.props.params}
                                       showDetails={this.props.params.issueId && this.props.params.issueId == issue.number ? true : false}
                                       collaborators={data.collaborators}
-                                      categoryData={categoryData}
+                                      issueManager={this.issueManager}
                                       milestones={data.milestones}
                                       dragStart={this.dragStart}
                                       dragged={issue.id == (this.state.draggedIssue && this.state.draggedIssue.id == issue.id ? true : false)}
@@ -770,16 +620,14 @@ define(["react",
                 event.preventDefault();
             }.bind(this);
 
-            var issueLists = Object.keys(categoryData).map(function(category){
+            var issueLists = Object.keys(this.issueManager.issueCategories).map(function(category){
                 return <IssueList key={category}
                             addIssue={addIssue.bind(this,category)}
-                            onChange={reloadResources}
                             dragEnd={this.dragEnd.bind(this,category)}
                             dragEnter={this.dragEnter.bind(this,category)}
-                            dragLeave={this.dragLeave.bind(this,category)}
                             name={category}
                             active={this.state.dropZone == category ? true : false}>
-                        <h4>{categoryData[category].title}</h4>
+                        <h4>{this.issueManager.issueCategories[category].title}</h4>
                         <p className="estimates"><span className="time-estimate">5h</span><span className="time-spent">7h</span></p>
                         {issueItems[category]}
                     </IssueList>
