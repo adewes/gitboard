@@ -71,10 +71,10 @@ define(["react",
         var Dropdown = React.createClass({
 
             render :function(){
-                var lis = React.Children.map(this.props.children,function(child){
+                var lis = React.Children.map(this.props.children,function(child,i){
                     if (child == undefined)
-                        return <li role="separator" className="divider" />;
-                    return <li>{child}</li>;
+                        return <li role="separator" className="divider" key={i} />;
+                    return <li key={i}>{child}</li>;
                 });
                 if (this.props.disabled)
                     return <div className="btn-group">
@@ -82,7 +82,7 @@ define(["react",
                 </div>
                 else
                 return <div className="btn-group">
-                    <A onClick={this.props.onClick} href="#" className="btn btn-xs btn-default dropdown-toggle" data-target="#" data-toggle="dropdown">{this.props.title}&nbsp;<i className="fa fa-caret-down" /></A>
+                    <A key="dropdown-link" onClick={this.props.onClick} href="#" className="btn btn-xs btn-default dropdown-toggle" data-target="#" data-toggle="dropdown">{this.props.title}&nbsp;<i key="caret-down" className="fa fa-caret-down" /></A>
                     <ul className="dropdown-menu">
                         {lis}
                     </ul>
@@ -108,12 +108,25 @@ define(["react",
                     '40h' : '5 days',
                     '80h' : '10 days'
                 };
+
+                var setTime = function(time,event){
+                    event.preventDefault();
+                    this.props.issueManager.setTime(this.props.issue,time,this.props.type);
+                }.bind(this);
+
+
                 var timeLinks = Object.keys(choices).map(function(key){
                     var title = choices[key];
-                    return <A href="#">{title}</A>;
+                    return <A key={key} href="#" onClick={setTime.bind(this,key)}>{title}</A>;
                 });
 
-                var title = <span className={"time-"+this.props.type}>n/a</span>
+                timeLinks.push(undefined);
+                timeLinks.push(<A href="#" onClick={setTime.bind(this,undefined)}>remove time</A>);
+                var minutes = this.props.issue["time"+(this.props.type == 'estimate' ? 'Estimate' : 'Spent')];
+                var minutesStr = 'n/a';
+                if (minutes)
+                    minutesStr = this.props.issueManager.formatMinutes(minutes)
+                var title = <span key="main-title" className={"time-"+this.props.type}>{minutesStr}</span>
 
                 return <Dropdown disabled={!Utils.isLoggedIn()} onClick={this.props.onClick} title={title}>
                     {timeLinks}
@@ -142,7 +155,7 @@ define(["react",
 
                 var categoryLinks = Object.keys(categoryData).map(function(key){
                     var params = categoryData[key];
-                    return <A href="#" onClick={setCategory.bind(this,key)}>{params.title}</A>;
+                    return <A key={key} href="#" onClick={setCategory.bind(this,key)}>{params.title}</A>;
                 });
                 return <Dropdown disabled={!Utils.isLoggedIn()} onClick={this.props.onClick} title={categoryData[category].title}>
                     {categoryLinks}
@@ -163,7 +176,7 @@ define(["react",
 
                 if (this.props.milestones){
                     var milestoneLinks = this.props.milestones.map(function(milestone){
-                        return <A href="#" onClick={setMilestone.bind(this,milestone)}>{milestone.title}</A>
+                        return <A key={milestone.number} href="#" onClick={setMilestone.bind(this,milestone)}>{milestone.title}</A>
                     }.bind(this));
                     milestoneLinks.push(undefined);
                     milestoneLinks.push(<A href="#" onClick={setMilestone.bind(this,null)}> <i className="fa fa-trash" />&nbsp;&nbsp;remove milestone</A>);
@@ -192,13 +205,13 @@ define(["react",
                 var dropdownContent;
                 if (this.props.collaborators){
                     var collaboratorLinks = this.props.collaborators.map(function(collaborator){
-                        return <A href="#" onClick={assignTo.bind(this,collaborator)}>{userHtml(collaborator)}</A>
+                        return <A key={collaborator.id} href="#" onClick={assignTo.bind(this,collaborator)}>{userHtml(collaborator)}</A>
                     }.bind(this));
                     collaboratorLinks.push(undefined);
-                    collaboratorLinks.push(<A href="#" onClick={assignTo.bind(this,null)}> <i className="fa fa-trash" />&nbsp;&nbsp;remove assignee</A>);
+                    collaboratorLinks.push(<A key={0} href="#" onClick={assignTo.bind(this,null)}> <i className="fa fa-trash" />&nbsp;&nbsp;remove assignee</A>);
                     dropdownContent = collaboratorLinks;
                 }
-                return <Dropdown disabled={!Utils.isLoggedIn()} onClick={this.props.onClick} title={[(this.props.issue.assignee ? userHtml(this.props.issue.assignee) : ' no one assigned')]}>
+                return <Dropdown disabled={!Utils.isLoggedIn()} onClick={this.props.onClick} title={(this.props.issue.assignee ? userHtml(this.props.issue.assignee) : ' no one assigned')}>
                     {dropdownContent}
                 </Dropdown>;
             }
@@ -208,7 +221,7 @@ define(["react",
             render : function(){
                 var issue = this.props.issue;
                 var labels = issue.labels.map(function(label){
-                    return <span className="issue-label" style={{borderBottom:'3px solid '+'#'+label.color}}>{label.name}</span>
+                    return <span key={label.name} className="issue-label" style={{borderBottom:'3px solid '+'#'+label.color}}>{label.name}</span>
                 });
                 return <div>
                     <span className="pull-right"><A target="_blank" href={issue.html_url}>#{issue.number}</A></span>
@@ -366,6 +379,12 @@ define(["react",
                         </div>
                   </Modal>
             }
+            var times =[];
+            if (issue.timeEstimate)
+                times.push(<span className="time-estimate">{this.props.issueManager.formatMinutes(issue.timeEstimate)}</span>);
+            if (issue.timeSpent)
+                times.push(<span className="time-spent">{this.props.issueManager.formatMinutes(issue.timeSpent)}</span>);
+
             return <div className={"panel panel-primary issue-item"+(issue.dragged ? " dragged" : "")}
                         onDragStart={this.onDragStart}
                         onDragEnd={this.onDragEnd}
@@ -379,7 +398,7 @@ define(["react",
                     <h5>{issue.title}</h5>
                 </div>
                 <div className="panel-footer">
-                    <span className="time-estimate">5h</span> <span className="time-spent">7h</span>
+                    {times} &nbsp;
                 </div>
                 </A>
             </div>;
@@ -504,10 +523,20 @@ define(["react",
                                                   labelsByName : data.labelsByName,
                                                   onResourceChange : this.reloadResources,
                                                   onImmediateChange : this.updateView});
+            this.processIssues(data.allIssues);
             return data;
         },
 
+        processIssues : function(issues){
+            for(var i in issues){
+                var issue = issues[i];
+                issue.timeSpent = this.issueManager.getMinutes(this.issueManager.getTime(issue,'spent'));
+                issue.timeEstimate = this.issueManager.getMinutes(this.issueManager.getTime(issue,'estimate'));
+            }
+        },
+
         updateView : function(){
+            this.processIssues(this.state.data.allIssues);
             this.forceUpdate();
         },
 
@@ -560,8 +589,11 @@ define(["react",
                 }
                 categories[category].push(issue);
             }
-            if (draggedIssue && dropZone && !Utils.contains(categories[dropZone],draggedIssue)){
-                categories[dropZone].push(draggedIssue);
+            if (draggedIssue && dropZone && !this.issueManager.isMemberOf(issue,dropZone)){
+                issueCopy = $.extend(true,{},draggedIssue);
+                issueCopy.placeholder = true;
+                issueCopy.number = 9999999999;
+                categories[dropZone].push(issueCopy);
             }
             return categories;
         },
@@ -570,11 +602,35 @@ define(["react",
             var data = this.state.data;
             var categorizedIssues = this.categorizeIssues(data.allIssues,this.state.draggedIssue,this.state.dropZone);
             var issueItems = {};
+            var times = {};
+
+            var getMinutes = function(timeString){
+
+            };
+
+            var formatMinutes = function(minutes){
+
+            };
+
+            var totalTimes = {estimate : 0,spent : 0};
 
             var categoryData = this.issueManager.issueCategories;
-
             for (var category in categorizedIssues){
                 var issues = categorizedIssues[category];
+                times[category] = {estimate : 0,spent : 0};
+                for(var i in issues){
+                    var issue = issues[i];
+                    if (issue.placeholder)
+                        continue;
+                    if (issue.timeEstimate){
+                        times[category].estimate+=issue.timeEstimate;
+                        totalTimes.estimate+=issue.timeEstimate;
+                    }
+                    if (issue.timeSpent){
+                        times[category].spent+=issue.timeSpent;
+                        totalTimes.spent+=issue.timeSpent;
+                    }
+                }
                 issueItems[category] = issues.sort(function(issueA,issueB){return (new Date(issueA.created_at))-(new Date(issueB.created_at));}).map(function(issue){
                     return <IssueItem data={this.props.data}
                                       key={issue.number}
@@ -621,6 +677,11 @@ define(["react",
             }.bind(this);
 
             var issueLists = Object.keys(this.issueManager.issueCategories).map(function(category){
+                var estimates = [];
+                if (times[category].estimate)
+                    estimates.push(<span className="time-estimate">{this.issueManager.formatMinutes(times[category].estimate)}</span>)
+                if (times[category].spent)
+                    estimates.push(<span className="time-spent">{this.issueManager.formatMinutes(times[category].spent)}</span>);
                 return <IssueList key={category}
                             addIssue={addIssue.bind(this,category)}
                             dragEnd={this.dragEnd.bind(this,category)}
@@ -628,10 +689,16 @@ define(["react",
                             name={category}
                             active={this.state.dropZone == category ? true : false}>
                         <h4>{this.issueManager.issueCategories[category].title}</h4>
-                        <p className="estimates"><span className="time-estimate">5h</span><span className="time-spent">7h</span></p>
+                        <p className="estimates">{estimates}&nbsp;</p>
                         {issueItems[category]}
                     </IssueList>
             }.bind(this))
+
+            var estimates = [];
+            if (totalTimes.estimate)
+                estimates.push(<span key="estimate" className="time-estimate">{this.issueManager.formatMinutes(totalTimes.estimate)}</span>);
+            if (totalTimes.spent)
+                estimates.push(<span key="spent" className="time-spent">{this.issueManager.formatMinutes(totalTimes.spent)}</span>);
 
             return <div className="container sprintboard">
                 <div className="row">
@@ -639,7 +706,7 @@ define(["react",
                         <h3><A href={Utils.makeUrl('/milestones/'+this.props.data.repositoryId)}>{data.repository.name}</A> {milestoneTitle}</h3>
                         <p>
                             {due}
-                            &nbsp; <span className="time-estimate">23h</span> <span className="time-spent">11h</span>
+                            &nbsp; {estimates}
                         </p>
                         {milestoneDescription}
                     </div>

@@ -31,9 +31,8 @@ define(["js/utils","js/api/all","js/flash_messages"],function (Utils,Apis,FlashM
     IssueManager.prototype._setLabelsImmediately = function(issue,labels){
 
         var labelsToRemove = issue.labels.filter(function(label){
-                            return (label.name != labels[0]
-                                   && categoryLabels.indexOf(label.name) != -1) ?
-                                   true : false;})
+                            return Object.keys(labels).indexOf(label.name) !== -1 && labels[label.name] == false;
+                            })
                          .map(function(label){return label.name;});
 
         issue.labels = issue.labels.filter(function(label){
@@ -73,6 +72,85 @@ define(["js/utils","js/api/all","js/flash_messages"],function (Utils,Apis,FlashM
         else if (removeCallback)
             removeCallback();
 
+    }
+
+    IssueManager.prototype.getMinutes = function(timeString){
+        var re = /([\d]+)(m|h|d)/i;
+        var res = re.exec(timeString);
+        if (res){
+            var number = parseInt(res[1]);
+            switch(res[2]){
+                case 'm':return number;
+                case 'h':return number*60;
+                case 'd':return number*60*8;
+            }
+        }
+        return undefined;
+    };
+
+    IssueManager.prototype.formatMinutes = function(minutes){
+        if (minutes < 60)
+            return minutes+'m';
+        else if (minutes < 8*60){
+            var hours = Math.floor(minutes/60);
+            var minutes = minutes % 60;
+            var str = hours+'h';
+            if (minutes)
+                str+=' '+minutes+'m';
+            return str;
+        }
+        var days = Math.floor(minutes/60/8);
+        var hours = Math.floor((minutes%(60*8))/60);
+        var minutes = minutes % 60;
+        str = days+'d';
+        if (hours)
+            str+=' '+hours+'h';
+        if (minutes)
+            str+=' '+minutes+'m';
+        return str;
+    };
+
+    IssueManager.prototype.getTime = function(issue,type){
+        for (var i in issue.labels){
+            var label = issue.labels[i];
+            var re;
+            if (type == 'estimate')
+                re = /^time-estimate-([\d\w]+)$/i;
+            else
+                re = /^time-spent-([\d\w]+)$/i;
+            var res = re.exec(label.name);
+            if (res){
+                return res[1];
+            }
+        }
+        return null;
+    };
+
+    IssueManager.prototype.setTime = function(issue,time,type){
+        var labels = {};
+        for(var i in issue.labels){
+            var label = issue.labels[i];
+            if (type == 'estimate'){
+                if (/^time-estimate-/i.exec(label.name))
+                    labels[label.name] = false;
+            }else{
+                if (/^time-spent-/i.exec(label.name))
+                    labels[label.name] = false;
+            }
+        }
+        if (time){
+            if (type == 'estimate')
+                labels['time-estimate-'+time] = true;
+            else
+                labels['time-spent-'+time] = true;
+        }
+
+        var labelOps = this._setLabelsImmediately(issue,labels);
+
+        if (this.params.onImmediateChange)
+            this.params.onImmediateChange();
+
+        this._setLabels(issue,labelOps.remove,labelOps.add,this.params.onResourceChange,this.params.onError);
     }
 
     IssueManager.prototype.assignTo = function(issue,collaborator){
