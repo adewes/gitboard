@@ -710,7 +710,7 @@ define(["react",
             return <div className="container sprintboard">
                 <div className="row">
                     <div className="col-md-12">
-                        <h3><A href={Utils.makeUrl('/milestones/'+this.props.data.repositoryId)}>{data.repository.name}</A> {milestoneTitle} <A onClick={reload} href="#" className="pull-right" title="refresh issues"><i className={"fa fa-refresh"+(this.state.refreshing ? ' fa-spin' : '')} /></A></h3>
+                        <h3><A href={Utils.makeUrl('/milestones/'+this.props.data.repositoryId)}>{data.repository.name}</A> {milestoneTitle} <A onClick={reload} href="#" className="pull-right refresh-link" title="refresh issues"><i className={"fa fa-refresh"+(this.state.refreshing ? ' fa-spin' : '')} /></A></h3>
                         <p>
                             {due}
                             &nbsp; {estimates}

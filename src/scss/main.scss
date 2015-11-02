@@ -18,13 +18,54 @@ body,h1,h2,h3,h4,h5,h6 {
     font-weight:300;
 }
 
+
+img.github-ribbon{
+    z-index:2000;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    border: 0;
+}
+
+@media(min-width:992px){
+    #features{
+        img{
+            width:80%;
+        }
+    }
+}
+
+#features{
+
+    p{
+        margin-top:40px;
+        text-align:left;
+    }
+    div.row{
+        margin-bottom:40px;
+    }
+    div.diagram{
+        text-align:center;
+    }
+}
+
 footer {background:#fff; padding-top:10px;}
 
 a {color:#006; font-weight:bolder;}
 a:hover,a:active {color: #008; text-decoration:none;}
 a:visited {color:#006;}
 
-@media (max-width:768px){
+@media (max-width:991px){
+    
+    #features{
+        img{
+            width:60%;
+        }
+    }
+
+    img.github-ribbon{
+        display:none; //we do not show the ribbon on mobile devices since it obstructs everything...
+    }
     footer{
         margin-top:20px;
     }
@@ -33,7 +74,7 @@ a:visited {color:#006;}
     }
 }
 
-@media (min-width: 1000px) {
+@media (min-width: 992px) {
   .narrow-container {
     width: 970px;
   }

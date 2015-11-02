@@ -33,9 +33,7 @@
                 <li><a href="#features">Features</a></li>
                 <li><a href="#faq">Questions &amp; Answers</a></li>
                 <li><a href="https://github.com/adewes/gitboard">View on Github <i class="fa fa-github"></i></a></li>
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-                <li><a href="app.html#/login">Login</a></li>
+                <li><a href="app.html#/login"><strong>Login</strong></a></li>
             </ul>
           </div><!--/.nav-collapse -->
         </div>
@@ -43,8 +41,8 @@
 
       <section id="app">
       <hr />
-      <div class="narrow-container container left-tilt">
-        <div class="jumbotron">
+      <div class="narrow-container container">
+        <div class="jumbotron left-tilt">
             <h1 class="text-center">Github + Kanban = <strong>Gitboard</strong></h1>
             <hr />
             <p class="text-center">Gitboard is a simple and intuitive <strong>Kanban board</strong> for your <strong>Github issues</strong>. Easily manage to-dos, milestones and projects and keep up-to-date on your progress. Gitboard is <strong>open-source</strong> and runs <strong>securely</strong> inside your browser.</p>
@@ -60,149 +58,79 @@
           <div class="narrow-container container">
             <div class="row">
                 <div class="col-md-12">
-                    <h1><a name="features">&nbsp;</a></h1>
+                    <a name="features">&nbsp;</a>
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-4">
-                    <img width="100%" src="static/assets/images/homepage/arrow.svg" />
+                <div class="col-md-6 col-md-push-6 diagram">
+                    <img src="static/assets/images/homepage/card.svg" />
+                </div>
+                <div class="col-md-6 col-md-pull-6">
+                    <h1>See everything at a glance</h1>
+                    <p class="lead">Gitboard gives you an intuitive and beautiful overview of your Github issues. Forget navigating back and forth to see which issues are in the backlog, being worked on or closed.</p>
+                    <p class="lead">
+                    See who's working on what. Move issues between categories by dragging and dropping them. Define time estimates for your issues and track actual working time.
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 diagram">
+                    <img src="static/assets/images/homepage/arrow.svg" />
                 </div>
                 <div class="col-md-6">
-                <h1>Keep track of your goals</h1>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-4 col-md-push-6">
-                    <img width="100%" src="static/assets/images/homepage/astronaut.svg" />
-                </div>
-                <div class="col-md-6 col-md-pull-4">
                     <h1>Keep track of your goals</h1>
+                    <p class="lead">Gitboard communicates directly with the Github API without using a third-party. You access credentials therefore stay on your computer. Gitboard does not store any user information or passwords in plaintext and will erase all data from your browser after you log out.</p>
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-4">
-                    <img width="100%" src="static/assets/images/homepage/monitor.svg" />
+                <div class="col-md-6 col-md-push-6 diagram">
+                    <img src="static/assets/images/homepage/astronaut.svg" />
+                </div>
+                <div class="col-md-6 col-md-pull-6">
+                    <h1>Built with modern technologies</h1>
+                    <p class="lead">Gitboard is built with <strong>React.js</strong>, <strong>Bootstrap 3</strong> and <strong>SASS</strong> and <a href="https://fezvrasta.github.io/bootstrap-material-design/">Material Design for Bootstrap</a>.</p>
+                    <p class="lead">
+                    It uses a simple, <strong>resource-based</strong> data synchronization scheme and tries to keep complexity to a minimum. Feel free to use Gitboard as inspiration for your own React.js-based projects.
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 diagram">
+                    <img src="static/assets/images/homepage/mouse.svg" />
                 </div>
                 <div class="col-md-6">
-                <h1>Keep track of your goals</h1>
+                    <h1>Open-source license</h1>
+                    <p class="lead">Gitboard is licensed under the <strong>Affero General Public License (AGPL)</strong>. This means that you can adapt it to your needs and freely publish your own version as long as you respect the terms of the license and make your improvements available to the community.</p>
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-4 col-md-push-6">
-                    <img width="100%" src="static/assets/images/homepage/letter.svg" />
+                <div class="col-md-6 col-md-push-6 diagram">
+                    <img src="static/assets/images/homepage/shield.svg" />
                 </div>
-                <div class="col-md-6 col-md-pull-4">
-                <h1>Keep track of your goals</h1>
+                <div class="col-md-6 col-md-pull-6">
+                <h1>Secure and transparent</h1>
+                <p class="lead">Gitboard communicates directly with the Github API without using an intermediate server. This means that your Github access credentials stay on your computer all the time.</p>
+                <p class="lead">
+                Gitboard will never store your username or password in plaintext and only use them to create an access token. The access token will be held securely in the session storage or local storage of your browser.
+                </p>
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-4">
-                    <img width="100%" src="static/assets/images/homepage/shield.svg" />
+                <div class="col-md-6 diagram">
+                    <img src="static/assets/images/homepage/letter.svg" />
                 </div>
                 <div class="col-md-6">
-                <h1>Keep track of your goals</h1>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-4 col-md-push-6">
-                    <img width="100%" src="static/assets/images/homepage/card.svg" />
-                </div>
-                <div class="col-md-6 col-md-pull-4">
-                <h1>Keep track of your goals</h1>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-4">
-                    <img width="100%" src="static/assets/images/homepage/mouse.svg" />
-                </div>
-                <div class="col-md-6">
-                <h1>Keep track of your goals</h1>
+                <h1>Questions? Get in touch!</h1>
+                <p class="lead">
+                If you have questions about Gitboard or if you experience problems using it, please <a href="https://github.com/adewes/gitboard/issues">open an issue</a>. You can also get in touch with me <a href="mailto:andreas.dewes@7scientists.com">via e-mail</a>.
+                </p>
+                <p class="lead">
+                Contributions and feedback are highly welcome! When contributing to the code, please make sure to check out the <a href="https://github.com/adewes/gitboard">README</a> first.
+                </p>
                 </div>
             </div>
           </div>
       </section>
-
-      <section id="features">
-          <div class="narrow-container container">
-            <div class="row">
-                <div class="col-md-12">
-                    <h1><a name="faq">Questions &amp; Answers</a></h1>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="panel panel-info">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Is Gitboard commercial?</h3>
-                        </div>
-                        <div class="panel-body">
-                            <p>No! Gitboard is <strong>open-source software</strong> and licensed under a <strong>Affero General Public License</strong>. That means you can download, modify and republish Gitboard without charge, as long as you conform to the requirements of the license.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="panel panel-info">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Does Gitboard require a server to run on?</h3>
-                        </div>
-                        <div class="panel-body">
-                            <p>No! Gitboard is a <strong>single-page application</strong> that runs entirely in your browser. All communication with the Github API is done directly, without use of a third-party server.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="panel panel-info">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Is Gitboard secure?</h3>
-                        </div>
-                        <div class="panel-body">
-                            <p>Yes! Gitboard communicates directly with the Github API without using a third-party. You access credentials therefore stay on your computer. Gitboard does not store any user information or passwords in plaintext and will erase all data from your browser after you log out.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="panel panel-info">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">How can I contribute to Github?</h3>
-                        </div>
-                        <div class="panel-body">
-                            <p>As Gitboard is open-source, contributions are highly welcome! Our <a href="https://github.com/adewes/gitboard">Github page</a> contains all the information you need to get started. If you get stuck, feel free to send us an e-mail (see Github).
-                            </p>
-                            <p>
-                            <a class="btn btn-primary btn-lg btn-info" href="https://github.com/adewes/gitboard" role="button">Fork on <i class="octicon octicon-mark-github"></i></a>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="panel panel-info">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Which technologies is Gitboard built with?</h3>
-                        </div>
-                        <div class="panel-body">
-                            <p>Gitboard is built with React.js, Bootstrap (+Material Design) and various JS libraries such as jQuery, Moments.js and Marked.js. It uses SASS for CSS, Bower for dependency management and Make for building.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="panel panel-info">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">How can I contribute to Github?</h3>
-                        </div>
-                        <div class="panel-body">
-                            <p>As Gitboard is open-source, contributions are highly welcome! Our <a href="https://github.com/adewes/gitboard">Github page</a> contains all the information you need to get started. If you get stuck, feel free to send us an e-mail (see Github).</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-          </div>
-          </div>
-      </section>
-
 
       <footer class="footer navbar-fixed-bottom">
         <div class="container">
@@ -217,6 +145,8 @@
           </div>
         </div>
       </footer>
+
+      <a href="https://github.com/adewes/gitboard"><img class="github-ribbon" src="static/assets/images/github_ribbon.png" alt="Fork me on GitHub"></a>
 
       <!--Google Analytics Tracking - feel free to remove this if you self-host your version-->
       <script>
