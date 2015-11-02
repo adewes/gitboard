@@ -524,6 +524,7 @@ define(["react",
                                                   onResourceChange : this.reloadResources,
                                                   onImmediateChange : this.updateView});
             this.processIssues(data.allIssues);
+            this.setState({refreshing : false});
             return data;
         },
 
@@ -700,10 +701,16 @@ define(["react",
             if (totalTimes.spent)
                 estimates.push(<span key="spent" className="time-spent">{this.issueManager.formatMinutes(totalTimes.spent)}</span>);
 
+            var reload = function(e){
+                e.preventDefault();
+                this.setState({refreshing : true});
+                this.reloadResources();
+            }.bind(this);
+
             return <div className="container sprintboard">
                 <div className="row">
                     <div className="col-md-12">
-                        <h3><A href={Utils.makeUrl('/milestones/'+this.props.data.repositoryId)}>{data.repository.name}</A> {milestoneTitle}</h3>
+                        <h3><A href={Utils.makeUrl('/milestones/'+this.props.data.repositoryId)}>{data.repository.name}</A> {milestoneTitle} <A onClick={reload} href="#" className="pull-right" title="refresh issues"><i className={"fa fa-refresh"+(this.state.refreshing ? ' fa-spin' : '')} /></A></h3>
                         <p>
                             {due}
                             &nbsp; {estimates}
