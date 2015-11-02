@@ -1,5 +1,5 @@
 {
   "name": "react",
-  "main": "react.js",
+  "main": ["react.js", "react-dom.js"],
   "ignore": []
 }

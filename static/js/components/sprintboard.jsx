@@ -32,11 +32,21 @@ define(["react",
         "js/components/mixins/github_error_handler",
         "js/components/generic/modal",
         "js/flash_messages",
+        "js/helpers/issue_manager",
         "jquery",
         "marked",
         "moment"
         ],
-        function (React,Utils,LoaderMixin,GithubErrorHandlerMixin,Modal,FlashMessagesService,$,Marked,Moment) {
+        function (React,
+                  Utils,
+                  LoaderMixin,
+                  GithubErrorHandlerMixin,
+                  Modal,
+                  FlashMessagesService,
+                  IssueManager,
+                  $,
+                  Marked,
+                  Moment) {
         'use'+' strict';
 
         Marked.setOptions({
@@ -61,10 +71,10 @@ define(["react",
         var Dropdown = React.createClass({
 
             render :function(){
-                var lis = React.Children.map(this.props.children,function(child){
+                var lis = React.Children.map(this.props.children,function(child,i){
                     if (child == undefined)
-                        return <li role="separator" className="divider" />;
-                    return <li>{child}</li>;
+                        return <li role="separator" className="divider" key={i} />;
+                    return <li key={i}>{child}</li>;
                 });
                 if (this.props.disabled)
                     return <div className="btn-group">
@@ -72,7 +82,7 @@ define(["react",
                 </div>
                 else
                 return <div className="btn-group">
-                    <A onClick={this.props.onClick} href="#" className="btn btn-xs btn-default dropdown-toggle" data-target="#" data-toggle="dropdown">{this.props.title}&nbsp;<i className="fa fa-caret-down" /></A>
+                    <A key="dropdown-link" onClick={this.props.onClick} href="#" className="btn btn-xs btn-default dropdown-toggle" data-target="#" data-toggle="dropdown">{this.props.title}&nbsp;<i key="caret-down" className="fa fa-caret-down" /></A>
                     <ul className="dropdown-menu">
                         {lis}
                     </ul>
@@ -98,12 +108,25 @@ define(["react",
                     '40h' : '5 days',
                     '80h' : '10 days'
                 };
+
+                var setTime = function(time,event){
+                    event.preventDefault();
+                    this.props.issueManager.setTime(this.props.issue,time,this.props.type);
+                }.bind(this);
+
+
                 var timeLinks = Object.keys(choices).map(function(key){
                     var title = choices[key];
-                    return <A href="#">{title}</A>;
+                    return <A key={key} href="#" onClick={setTime.bind(this,key)}>{title}</A>;
                 });
 
-                var title = <span className={"time-"+this.props.type}>n/a</span>
+                timeLinks.push(undefined);
+                timeLinks.push(<A href="#" onClick={setTime.bind(this,undefined)}>remove time</A>);
+                var minutes = this.props.issue["time"+(this.props.type == 'estimate' ? 'Estimate' : 'Spent')];
+                var minutesStr = 'n/a';
+                if (minutes)
+                    minutesStr = this.props.issueManager.formatMinutes(minutes)
+                var title = <span key="main-title" className={"time-"+this.props.type}>{minutesStr}</span>
 
                 return <Dropdown disabled={!Utils.isLoggedIn()} onClick={this.props.onClick} title={title}>
                     {timeLinks}
@@ -112,20 +135,30 @@ define(["react",
         });
 
         var CategorySelector = React.createClass({
-            render : function(){
-                var choices = {
-                    'todo' : 'To Do',
-                    'doing' : 'Doing',
-                    'awaiting-review' : 'Awaiting Review',
-                    'done' : 'Done'
-                };
-                var timeLinks = Object.keys(choices).map(function(key){
-                    var title = choices[key];
-                    return <A href="#">{title}</A>;
-                });
 
-                return <Dropdown disabled={!Utils.isLoggedIn()} onClick={this.props.onClick} title="To Do">
-                    {timeLinks}
+            render : function(){
+
+                var categoryData = this.props.issueManager.issueCategories;
+
+                var setCategory = function(category,event){
+                    event.preventDefault();
+                    this.props.issueManager.moveTo(this.props.issue,category);
+                }.bind(this);
+
+                var category = Object.keys(categoryData)[0];
+                for (var cat in categoryData){
+                    if (this.props.issueManager.isMemberOf(this.props.issue,cat)){
+                        category = cat;
+                        break;
+                    }
+                }
+
+                var categoryLinks = Object.keys(categoryData).map(function(key){
+                    var params = categoryData[key];
+                    return <A key={key} href="#" onClick={setCategory.bind(this,key)}>{params.title}</A>;
+                });
+                return <Dropdown disabled={!Utils.isLoggedIn()} onClick={this.props.onClick} title={categoryData[category].title}>
+                    {categoryLinks}
                 </Dropdown>;
             }
         });
@@ -138,12 +171,12 @@ define(["react",
 
                 var setMilestone = function(milestone,event){
                     event.preventDefault();
-                    this.props.setMilestone(milestone);
+                    this.props.issueManager.setMilestone(this.props.issue,milestone);
                 }.bind(this);
 
                 if (this.props.milestones){
                     var milestoneLinks = this.props.milestones.map(function(milestone){
-                        return <A href="#" onClick={setMilestone.bind(this,milestone)}>{milestone.title}</A>
+                        return <A key={milestone.number} href="#" onClick={setMilestone.bind(this,milestone)}>{milestone.title}</A>
                     }.bind(this));
                     milestoneLinks.push(undefined);
                     milestoneLinks.push(<A href="#" onClick={setMilestone.bind(this,null)}> <i className="fa fa-trash" />&nbsp;&nbsp;remove milestone</A>);
@@ -162,7 +195,7 @@ define(["react",
 
                 var assignTo = function(collaborator,event){
                     event.preventDefault();
-                    this.props.assignTo(collaborator);
+                    this.props.issueManager.assignTo(this.props.issue,collaborator);
                 }.bind(this);
 
                 var userHtml = function(user){
@@ -172,13 +205,13 @@ define(["react",
                 var dropdownContent;
                 if (this.props.collaborators){
                     var collaboratorLinks = this.props.collaborators.map(function(collaborator){
-                        return <A href="#" onClick={assignTo.bind(this,collaborator)}>{userHtml(collaborator)}</A>
+                        return <A key={collaborator.id} href="#" onClick={assignTo.bind(this,collaborator)}>{userHtml(collaborator)}</A>
                     }.bind(this));
                     collaboratorLinks.push(undefined);
-                    collaboratorLinks.push(<A href="#" onClick={assignTo.bind(this,null)}> <i className="fa fa-trash" />&nbsp;&nbsp;remove assignee</A>);
+                    collaboratorLinks.push(<A key={0} href="#" onClick={assignTo.bind(this,null)}> <i className="fa fa-trash" />&nbsp;&nbsp;remove assignee</A>);
                     dropdownContent = collaboratorLinks;
                 }
-                return <Dropdown disabled={!Utils.isLoggedIn()} onClick={this.props.onClick} title={[(this.props.issue.assignee ? userHtml(this.props.issue.assignee) : ' no one assigned')]}>
+                return <Dropdown disabled={!Utils.isLoggedIn()} onClick={this.props.onClick} title={(this.props.issue.assignee ? userHtml(this.props.issue.assignee) : ' no one assigned')}>
                     {dropdownContent}
                 </Dropdown>;
             }
@@ -188,7 +221,7 @@ define(["react",
             render : function(){
                 var issue = this.props.issue;
                 var labels = issue.labels.map(function(label){
-                    return <span className="issue-label" style={{borderBottom:'3px solid '+'#'+label.color}}>{label.name}</span>
+                    return <span key={label.name} className="issue-label" style={{borderBottom:'3px solid '+'#'+label.color}}>{label.name}</span>
                 });
                 return <div>
                     <span className="pull-right"><A target="_blank" href={issue.html_url}>#{issue.number}</A></span>
@@ -212,40 +245,28 @@ define(["react",
                 var markdown = <p>(no description given)</p>;
                 var assignee;
 
-                var assignTo = function(collaborator){
-                    issue.assignee = collaborator;
-                    this.forceUpdate();
-                    this.apis.issue.updateIssue(this.props.data.repositoryId,
-                                                issue.number,
-                                                {assignee : collaborator ? collaborator.login : null},
-                                                this.props.onChange,
-                                                this.props.onChange);
-                }.bind(this);
-
-                var setMilestone = function(milestone){
-                    issue.milestone = milestone;
-                    this.forceUpdate();
-                    this.apis.issue.updateIssue(this.props.data.repositoryId,
-                                                issue.number,
-                                                {milestone : milestone ? milestone.number : null},
-                                                this.props.onChange,
-                                                this.props.onChange);
-                }.bind(this);
-
                 if (issue.assignee !== null)
                     assignee = [<img width="16" height="16" src={issue.assignee.avatar_url+'&s=16'} />,<span className="label">{issue.assignee.login}</span>];
                 var selectors;
                 if (Utils.isLoggedIn() || true){
                     selectors = <div className="btn-group btn-group">
                         <AssigneeSelector issue={issue}
-                                          assignTo={assignTo}
                                           onClick={this.props.onContentChange}
+                                          issueManager={this.props.issueManager}
                                           collaborators={this.props.collaborators}/>
-                        <TimeSelector type="estimate" issue={issue} onClick={this.props.onContentChange}/>
-                        <TimeSelector type="spent" issue={issue} onClick={this.props.onContentChange} />
-                        <CategorySelector issue={issue} onClick={this.props.onContentChange} />
+                        <TimeSelector type="estimate"
+                                      issueManager={this.props.issueManager}
+                                      issue={issue}
+                                      onClick={this.props.onContentChange}/>
+                        <TimeSelector type="spent"
+                                      issue={issue}
+                                      issueManager={this.props.issueManager}
+                                      onClick={this.props.onContentChange} />
+                        <CategorySelector issue={issue}
+                                          issueManager={this.props.issueManager}
+                                          onClick={this.props.onContentChange} />
                         <MilestoneSelector issue={issue}
-                                           setMilestone={setMilestone}
+                                           issueManager={this.props.issueManager}
                                            milestones={this.props.milestones}
                                            onClick={this.props.onContentChange} />
                     </div>;
@@ -283,18 +304,28 @@ define(["react",
         },
 
         closeModal : function(e){
+            Utils.redirectTo(Utils.makeUrl(this.props.baseUrl,{},this.props.params,['issueId']));
             this.refs.issueDetails.close();
             this.setState({showDetails : false});
         },
 
         getInitialState : function(){
-            return {showDetails : false};
+            return {showDetails : this.props.showDetails || false};
         },
 
         componentDidUpdate : function(prevProps,prevState){
             if (this.state.showDetails){
                 this.refs.issueDetails.open();
             }
+        },
+
+        componentDidMount : function(){
+            if (this.state.showDetails)
+                this.refs.issueDetails.open();
+        },
+
+        componentWillReceiveProps : function(props){
+            this.setState({showDetails : props.showDetails});
         },
 
         onDragStart: function(e){
@@ -325,7 +356,7 @@ define(["react",
                     var maxHeight = $(window).height(); 
                     var element = $('.modal-body');
                     element.css({overflow:'auto',
-                                 height:Math.min(maxHeight-100,element[0].scrollHeight+50)+'px'});
+                                 height:Math.min(maxHeight-100,element[0].scrollHeight+0)+'px'});
                 }.bind(this)
                 modal = <Modal
                     ref="issueDetails"
@@ -337,7 +368,8 @@ define(["react",
                         <div className="modal-body">
                             <IssueDetails issue={issue}
                                           onContentChange={resize}
-                                          onChange={this.props.onChange}
+                                          key={issue.number}
+                                          issueManager={this.props.issueManager}
                                           collaborators={this.props.collaborators}
                                           milestones={this.props.milestones}
                                           data={this.props.data}/>
@@ -347,12 +379,18 @@ define(["react",
                         </div>
                   </Modal>
             }
+            var times =[];
+            if (issue.timeEstimate)
+                times.push(<span className="time-estimate">{this.props.issueManager.formatMinutes(issue.timeEstimate)}</span>);
+            if (issue.timeSpent)
+                times.push(<span className="time-spent">{this.props.issueManager.formatMinutes(issue.timeSpent)}</span>);
+
             return <div className={"panel panel-primary issue-item"+(issue.dragged ? " dragged" : "")}
                         onDragStart={this.onDragStart}
                         onDragEnd={this.onDragEnd}
                         draggable={true}>
               {modal}                 
-              <A href="#" onClick={this.showIssueDetails}>
+              <A href={Utils.makeUrl(this.props.baseUrl,{issueId : issue.number},this.props.params)}>
                 <div className="panel-heading">
                     {labelInfo} <p className="right-symbols"><span className="assignee">{assigneeInfo}</span></p>
                 </div>
@@ -360,7 +398,7 @@ define(["react",
                     <h5>{issue.title}</h5>
                 </div>
                 <div className="panel-footer">
-                    <span className="time-estimate">5h</span> <span className="time-spent">7h</span>
+                    {times} &nbsp;
                 </div>
                 </A>
             </div>;
@@ -374,7 +412,8 @@ define(["react",
         },
 
         onDragLeave : function(e){
-            this.props.dragLeave();
+            if (this.props.dragLeave)
+                this.props.dragLeave();
         },
 
         render : function(){
@@ -390,137 +429,6 @@ define(["react",
 
         displayName: 'SprintBoard',
         mixins : [LoaderMixin,GithubErrorHandlerMixin],
-
-        categoryData : function(){
-
-            var hasLabel = function(issue,label){
-                for (var i in issue.labels){
-                    var issueLabel = issue.labels[i];
-                    if (label.toLowerCase() == issueLabel.name.toLowerCase())
-                        return true;
-                }
-                return false;
-            }
-
-            var setImmediateState = function(issue,state){
-                if (issue.state != state)
-                    issue.state = state;
-            }
-
-            var onError = function(xhr){
-                FlashMessagesService.postMessage({
-                    type : "danger",
-                    description : "An error occurred when trying to update the issue. Please try again..."
-                });
-                this.reloadResources();
-            }.bind(this);
-
-            var setState = function(issue,state,onSuccess){
-                this.apis.issue.updateIssue(this.props.data.repositoryId,issue.number,{state : state},onSuccess,onError);
-            }.bind(this);
-
-            var categoryLabels = ['doing','to-do','todo','awaiting-review','done'];
-
-            var setImmediateLabel = function(issue,label){
-                if (Array.isArray(label)){
-                    var labels = label;
-                }else{
-                    var labels = [label];
-                }
-                var found = false;
-                for (var i in labels){
-                    var l = labels[i];
-                    if (hasLabel(issue,l)){
-                        found = true;
-                        break;
-                    }
-                }
-                var labelsToRemove = [];
-                var labelsToAdd = [];
-                if (!found){
-                    labelsToAdd.push(labels[0]);
-                    if (!issue.labels)
-                        issue.labels = [];
-                    var newLabel = this.state.data.labelsByName[labels[0]] || {name : labels[0]};
-                    issue.labels.push(newLabel);
-                }
-                labelsToRemove = issue.labels.filter(function(label){
-                                    return (label.name != labels[0]
-                                           && categoryLabels.indexOf(label.name) != -1) ?
-                                           true : false;})
-                                 .map(function(label){return label.name;});
-                issue.labels = issue.labels.filter(function(label){
-                    return (labelsToRemove.indexOf(label.name) == -1) ? true: false})
-                return [labelsToAdd,labelsToRemove];
-            }.bind(this)
-
-            var setLabel = function(issue,labelsToAdd,labelsToRemove,onSuccess){
-                var removeCallback = function(){
-                    this.reloadResources();
-                    if (onSuccess)
-                        onSuccess();
-                }.bind(this);
-                if (labelsToRemove.length)
-                    for(var i in labelsToRemove){
-                        removeCallback = function(oldCallback){
-                            this.apis.label.removeLabel(this.props.data.repositoryId,issue.number,labelsToRemove[i],oldCallback,onError);
-                        }.bind(this,removeCallback);
-                    }
-                if (labelsToAdd.length)
-                    this.apis.label.addLabels(this.props.data.repositoryId,issue.number,labelsToAdd,removeCallback,onError);
-                else
-                    removeCallback();
-            }.bind(this);
-
-            return {
-                toDo : {
-                    title : 'To Do',
-                    isMemberOf : function(issue){
-                        return (hasLabel(issue,'to-do') || hasLabel(issue,'todo')) && issue.state == 'open';
-                    },
-                    moveTo : function(issue){
-                        setImmediateState(issue,'open');
-                        var labelsToModify = setImmediateLabel(issue,['to-do','todo']);
-                        setState(issue,'open',function(){setLabel(issue,labelsToModify[0],labelsToModify[1]);});
-                    }.bind(this)
-                },
-                doing : {
-                    title : 'Doing',
-                    isMemberOf : function(issue){
-                        return hasLabel(issue,'doing') && issue.state == 'open';
-                    },
-                    moveTo : function(issue){
-                        setImmediateState(issue,'open');
-                        var labelsToModify = setImmediateLabel(issue,['doing']);
-                        setState(issue,'open',function(){setLabel(issue,labelsToModify[0],labelsToModify[1]);});
-                        this.forceUpdate();
-                    }.bind(this)
-                },
-                awaitingReview : {
-                    title : 'Awaiting Review',
-                    moveTo : function(issue){
-                        setImmediateState(issue,'open');
-                        var labelsToModify = setImmediateLabel(issue,['done','awaiting-review']);
-                        setState(issue,'open',function(){setLabel(issue,labelsToModify[0],labelsToModify[1]);});
-                    }.bind(this),
-                    isMemberOf : function(issue){
-                        return (hasLabel(issue,'done') || hasLabel(issue,'awaiting-review')) && issue.state == 'open';
-                    }
-                },
-                done : {
-                    title : 'Done',
-                    isMemberOf : function(issue){
-                        return issue.state == 'closed';
-                    }.bind(this),
-                    moveTo : function(issue){
-                        setImmediateState(issue,'closed');
-                        var labelsToModify = setImmediateLabel(issue,['done']);
-                        setState(issue,'closed',function(){setLabel(issue,labelsToModify[0],labelsToModify[1]);});
-                        this.forceUpdate();
-                    }.bind(this)
-                },
-            }
-        },
 
         resources : function(props,state){
             var convertToArray = function(data){
@@ -611,7 +519,26 @@ define(["react",
             for(var i in data.labels){
                 data.labelsByName[data.labels[i].name] = data.labels[i];
             }
+            this.issueManager = new IssueManager({repositoryId : this.props.data.repositoryId,
+                                                  labelsByName : data.labelsByName,
+                                                  onResourceChange : this.reloadResources,
+                                                  onImmediateChange : this.updateView});
+            this.processIssues(data.allIssues);
+            this.setState({refreshing : false});
             return data;
+        },
+
+        processIssues : function(issues){
+            for(var i in issues){
+                var issue = issues[i];
+                issue.timeSpent = this.issueManager.getMinutes(this.issueManager.getTime(issue,'spent'));
+                issue.timeEstimate = this.issueManager.getMinutes(this.issueManager.getTime(issue,'estimate'));
+            }
+        },
+
+        updateView : function(){
+            this.processIssues(this.state.data.allIssues);
+            this.forceUpdate();
         },
 
         getInitialState : function(){
@@ -623,8 +550,14 @@ define(["react",
             this.setState({draggedIssue : issue});
         },
 
+        moveTo : function(issue,category){
+            if (this.issueManager.issueCategories[category]){
+                this.issueManager.moveTo(issue,category,this.reloadResources,this.onIssueError);
+            }
+        },
+
         dragEnd : function(issue){
-            this.moveIssue(issue,this.state.dropZone);
+            this.moveTo(issue,this.state.dropZone);
             this.state.draggedIssue.dragged = false;
             this.setState({dropZone : undefined,draggedIssue : undefined});
         },
@@ -633,54 +566,81 @@ define(["react",
             this.setState({dropZone : list})
         },
 
-        dragLeave : function(list){
+        onIssueError : function(xhr){
+            FlashMessagesService.postMessage({
+                type : "danger",
+                description : "An error occurred when trying to update the issue. Please try again..."
+            });
+            this.reloadResources();
         },
 
         categorizeIssues : function(issues,draggedIssue,dropZone){
-            var categoryData = this.categoryData();
+            var categoryData = this.issueManager.issueCategories;
             var categories = {};
             for(var category in categoryData)
                 categories[category] = [];
             for (var i in issues){
                 var issue = issues[i];
-                var category = 'toDo';
+                var category = 'toDo';//the default category
                 for (var cat in categoryData){
-                    if (categoryData[cat].isMemberOf(issue)){
+                    if (this.issueManager.isMemberOf(issue,cat)){
                         category = cat;
                         break;
                     }
                 }
                 categories[category].push(issue);
             }
-            if (draggedIssue && dropZone && !Utils.contains(categories[dropZone],draggedIssue)){
-                categories[dropZone].push(draggedIssue);
+            if (draggedIssue && dropZone && !this.issueManager.isMemberOf(issue,dropZone)){
+                issueCopy = $.extend(true,{},draggedIssue);
+                issueCopy.placeholder = true;
+                issueCopy.number = 9999999999;
+                categories[dropZone].push(issueCopy);
             }
             return categories;
-        },
-
-        moveIssue : function(issue,to){
-            var categoryData = this.categoryData();
-            if (categoryData[to] !== undefined)
-                categoryData[to].moveTo(issue,this.state.dropZone);
         },
 
         render: function () {
             var data = this.state.data;
             var categorizedIssues = this.categorizeIssues(data.allIssues,this.state.draggedIssue,this.state.dropZone);
             var issueItems = {};
+            var times = {};
 
-            var reloadResources = function(){
-                this.reloadResources();
-            }.bind(this);
+            var getMinutes = function(timeString){
 
+            };
+
+            var formatMinutes = function(minutes){
+
+            };
+
+            var totalTimes = {estimate : 0,spent : 0};
+
+            var categoryData = this.issueManager.issueCategories;
             for (var category in categorizedIssues){
                 var issues = categorizedIssues[category];
+                times[category] = {estimate : 0,spent : 0};
+                for(var i in issues){
+                    var issue = issues[i];
+                    if (issue.placeholder)
+                        continue;
+                    if (issue.timeEstimate){
+                        times[category].estimate+=issue.timeEstimate;
+                        totalTimes.estimate+=issue.timeEstimate;
+                    }
+                    if (issue.timeSpent){
+                        times[category].spent+=issue.timeSpent;
+                        totalTimes.spent+=issue.timeSpent;
+                    }
+                }
                 issueItems[category] = issues.sort(function(issueA,issueB){return (new Date(issueA.created_at))-(new Date(issueB.created_at));}).map(function(issue){
                     return <IssueItem data={this.props.data}
                                       key={issue.number}
-                                      onChange={reloadResources}
                                       issue={issue}
+                                      baseUrl={this.props.baseUrl}
+                                      params={this.props.params}
+                                      showDetails={this.props.params.issueId && this.props.params.issueId == issue.number ? true : false}
                                       collaborators={data.collaborators}
+                                      issueManager={this.issueManager}
                                       milestones={data.milestones}
                                       dragStart={this.dragStart}
                                       dragged={issue.id == (this.state.draggedIssue && this.state.draggedIssue.id == issue.id ? true : false)}
@@ -712,34 +672,48 @@ define(["react",
 
             }
 
-            var categoryData = this.categoryData();
 
             var addIssue = function(category,event){
                 event.preventDefault();
             }.bind(this);
 
-            var issueLists = Object.keys(categoryData).map(function(category){
+            var issueLists = Object.keys(this.issueManager.issueCategories).map(function(category){
+                var estimates = [];
+                if (times[category].estimate)
+                    estimates.push(<span className="time-estimate">{this.issueManager.formatMinutes(times[category].estimate)}</span>)
+                if (times[category].spent)
+                    estimates.push(<span className="time-spent">{this.issueManager.formatMinutes(times[category].spent)}</span>);
                 return <IssueList key={category}
                             addIssue={addIssue.bind(this,category)}
-                            onChange={reloadResources}
                             dragEnd={this.dragEnd.bind(this,category)}
                             dragEnter={this.dragEnter.bind(this,category)}
-                            dragLeave={this.dragLeave.bind(this,category)}
                             name={category}
                             active={this.state.dropZone == category ? true : false}>
-                        <h4>{categoryData[category].title}</h4>
-                        <p className="estimates"><span className="time-estimate">5h</span><span className="time-spent">7h</span></p>
+                        <h4>{this.issueManager.issueCategories[category].title}</h4>
+                        <p className="estimates">{estimates}&nbsp;</p>
                         {issueItems[category]}
                     </IssueList>
             }.bind(this))
 
+            var estimates = [];
+            if (totalTimes.estimate)
+                estimates.push(<span key="estimate" className="time-estimate">{this.issueManager.formatMinutes(totalTimes.estimate)}</span>);
+            if (totalTimes.spent)
+                estimates.push(<span key="spent" className="time-spent">{this.issueManager.formatMinutes(totalTimes.spent)}</span>);
+
+            var reload = function(e){
+                e.preventDefault();
+                this.setState({refreshing : true});
+                this.reloadResources();
+            }.bind(this);
+
             return <div className="container sprintboard">
                 <div className="row">
                     <div className="col-md-12">
-                        <h3><A href={Utils.makeUrl('/milestones/'+this.props.data.repositoryId)}>{data.repository.name}</A> {milestoneTitle}</h3>
+                        <h3><A href={Utils.makeUrl('/milestones/'+this.props.data.repositoryId)}>{data.repository.name}</A> {milestoneTitle} <A onClick={reload} href="#" className="pull-right refresh-link" title="refresh issues"><i className={"fa fa-refresh"+(this.state.refreshing ? ' fa-spin' : '')} /></A></h3>
                         <p>
                             {due}
-                            &nbsp; <span className="time-estimate">23h</span> <span className="time-spent">11h</span>
+                            &nbsp; {estimates}
                         </p>
                         {milestoneDescription}
                     </div>

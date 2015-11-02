@@ -101,6 +101,7 @@ static/js/components/app.js
 static/bower_components/bootstrap/dist/js/bootstrap.js
 static/js/components/generic/modal.js
 static/js/components/mixins/github_error_handler.js
+static/js/helpers/issue_manager.js
 static/bower_components/marked/lib/marked.js
 static/bower_components/momentjs/moment.js
 static/js/components/sprintboard.js
