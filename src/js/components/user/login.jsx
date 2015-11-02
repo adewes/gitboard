@@ -129,6 +129,9 @@ define(["js/settings",
                                id="accessToken" 
                                className="form-control" 
                                placeholder="Github Access Token" autofocus />
+                        <div className="form-control">
+                            <label htmlFor="remember_me"><input type="checkbox" checked={this.state.rememberMe == '1' ? true : false} value="1" onChange={function(e){e.target.checked ? this.setState({rememberMe : true}) : this.setState({rememberMe : false});}.bind(this)} id="remember_me" /> Remember me</label>
+                        </div>
                         <button id="login-button" className="btn btn-success" type="submit"><span className="text">Log in</span> <span className="trigger"></span></button>
                     </fieldset>
                     <hr />
@@ -179,9 +182,7 @@ define(["js/settings",
 
             }.bind(this);
 
-            console.log(formData.accessToken);
-
-            Utils.login(formData.accessToken)
+            Utils.login(formData.accessToken,this.state.rememberMe)
             this.userApi.getProfile(onSuccess,onError);
 
         },
@@ -227,7 +228,6 @@ define(["js/settings",
         render: function () {
             var params = Utils.makeUrlParameters(this.props.params);
             var spacerWidth = this.state.spacerWidth ? 'large' : 'thin';
-
             return <form className="form-horizontal" 
                  onSubmit={this.handleSubmit} 
                  roleName="form">
@@ -243,6 +243,9 @@ define(["js/settings",
                         <input type="password" onChange={this.setter('password')} id="password" className="form-control" placeholder="Password" />
                         {this.formatFieldError('otp')}
                         <input type="login" onChange={this.setter('otp')} id="otp" className="form-control" placeholder="One-Time-Password (if required)" />
+                        <div className="form-control">
+                            <label htmlFor="remember_me"><input type="checkbox" checked={this.state.rememberMe == '1' ? true : false} value="1" onChange={function(e){e.target.checked ? this.setState({rememberMe : true}) : this.setState({rememberMe : false});}.bind(this)} id="remember_me" /> Remember me</label>
+                        </div>
                         <button id="login-button" className="btn btn-success" type="submit"><span className="text">Log in</span> <span className="trigger"></span></button>
                     </fieldset>
                     <hr />
@@ -288,8 +291,7 @@ define(["js/settings",
             }.bind(this);
 
             var onSuccess = function(data){
-                Utils.login(data.token);
-                Utils.localStore("authorizationId",data.id);
+                Utils.login(data.token,this.state.rememberMe);
                 Utils.redirectTo(Utils.makeUrl("/"));
             }.bind(this);
 

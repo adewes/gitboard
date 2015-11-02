@@ -121,8 +121,11 @@ define(["js/settings",
             return baseUrl;
         },
 
-        accessToken: function(value){
-            return this.sessionStore("accessToken",value);
+        accessToken: function(){
+            var accessToken = this.sessionStore("accessToken");
+            if (accessToken === undefined)
+                accessToken = this.localStore("accessToken");
+            return accessToken
         },
 
         redirectTo:function(url){
@@ -419,14 +422,19 @@ define(["js/settings",
         },
 
         logout : function(){
-            var authorizationId = this.sessionStore('authorizationId');
             sessionStorage.clear();
+            localStorage.clear();
         },
 
-        login : function(accessToken) {
+        login : function(accessToken,rememberMe) {
+            var store;
+            if (rememberMe)
+                store = this.localStore.bind(this);
+            else
+                store = this.sessionStore.bind(this);
             //we clear the local storage to make sure no information about other users is present
             sessionStorage.clear();
-            this.sessionStore("accessToken",accessToken);
+            store("accessToken",accessToken);
         },
 
         isLoggedIn : function(){
