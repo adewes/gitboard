@@ -1,5 +1,5 @@
 {
-  "name": "qc-react",
+  "name": "gitboard",
   "version": "0.0.1",
   "dependencies": {
     "director": "1.2.2",
