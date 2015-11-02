@@ -4,6 +4,8 @@ Gitboard is an intuitive Kanban board for your Github issues. It runs securely i
 and does not need an intermediate server. It is built using React.js, Bootstrap + Material Design,
 SASS and Require.js.
 
+[https://adewes.github.io/gitboard](Go to Live Version)
+
 ##License
 
 Gitboard is released under a *Affero General Public License (AGPL)*.
