@@ -24,6 +24,15 @@ a {color:#006; font-weight:bolder;}
 a:hover,a:active {color: #008; text-decoration:none;}
 a:visited {color:#006;}
 
+@media (max-width:768px){
+    footer{
+        margin-top:20px;
+    }
+    .navbar-fixed-bottom{
+        position:relative;
+    }
+}
+
 @media (min-width: 1000px) {
   .narrow-container {
     width: 970px;
